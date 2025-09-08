@@ -6,75 +6,71 @@ from datetime import datetime, timezone
 from typing import Any
 
 import logging
-_LOGGER = logging.getLogger(__name__)
 
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
-    KEY_PHASE,
     KEY_AZ,
-    KEY_EL,
-    KEY_ILLUM,
     KEY_DISTANCE,
-    KEY_PARALLAX,
-    KEY_ECLIPTIC_LON_TOPO,
+    KEY_ECLIPTIC_LAT_GEO,
+    KEY_ECLIPTIC_LAT_NEXT_FULL,
+    KEY_ECLIPTIC_LAT_NEXT_NEW,
     KEY_ECLIPTIC_LAT_TOPO,
     KEY_ECLIPTIC_LON_GEO,
-    KEY_ECLIPTIC_LAT_GEO,
     KEY_ECLIPTIC_LON_NEXT_FULL,
-    KEY_ECLIPTIC_LAT_NEXT_FULL,
     KEY_ECLIPTIC_LON_NEXT_NEW,
-    KEY_ECLIPTIC_LAT_NEXT_NEW,
-    KEY_NEXT_RISE,
-    KEY_NEXT_SET,
+    KEY_ECLIPTIC_LON_TOPO,
+    KEY_EL,
+    KEY_ILLUM,
     KEY_NEXT_APOGEE,
-    KEY_NEXT_PERIGEE,
-    KEY_NEXT_NEW,
     KEY_NEXT_FIRST,
     KEY_NEXT_FULL,
     KEY_NEXT_LAST,
+    KEY_NEXT_NEW,
+    KEY_NEXT_PERIGEE,
+    KEY_NEXT_RISE,
+    KEY_NEXT_SET,
+    KEY_PARALLAX,
+    KEY_PHASE,
     KEY_WAXING,
-    KEY_ZODIAC_SIGN_NEXT_NEW,
-    KEY_ZODIAC_SIGN_NEXT_FULL,
-    KEY_ZODIAC_DEGREE_NEXT_NEW,
     KEY_ZODIAC_DEGREE_NEXT_FULL,
+    KEY_ZODIAC_DEGREE_NEXT_NEW,
+    KEY_ZODIAC_SIGN_NEXT_FULL,
+    KEY_ZODIAC_SIGN_NEXT_NEW,
     PRECISION_AZ,
+    PRECISION_DISTANCE,
+    PRECISION_ECL_GEO,
+    PRECISION_ECL_TOPO,
     PRECISION_EL,
     PRECISION_ILLUM,
-    PRECISION_DISTANCE,
     PRECISION_PARALLAX,
-    PRECISION_ECL_TOPO,
-    PRECISION_ECL_GEO,
     PRECISION_ZODIAC_DEGREE,
 )
-
 from .coordinator import MoonAstroCoordinator
 
+_LOGGER = logging.getLogger(__name__)
 
-SENSORS = [
-    # key, translation key, unit, device_class, suggested_display_precision
+
+# key, translation_key, unit, device_class, suggested_display_precision
+SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]] = [
     (KEY_PHASE, "sensor_phase", None, None, None),
-
     (KEY_AZ, "sensor_azimuth", "°", None, PRECISION_AZ),
     (KEY_EL, "sensor_elevation", "°", None, PRECISION_EL),
     (KEY_ILLUM, "sensor_illumination", "%", None, PRECISION_ILLUM),
     (KEY_DISTANCE, "sensor_distance", "km", None, PRECISION_DISTANCE),
     (KEY_PARALLAX, "sensor_parallax", "°", None, PRECISION_PARALLAX),
-
-    # Topocentric ecliptic coordinates (renamed)
+    # Topocentric ecliptic coordinates (current)
     (KEY_ECLIPTIC_LON_TOPO, "sensor_ecliptic_longitude_topocentric", "°", None, PRECISION_ECL_TOPO),
     (KEY_ECLIPTIC_LAT_TOPO, "sensor_ecliptic_latitude_topocentric", "°", None, PRECISION_ECL_TOPO),
-
-    # Geocentric ecliptic coordinates (current moment)
+    # Geocentric ecliptic coordinates (current)
     (KEY_ECLIPTIC_LON_GEO, "sensor_ecliptic_longitude_geocentric", "°", None, PRECISION_ECL_GEO),
     (KEY_ECLIPTIC_LAT_GEO, "sensor_ecliptic_latitude_geocentric", "°", None, PRECISION_ECL_GEO),
-
     # Time sensors
     (KEY_NEXT_RISE, "sensor_next_rise", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_SET, "sensor_next_set", None, SensorDeviceClass.TIMESTAMP, None),
@@ -84,24 +80,21 @@ SENSORS = [
     (KEY_NEXT_FIRST, "sensor_next_first_quarter", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_FULL, "sensor_next_full_moon", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_LAST, "sensor_next_last_quarter", None, SensorDeviceClass.TIMESTAMP, None),
-
     # Ecliptic coordinates at next lunations (geocentric, true-of-date)
     (KEY_ECLIPTIC_LON_NEXT_FULL, "sensor_ecliptic_longitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
     (KEY_ECLIPTIC_LAT_NEXT_FULL, "sensor_ecliptic_latitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
     (KEY_ECLIPTIC_LON_NEXT_NEW, "sensor_ecliptic_longitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
     (KEY_ECLIPTIC_LAT_NEXT_NEW, "sensor_ecliptic_latitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
-
-    # Zodiac sign sensors (strings)
+    # Zodiac sign sensors (string states)
     (KEY_ZODIAC_SIGN_NEXT_NEW, "sensor_zodiac_sign_next_new_moon", None, None, None),
     (KEY_ZODIAC_SIGN_NEXT_FULL, "sensor_zodiac_sign_next_full_moon", None, None, None),
-
     # Zodiac degree sensors (floats 0..30)
     (KEY_ZODIAC_DEGREE_NEXT_NEW, "sensor_zodiac_degree_next_new_moon", "°", None, PRECISION_ZODIAC_DEGREE),
     (KEY_ZODIAC_DEGREE_NEXT_FULL, "sensor_zodiac_degree_next_full_moon", "°", None, PRECISION_ZODIAC_DEGREE),
 ]
 
 # Stable, non-localized slugs for initial entity_id creation
-SUGGESTED_SLUGS = {
+SUGGESTED_SLUGS: dict[str, str] = {
     KEY_PHASE: "phase",
     KEY_AZ: "azimuth",
     KEY_EL: "elevation",
@@ -131,7 +124,9 @@ SUGGESTED_SLUGS = {
 }
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     """Set up sensor entities from a config entry."""
     coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
     device_info = DeviceInfo(
@@ -146,15 +141,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         suggested_slug = SUGGESTED_SLUGS.get(key, key)
         entities.append(
             MoonAstroSensor(
-                coordinator, entry.entry_id, key, name_key, unit, device_class, precision, device_info, suggested_slug
+                coordinator=coordinator,
+                entry_id=entry.entry_id,
+                key=key,
+                name_key=name_key,
+                unit=unit,
+                device_class=device_class,
+                suggested_display_precision=precision,
+                device_info=device_info,
+                suggested_object_id=suggested_slug,
             )
         )
 
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
     """Generic sensor bound to a coordinator value."""
+
+    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -171,18 +176,17 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         super().__init__(coordinator)
         self._key = key
         self._attr_unique_id = f"moon_astro_{entry_id}_{key}"
-        self._attr_has_entity_name = True
         self._attr_translation_key = name_key
         self._attr_native_unit_of_measurement = unit
         self._attr_device_class = device_class
         self._attr_device_info = device_info
         self._attr_suggested_display_precision = suggested_display_precision
-        # Lock initial entity_id slug (stable, ASCII, non-localized)
+        # Stable ASCII object_id slug
         self._attr_suggested_object_id = suggested_object_id
 
     @property
     def translation_key(self) -> str | None:
-        # Expose explicit translation_key so frontend can translate state values
+        """Expose explicit translation_key so frontend can translate state values."""
         return self._attr_translation_key
 
     @property
@@ -190,13 +194,13 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         data = self.coordinator.data or {}
         value = data.get(self._key)
 
-        # Convert ISO string (local) -> aware UTC datetime for timestamp sensors
+        # Convert ISO string (local or aware) -> aware UTC datetime for timestamp sensors
         if self.device_class == SensorDeviceClass.TIMESTAMP:
             if value is None:
                 return None
             try:
-                dt = datetime.fromisoformat(value)
-            except Exception:
+                dt = datetime.fromisoformat(str(value))
+            except Exception:  # noqa: BLE001
                 return None
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=timezone.utc)
@@ -204,13 +208,13 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 dt = dt.astimezone(timezone.utc)
             return dt
 
-        # Normalize zodiac sign values to match translation keys
+        # Normalize zodiac sign string states to canonical lowercase keys
         if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW, KEY_ZODIAC_SIGN_NEXT_FULL):
             if value is None:
                 return None
             try:
                 value_str = str(value).strip().lower()
-            except Exception:
+            except Exception:  # noqa: BLE001
                 return None
             aliases = {
                 "aries": "aries",
@@ -227,7 +231,9 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 "pisces": "pisces",
             }
             resolved = aliases.get(value_str, value_str)
-            _LOGGER.debug("Zodiac state for %s -> %r (from %r)", self._attr_translation_key, resolved, value)
+            _LOGGER.debug(
+                "Zodiac state for %s -> %r (from %r)", self._attr_translation_key, resolved, value
+            )
             return resolved
 
         _LOGGER.debug("Sensor %s (%s) raw value: %r", self._key, self._attr_translation_key, value)
@@ -235,22 +241,19 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
 
     @property
     def icon(self) -> str | None:
-        """Return an MDI icon by sensor type.
-        - Phase: dynamic (kept, with thresholds)
-        - Angles/measures: static icons
-        - Ecliptic coordinates: longitude/latitude icon
-        - Time events: static time/orbit/calendar icons
-        - Zodiac sensors: static degree icon or dynamic sign → MDI mapping
-        """
+        """Return an MDI icon by sensor type."""
 
-        # Phase sensor: keep dynamic logic based on phase, illumination, and waxing/waning
+        # Phase sensor: dynamic based on phase, illumination, and waxing/waning
         if self._key == KEY_PHASE:
             data = self.coordinator.data or {}
-            phase = data.get(KEY_PHASE, "unknown") or "unknown"
-            illum = float(data.get(KEY_ILLUM, 0.0) or 0.0)
+            phase = (data.get(KEY_PHASE) or "unknown") or "unknown"
+            illum = 0.0
+            try:
+                illum = float(data.get(KEY_ILLUM, 0.0) or 0.0)
+            except Exception:  # noqa: BLE001
+                illum = 0.0
             waxing = bool(data.get(KEY_WAXING, False))
 
-            # Canonical phase icons
             if phase == "new_moon":
                 return "mdi:moon-new"
             if phase == "full_moon":
@@ -260,7 +263,6 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             if phase == "last_quarter":
                 return "mdi:moon-last-quarter"
 
-            # Continuous thresholds with waxing/waning
             if illum < 5.0:
                 return "mdi:moon-new"
             if illum <= 45.0:
@@ -271,7 +273,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 return "mdi:moon-waxing-gibbous" if waxing else "mdi:moon-waning-gibbous"
             return "mdi:moon-full"
 
-        # Canonical phase icons
+        # Canonical phase-related icons for specific next events
         if self._key in (KEY_NEXT_NEW, KEY_ZODIAC_DEGREE_NEXT_NEW):
             return "mdi:moon-new"
         if self._key in (KEY_NEXT_FULL, KEY_ZODIAC_DEGREE_NEXT_FULL):
@@ -281,24 +283,19 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         if self._key == KEY_NEXT_LAST:
             return "mdi:moon-last-quarter"
 
-        # Instant angles and measurements: use simple, stable icons
+        # Instant angles and measurements
         if self._key == KEY_AZ:
-            # Azimuth (angle along horizon)
             return "mdi:angle-obtuse"
         if self._key == KEY_EL:
-            # Elevation (vertical angle)
             return "mdi:angle-acute"
         if self._key == KEY_ILLUM:
-            # Moon illumination percentage
             return "mdi:weather-night"
         if self._key == KEY_DISTANCE:
-            # Earth–Moon distance
             return "mdi:ruler"
         if self._key == KEY_PARALLAX:
-            # Parallax angle
             return "mdi:circle-multiple"
 
-        # Ecliptic longitude (topocentric / geocentric, current or at lunations)
+        # Ecliptic longitudes
         if self._key in (
             KEY_ECLIPTIC_LON_TOPO,
             KEY_ECLIPTIC_LON_GEO,
@@ -307,7 +304,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         ):
             return "mdi:longitude"
 
-        # Ecliptic latitude (topocentric / geocentric, current or at lunations)
+        # Ecliptic latitudes
         if self._key in (
             KEY_ECLIPTIC_LAT_TOPO,
             KEY_ECLIPTIC_LAT_GEO,
@@ -316,23 +313,19 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         ):
             return "mdi:latitude"
 
-        # Time-based events (timestamps): use time/orbit/calendar cues
+        # Time-based events
         if self._key == KEY_NEXT_RISE:
-            # Next moonrise
             return "mdi:chevron-up-circle"
         if self._key == KEY_NEXT_SET:
-            # Next moonset
             return "mdi:chevron-down-circle"
         if self._key in (KEY_NEXT_APOGEE, KEY_NEXT_PERIGEE):
-            # Next apogee / perigee (orbital extrema)
             return "mdi:orbit"
 
         # Zodiac sensors
         if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW, KEY_ZODIAC_SIGN_NEXT_FULL):
-            # Dynamic mapping: zodiac sign -> MDI icon
             data = self.coordinator.data or {}
-            sign = data.get(self._key)
-            sign = (str(sign).strip().lower() if sign is not None else "")
+            raw = data.get(self._key)
+            sign = str(raw).strip().lower() if raw is not None else ""
 
             zodiac_icons = {
                 "aries": "mdi:zodiac-aries",
@@ -348,8 +341,6 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 "aquarius": "mdi:zodiac-aquarius",
                 "pisces": "mdi:zodiac-pisces",
             }
-            # Fallback to a neutral zodiac icon if sign unknown
             return zodiac_icons.get(sign, "mdi:zodiac-aquarius")
 
-        # Default: no explicit icon (HA may show a generic one)
         return None
