@@ -4,11 +4,11 @@
         "step": {
             "user": {
                 "title": "Moon Astro",
-                "description": "Configure Moon Astro",
+                "description": "Set your GPS coordinates and altitude.",
                 "data": {
                     "latitude": "Latitude",
                     "longitude": "Longitude",
-                    "elevation": "Elevation (m)"
+                    "altitude": "Altitude (m)"
                 }
             }
         }
