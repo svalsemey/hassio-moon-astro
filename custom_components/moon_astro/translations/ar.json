@@ -71,7 +71,7 @@
                 }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "name": "برج البروج عند البدر التالي",
+                "name": "برج البروج عند البدر التالي",
                 "state": {
                     "aries": "الحمل",
                     "taurus": "الثور",
