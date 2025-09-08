@@ -4,11 +4,11 @@
         "step": {
             "user": {
                 "title": "Moon Astro",
-                "description": "Set your GPS coordinates and altitude.",
+                "description": "Configure Moon Astro",
                 "data": {
                     "latitude": "Latitude",
                     "longitude": "Longitude",
-                    "altitude": "Altitude (m)"
+                    "elevation": "Elevation (m)"
                 }
             }
         }
@@ -17,7 +17,7 @@
         "step": {
             "init": {
                 "title": "Moon Astro options",
-                "description": "Update polling interval and timezone behavior.",
+                "description": "Adjust update interval and time zone handling",
                 "data": {
                     "scan_interval": "Scan interval (seconds)",
                     "use_ha_time_zone": "Use Home Assistant time zone"
@@ -32,7 +32,12 @@
             "sensor_elevation": { "name": "Elevation" },
             "sensor_illumination": { "name": "Illumination" },
             "sensor_distance": { "name": "Distance" },
-            "sensor_parallax": { "name": "Parallax angle" },
+            "sensor_parallax": { "name": "Parallax" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ecliptic longitude (topocentric)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ecliptic latitude (topocentric)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ecliptic longitude (geocentric)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ecliptic latitude (geocentric)" },
     
             "sensor_next_rise": { "name": "Next rise" },
             "sensor_next_set": { "name": "Next set" },
@@ -43,55 +48,48 @@
             "sensor_next_full_moon": { "name": "Next full moon" },
             "sensor_next_last_quarter": { "name": "Next last quarter" },
     
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ecliptic longitude (topocentric)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ecliptic latitude (topocentric)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ecliptic longitude (geocentric)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ecliptic latitude (geocentric)" },
-    
             "sensor_ecliptic_longitude_next_full_moon": { "name": "Ecliptic longitude at next full moon" },
             "sensor_ecliptic_latitude_next_full_moon": { "name": "Ecliptic latitude at next full moon" },
             "sensor_ecliptic_longitude_next_new_moon": { "name": "Ecliptic longitude at next new moon" },
             "sensor_ecliptic_latitude_next_new_moon": { "name": "Ecliptic latitude at next new moon" },
     
-            "sensor_zodiac_sign_next_new_moon": { "name": "Zodiac sign at next new moon" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Zodiac sign at next full moon" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Zodiac degree at next new moon" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Zodiac degree at next full moon" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Moon above horizon" }
-        }
-    },
-    "state": {
-        "sensor": {
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Aries",
-            "taurus": "Taurus",
-            "gemini": "Gemini",
-            "cancer": "Cancer",
-            "leo": "Leo",
-            "virgo": "Virgo",
-            "libra": "Libra",
-            "scorpio": "Scorpio",
-            "sagittarius": "Sagittarius",
-            "capricorn": "Capricorn",
-            "aquarius": "Aquarius",
-            "pisces": "Pisces"
+            "name": "Zodiac sign at next new moon",
+            "state": {
+                "aries": "Aries",
+                "taurus": "Taurus",
+                "gemini": "Gemini",
+                "cancer": "Cancer",
+                "leo": "Leo",
+                "virgo": "Virgo",
+                "libra": "Libra",
+                "scorpio": "Scorpio",
+                "sagittarius": "Sagittarius",
+                "capricorn": "Capricorn",
+                "aquarius": "Aquarius",
+                "pisces": "Pisces"
+            }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Aries",
-            "taurus": "Taurus",
-            "gemini": "Gemini",
-            "cancer": "Cancer",
-            "leo": "Leo",
-            "virgo": "Virgo",
-            "libra": "Libra",
-            "scorpio": "Scorpio",
-            "sagittarius": "Sagittarius",
-            "capricorn": "Capricorn",
-            "aquarius": "Aquarius",
-            "pisces": "Pisces"
+            "name": "Zodiac sign at next full moon",
+            "state": {
+                "aries": "Aries",
+                "taurus": "Taurus",
+                "gemini": "Gemini",
+                "cancer": "Cancer",
+                "leo": "Leo",
+                "virgo": "Virgo",
+                "libra": "Libra",
+                "scorpio": "Scorpio",
+                "sagittarius": "Sagittarius",
+                "capricorn": "Capricorn",
+                "aquarius": "Aquarius",
+                "pisces": "Pisces"
             }
+            },
+    
+            "sensor_zodiac_degree_next_new_moon": { "name": "Zodiac degree at next new moon" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Zodiac degree at next full moon" }
         }
     }
 }
