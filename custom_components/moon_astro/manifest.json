@@ -1,16 +1,16 @@
 {
     "domain": "moon_astro",
     "name": "Moon Astro",
-    "version": "0.1.0",
+    "codeowners": ["@svalsemey"],
+    "config_flow": true,
     "documentation": "https://github.com/svalsemey/hassio-moon-astro",
+    "integration_type": "device",
+    "iot_class": "calculated",
     "issue_tracker": "https://github.com/svalsemey/hassio-moon-astro/issues",
+    "loggers": ["custom_components.moon_astro", "skyfield", "timezonefinder"]
     "requirements": [
         "skyfield>=1.53",
         "timezonefinder>=6.2.0"
     ],
-    "codeowners": ["@svalsemey"],
-    "iot_class": "calculated",
-    "integration_type": "device",
-    "config_flow": true,
-    "loggers": ["custom_components.moon_astro", "skyfield", "timezonefinder"]
+    "version": "0.1.0",
 }
