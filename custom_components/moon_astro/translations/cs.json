@@ -1,14 +1,14 @@
 {
-    "title": "Měsíc Astro",
+    "title": "Měsíční astronomie",
     "config": {
         "step": {
             "user": {
-                "title": "Měsíc Astro",
-                "description": "Nastavte své GPS souřadnice a nadmořskou výšku.",
+                "title": "Měsíční astronomie",
+                "description": "Nakonfigurujte Měsíční astronomii",
                 "data": {
                     "latitude": "Zeměpisná šířka",
                     "longitude": "Zeměpisná délka",
-                    "altitude": "Nadmořská výška (m)"
+                    "elevation": "Nadmořská výška (m)"
                 }
             }
         }
@@ -16,10 +16,10 @@
     "options": {
         "step": {
             "init": {
-                "title": "Možnosti Měsíc Astro",
-                "description": "Aktualizujte interval dotazování a chování časového pásma.",
+                "title": "Možnosti Měsíční astronomie",
+                "description": "Upravte interval aktualizace a chování časového pásma",
                 "data": {
-                    "scan_interval": "Interval skenování (sekundy)",
+                    "scan_interval": "Interval dotazování (sekundy)",
                     "use_ha_time_zone": "Použít časové pásmo Home Assistant"
                 }
             }
@@ -32,66 +32,64 @@
             "sensor_elevation": { "name": "Výška" },
             "sensor_illumination": { "name": "Osvětlení" },
             "sensor_distance": { "name": "Vzdálenost" },
-            "sensor_parallax": { "name": "Paralaktický úhel" },
-    
-            "sensor_next_rise": { "name": "Další východ" },
-            "sensor_next_set": { "name": "Další západ" },
-            "sensor_next_apogee": { "name": "Další apogeum" },
-            "sensor_next_perigee": { "name": "Další perigeum" },
-            "sensor_next_new_moon": { "name": "Další nov" },
-            "sensor_next_first_quarter": { "name": "Další první čtvrť" },
-            "sensor_next_full_moon": { "name": "Další úplněk" },
-            "sensor_next_last_quarter": { "name": "Další poslední čtvrť" },
-    
+            "sensor_parallax": { "name": "Paralaxa" },
+
             "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptikální délka (topocentrická)" },
             "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptikální šířka (topocentrická)" },
             "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptikální délka (geocentrická)" },
             "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptikální šířka (geocentrická)" },
-    
+
+            "sensor_next_rise": { "name": "Příští východ" },
+            "sensor_next_set": { "name": "Příští západ" },
+            "sensor_next_apogee": { "name": "Příští apogeum" },
+            "sensor_next_perigee": { "name": "Příští perigeum" },
+            "sensor_next_new_moon": { "name": "Příští nov" },
+            "sensor_next_first_quarter": { "name": "Příští první čtvrť" },
+            "sensor_next_full_moon": { "name": "Příští úplněk" },
+            "sensor_next_last_quarter": { "name": "Příští poslední čtvrť" },
+
             "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptikální délka při příštím úplňku" },
             "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptikální šířka při příštím úplňku" },
             "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptikální délka při příštím novu" },
             "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptikální šířka při příštím novu" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Znamení zvěrokruhu při příštím novu" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Znamení zvěrokruhu při příštím úplňku" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Stupeň ve znamení při příštím novu" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Stupeň ve znamení při příštím úplňku" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Měsíc nad horizontem" }
-        }
-    },
-    "state": {
-        "sensor": {
+
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Beran",
-            "taurus": "Býk",
-            "gemini": "Blíženci",
-            "cancer": "Rak",
-            "leo": "Lev",
-            "virgo": "Panna",
-            "libra": "Váhy",
-            "scorpio": "Štír",
-            "sagittarius": "Střelec",
-            "capricorn": "Kozoroh",
-            "aquarius": "Vodnář",
-            "pisces": "Ryby"
+                "name": "Znamení zvěrokruhu při příštím novu",
+                "state": {
+                    "aries": "Beran",
+                    "taurus": "Býk",
+                    "gemini": "Blíženci",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Panna",
+                    "libra": "Váhy",
+                    "scorpio": "Štír",
+                    "sagittarius": "Střelec",
+                    "capricorn": "Kozoroh",
+                    "aquarius": "Vodnář",
+                    "pisces": "Ryby"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Beran",
-            "taurus": "Býk",
-            "gemini": "Blíženci",
-            "cancer": "Rak",
-            "leo": "Lev",
-            "virgo": "Panna",
-            "libra": "Váhy",
-            "scorpio": "Štír",
-            "sagittarius": "Střelec",
-            "capricorn": "Kozoroh",
-            "aquarius": "Vodnář",
-            "pisces": "Ryby"
-            }
+                "name": "Znamení zvěrokruhu při příštím úplňku",
+                "state": {
+                    "aries": "Beran",
+                    "taurus": "Býk",
+                    "gemini": "Blíženci",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Panna",
+                    "libra": "Váhy",
+                    "scorpio": "Štír",
+                    "sagittarius": "Střelec",
+                    "capricorn": "Kozoroh",
+                    "aquarius": "Vodnář",
+                    "pisces": "Ryby"
+                }
+            },
+
+            "sensor_zodiac_degree_next_new_moon": { "name": "Stupeň zvěrokruhu při příštím novu" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Stupeň zvěrokruhu při příštím úplňku" }
         }
     }
 }
