@@ -4,11 +4,11 @@
         "step": {
             "user": {
                 "title": "فلك القمر",
-                "description": "اضبط إعدادات فلك القمر",
+                "description": "اضبط إحداثيات نظام تحديد المواقع (GPS) والارتفاع.",
                 "data": {
                     "latitude": "خط العرض",
                     "longitude": "خط الطول",
-                    "elevation": "الارتفاع (م)"
+                    "altitude": "الارتفاع (م)"
                 }
             }
         }
@@ -17,10 +17,10 @@
         "step": {
             "init": {
                 "title": "خيارات فلك القمر",
-                "description": "اضبط فترة التحديث وسلوك المنطقة الزمنية",
+                "description": "اضبط فترة التحديث وآلية التعامل مع المنطقة الزمنية",
                 "data": {
                     "scan_interval": "فاصل التحديث (بالثواني)",
-                    "use_ha_time_zone": "استخدام المنطقة الزمنية الخاصة بـ Home Assistant"
+                    "use_ha_time_zone": "استخدام المنطقة الزمنية لـ Home Assistant"
                 }
             }
         }
@@ -87,7 +87,7 @@
                     "pisces": "الحوت"
                 }
             },
-    
+
             "sensor_zodiac_degree_next_new_moon": { "name": "درجة البروج عند المحاق التالي" },
             "sensor_zodiac_degree_next_full_moon": { "name": "درجة البروج عند البدر التالي" }
         }
