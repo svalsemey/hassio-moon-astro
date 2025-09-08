@@ -27,70 +27,111 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Vaihe" },
-            "sensor_azimuth": { "name": "Atsimuutti" },
-            "sensor_elevation": { "name": "Korkeuskulma" },
-            "sensor_illumination": { "name": "Valaistus" },
-            "sensor_distance": { "name": "Etäisyys" },
-            "sensor_parallax": { "name": "Parallaksikulma" },
-    
-            "sensor_next_rise": { "name": "Seuraava nousu" },
-            "sensor_next_set": { "name": "Seuraava lasku" },
-            "sensor_next_apogee": { "name": "Seuraava apogeum" },
-            "sensor_next_perigee": { "name": "Seuraava perigeum" },
-            "sensor_next_new_moon": { "name": "Seuraava uusikuu" },
-            "sensor_next_first_quarter": { "name": "Seuraava ensimmäinen neljännes" },
-            "sensor_next_full_moon": { "name": "Seuraava täysikuu" },
-            "sensor_next_last_quarter": { "name": "Seuraava viimeinen neljännes" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptinen pituus (toposentrinen)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptinen leveys (toposentrinen)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptinen pituus (geosentrinen)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptinen leveys (geosentrinen)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptinen pituus seuraavassa täysikuussa" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptinen leveys seuraavassa täysikuussa" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptinen pituus seuraavassa uudessa kuussa" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptinen leveys seuraavassa uudessa kuussa" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Eläinradan merkki seuraavassa uudessa kuussa" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Eläinradan merkki seuraavassa täysikuussa" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Aste merkissä seuraavassa uudessa kuussa" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Aste merkissä seuraavassa täysikuussa" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Kuu horisontin yläpuolella" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Vaihe"
+            },
+            "sensor_azimuth": {
+                "name": "Atsimuutti"
+            },
+            "sensor_elevation": {
+                "name": "Korkeuskulma"
+            },
+            "sensor_illumination": {
+                "name": "Valaistus"
+            },
+            "sensor_distance": {
+                "name": "Etäisyys"
+            },
+            "sensor_parallax": {
+                "name": "Parallaaksi"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptinen pituus (toposentrinen)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptinen leveys (toposentrinen)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptinen pituus (geosentrinen)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptinen leveys (geosentrinen)"
+            },
+            "sensor_next_rise": {
+                "name": "Seuraava nousu"
+            },
+            "sensor_next_set": {
+                "name": "Seuraava lasku"
+            },
+            "sensor_next_apogee": {
+                "name": "Seuraava apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Seuraava perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Seuraava uusikuu"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Seuraava ensimmäinen neljännes"
+            },
+            "sensor_next_full_moon": {
+                "name": "Seuraava täysikuu"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Seuraava viimeinen neljännes"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptinen pituus seuraavassa täysikuussa"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptinen leveys seuraavassa täysikuussa"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptinen pituus seuraavassa uudessakuussa"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptinen leveys seuraavassa uudessakuussa"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Oinas",
-            "taurus": "Härkä",
-            "gemini": "Kaksoset",
-            "cancer": "Rapu",
-            "leo": "Leijona",
-            "virgo": "Neitsyt",
-            "libra": "Vaaka",
-            "scorpio": "Skorpioni",
-            "sagittarius": "Jousimies",
-            "capricorn": "Kauris",
-            "aquarius": "Vesimies",
-            "pisces": "Kalat"
+                "name": "Eläinradan merkki seuraavassa uudessakuussa",
+                "state": {
+                    "aries": "Oinas",
+                    "taurus": "Härkä",
+                    "gemini": "Kaksoset",
+                    "cancer": "Rapu",
+                    "leo": "Leijona",
+                    "virgo": "Neitsyt",
+                    "libra": "Vaaka",
+                    "scorpio": "Skorpioni",
+                    "sagittarius": "Jousimies",
+                    "capricorn": "Kauris",
+                    "aquarius": "Vesimies",
+                    "pisces": "Kalat"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Oinas",
-            "taurus": "Härkä",
-            "gemini": "Kaksoset",
-            "cancer": "Rapu",
-            "leo": "Leijona",
-            "virgo": "Neitsyt",
-            "libra": "Vaaka",
-            "scorpio": "Skorpioni",
-            "sagittarius": "Jousimies",
-            "capricorn": "Kauris",
-            "aquarius": "Vesimies",
-            "pisces": "Kalat"
+                "name": "Eläinradan merkki seuraavassa täysikuussa",
+                "state": {
+                    "aries": "Oinas",
+                    "taurus": "Härkä",
+                    "gemini": "Kaksoset",
+                    "cancer": "Rapu",
+                    "leo": "Leijona",
+                    "virgo": "Neitsyt",
+                    "libra": "Vaaka",
+                    "scorpio": "Skorpioni",
+                    "sagittarius": "Jousimies",
+                    "capricorn": "Kauris",
+                    "aquarius": "Vesimies",
+                    "pisces": "Kalat"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Eläinradan aste seuraavassa uudessakuussa"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Eläinradan aste seuraavassa täysikuussa"
             }
         }
     }

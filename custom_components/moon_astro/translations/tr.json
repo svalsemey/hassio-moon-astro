@@ -27,70 +27,111 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Evresi" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Yükseklik açısı" },
-            "sensor_illumination": { "name": "Aydınlanma" },
-            "sensor_distance": { "name": "Mesafe" },
-            "sensor_parallax": { "name": "Paralaks açısı" },
-    
-            "sensor_next_rise": { "name": "Sonraki doğuş" },
-            "sensor_next_set": { "name": "Sonraki batış" },
-            "sensor_next_apogee": { "name": "Sonraki apogee" },
-            "sensor_next_perigee": { "name": "Sonraki perigee" },
-            "sensor_next_new_moon": { "name": "Sonraki yeniay" },
-            "sensor_next_first_quarter": { "name": "Sonraki ilk dördün" },
-            "sensor_next_full_moon": { "name": "Sonraki dolunay" },
-            "sensor_next_last_quarter": { "name": "Sonraki son dördün" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptik boylam (toposentrik)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptik enlem (toposentrik)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptik boylam (jeosentrik)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptik enlem (jeosentrik)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Sonraki dolunayda ekliptik boylam" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Sonraki dolunayda ekliptik enlem" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Sonraki yeniayda ekliptik boylam" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Sonraki yeniayda ekliptik enlem" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Sonraki yeniayda burç" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Sonraki dolunayda burç" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Sonraki yeniayda burç derecesi" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Sonraki dolunayda burç derecesi" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Ay ufkun üzerinde" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Evre"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Yükseklik açısı"
+            },
+            "sensor_illumination": {
+                "name": "Aydınlanma"
+            },
+            "sensor_distance": {
+                "name": "Mesafe"
+            },
+            "sensor_parallax": {
+                "name": "Paralaks"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptik boylam (toposantrik)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptik enlem (toposantrik)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptik boylam (jeosantrik)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptik enlem (jeosantrik)"
+            },
+            "sensor_next_rise": {
+                "name": "Sıradaki doğuş"
+            },
+            "sensor_next_set": {
+                "name": "Sıradaki batış"
+            },
+            "sensor_next_apogee": {
+                "name": "Sıradaki apogee"
+            },
+            "sensor_next_perigee": {
+                "name": "Sıradaki perigee"
+            },
+            "sensor_next_new_moon": {
+                "name": "Sıradaki yeni ay"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Sıradaki ilk dördün"
+            },
+            "sensor_next_full_moon": {
+                "name": "Sıradaki dolunay"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Sıradaki son dördün"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Sıradaki dolunayda ekliptik boylam"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Sıradaki dolunayda ekliptik enlem"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Sıradaki yeni ayda ekliptik boylam"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Sıradaki yeni ayda ekliptik enlem"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Koç",
-            "taurus": "Boğa",
-            "gemini": "İkizler",
-            "cancer": "Yengeç",
-            "leo": "Aslan",
-            "virgo": "Başak",
-            "libra": "Terazi",
-            "scorpio": "Akrep",
-            "sagittarius": "Yay",
-            "capricorn": "Oğlak",
-            "aquarius": "Kova",
-            "pisces": "Balık"
+                "name": "Sıradaki yeni ayda burç",
+                "state": {
+                    "aries": "Koç",
+                    "taurus": "Boğa",
+                    "gemini": "İkizler",
+                    "cancer": "Yengeç",
+                    "leo": "Aslan",
+                    "virgo": "Başak",
+                    "libra": "Terazi",
+                    "scorpio": "Akrep",
+                    "sagittarius": "Yay",
+                    "capricorn": "Oğlak",
+                    "aquarius": "Kova",
+                    "pisces": "Balık"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Koç",
-            "taurus": "Boğa",
-            "gemini": "İkizler",
-            "cancer": "Yengeç",
-            "leo": "Aslan",
-            "virgo": "Başak",
-            "libra": "Terazi",
-            "scorpio": "Akrep",
-            "sagittarius": "Yay",
-            "capricorn": "Oğlak",
-            "aquarius": "Kova",
-            "pisces": "Balık"
+                "name": "Sıradaki dolunayda burç",
+                "state": {
+                    "aries": "Koç",
+                    "taurus": "Boğa",
+                    "gemini": "İkizler",
+                    "cancer": "Yengeç",
+                    "leo": "Aslan",
+                    "virgo": "Başak",
+                    "libra": "Terazi",
+                    "scorpio": "Akrep",
+                    "sagittarius": "Yay",
+                    "capricorn": "Oğlak",
+                    "aquarius": "Kova",
+                    "pisces": "Balık"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Sıradaki yeni ayda burç derecesi"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Sıradaki dolunayda burç derecesi"
             }
         }
     }

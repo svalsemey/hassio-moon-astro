@@ -27,70 +27,111 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fas" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Höjdvinkel" },
-            "sensor_illumination": { "name": "Belysning" },
-            "sensor_distance": { "name": "Avstånd" },
-            "sensor_parallax": { "name": "Parallaxvinkel" },
-    
-            "sensor_next_rise": { "name": "Nästa uppgång" },
-            "sensor_next_set": { "name": "Nästa nedgång" },
-            "sensor_next_apogee": { "name": "Nästa apogeum" },
-            "sensor_next_perigee": { "name": "Nästa perigeum" },
-            "sensor_next_new_moon": { "name": "Nästa nymåne" },
-            "sensor_next_first_quarter": { "name": "Nästa första kvarter" },
-            "sensor_next_full_moon": { "name": "Nästa fullmåne" },
-            "sensor_next_last_quarter": { "name": "Nästa sista kvarter" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptisk longitud (topocentrisk)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptisk latitud (topocentrisk)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptisk longitud (geocentrisk)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptisk latitud (geocentrisk)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptisk longitud vid nästa fullmåne" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptisk latitud vid nästa fullmåne" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptisk longitud vid nästa nymåne" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptisk latitud vid nästa nymåne" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Stjärntecken vid nästa nymåne" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Stjärntecken vid nästa fullmåne" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Grad i tecknet vid nästa nymåne" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Grad i tecknet vid nästa fullmåne" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Månen ovan horisonten" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Fas"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Höjdvinkel"
+            },
+            "sensor_illumination": {
+                "name": "Belysning"
+            },
+            "sensor_distance": {
+                "name": "Avstånd"
+            },
+            "sensor_parallax": {
+                "name": "Parallax"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptisk longitud (topocentrisk)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptisk latitud (topocentrisk)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptisk longitud (geocentrisk)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptisk latitud (geocentrisk)"
+            },
+            "sensor_next_rise": {
+                "name": "Nästa uppgång"
+            },
+            "sensor_next_set": {
+                "name": "Nästa nedgång"
+            },
+            "sensor_next_apogee": {
+                "name": "Nästa apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Nästa perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Nästa nymåne"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Nästa första kvarter"
+            },
+            "sensor_next_full_moon": {
+                "name": "Nästa fullmåne"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Nästa sista kvarter"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptisk longitud vid nästa fullmåne"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptisk latitud vid nästa fullmåne"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptisk longitud vid nästa nymåne"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptisk latitud vid nästa nymåne"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Väduren",
-            "taurus": "Oxen",
-            "gemini": "Tvillingarna",
-            "cancer": "Kräftan",
-            "leo": "Lejonet",
-            "virgo": "Jungfrun",
-            "libra": "Vågen",
-            "scorpio": "Skorpionen",
-            "sagittarius": "Skytten",
-            "capricorn": "Stenbocken",
-            "aquarius": "Vattumannen",
-            "pisces": "Fiskarna"
+                "name": "Stjärntecken vid nästa nymåne",
+                "state": {
+                    "aries": "Väduren",
+                    "taurus": "Oxen",
+                    "gemini": "Tvillingarna",
+                    "cancer": "Kräftan",
+                    "leo": "Lejonet",
+                    "virgo": "Jungfrun",
+                    "libra": "Vågen",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbocken",
+                    "aquarius": "Vattumannen",
+                    "pisces": "Fiskarna"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Väduren",
-            "taurus": "Oxen",
-            "gemini": "Tvillingarna",
-            "cancer": "Kräftan",
-            "leo": "Lejonet",
-            "virgo": "Jungfrun",
-            "libra": "Vågen",
-            "scorpio": "Skorpionen",
-            "sagittarius": "Skytten",
-            "capricorn": "Stenbocken",
-            "aquarius": "Vattumannen",
-            "pisces": "Fiskarna"
+                "name": "Stjärntecken vid nästa fullmåne",
+                "state": {
+                    "aries": "Väduren",
+                    "taurus": "Oxen",
+                    "gemini": "Tvillingarna",
+                    "cancer": "Kräftan",
+                    "leo": "Lejonet",
+                    "virgo": "Jungfrun",
+                    "libra": "Vågen",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbocken",
+                    "aquarius": "Vattumannen",
+                    "pisces": "Fiskarna"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Zodiakgrad vid nästa nymåne"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Zodiakgrad vid nästa fullmåne"
             }
         }
     }

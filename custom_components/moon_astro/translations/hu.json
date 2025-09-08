@@ -18,79 +18,120 @@
             "init": {
             "title": "Hold Asztro beállítások",
             "description": "A lekérdezési időköz és az időzóna viselkedésének frissítése.",
-            "data": {
-                "scan_interval": "Letapogatási időköz (másodperc)",
-                "use_ha_time_zone": "A Home Assistant időzónájának használata"
-            }
+                "data": {
+                    "scan_interval": "Letapogatási időköz (másodperc)",
+                    "use_ha_time_zone": "A Home Assistant időzónájának használata"
+                }
             }
         }
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fázis" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Magassági szög" },
-            "sensor_illumination": { "name": "Megvilágítás" },
-            "sensor_distance": { "name": "Távolság" },
-            "sensor_parallax": { "name": "Parallaxis szöge" },
-    
-            "sensor_next_rise": { "name": "Következő kelte" },
-            "sensor_next_set": { "name": "Következő nyugta" },
-            "sensor_next_apogee": { "name": "Következő apogeum" },
-            "sensor_next_perigee": { "name": "Következő perigeum" },
-            "sensor_next_new_moon": { "name": "Következő újhold" },
-            "sensor_next_first_quarter": { "name": "Következő első negyed" },
-            "sensor_next_full_moon": { "name": "Következő telihold" },
-            "sensor_next_last_quarter": { "name": "Következő utolsó negyed" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptikai hosszúság (topocentrikus)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptikai szélesség (topocentrikus)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptikai hosszúság (geocentrikus)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptikai szélesség (geocentrikus)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptikai hosszúság a következő teliholdkor" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptikai szélesség a következő teliholdkor" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptikai hosszúság a következő újholdkor" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptikai szélesség a következő újholdkor" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Állatövi jegy a következő újholdkor" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Állatövi jegy a következő teliholdkor" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Fok az állatövi jegyben a következő újholdkor" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Fok az állatövi jegyben a következő teliholdkor" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "A Hold a horizont felett" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Fázis"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Magassági szög"
+            },
+            "sensor_illumination": {
+                "name": "Megvilágítás"
+            },
+            "sensor_distance": {
+                "name": "Távolság"
+            },
+            "sensor_parallax": {
+                "name": "Parallaxis"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptikai hosszúság (topocentrikus)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptikai szélesség (topocentrikus)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptikai hosszúság (geocentrikus)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptikai szélesség (geocentrikus)"
+            },
+            "sensor_next_rise": {
+                "name": "Következő felkelés"
+            },
+            "sensor_next_set": {
+                "name": "Következő nyugvás"
+            },
+            "sensor_next_apogee": {
+                "name": "Következő apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Következő perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Következő újhold"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Következő első negyed"
+            },
+            "sensor_next_full_moon": {
+                "name": "Következő telihold"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Következő utolsó negyed"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptikai hosszúság a következő teliholdkor"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptikai szélesség a következő teliholdkor"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptikai hosszúság a következő újholdkor"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptikai szélesség a következő újholdkor"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Kos",
-            "taurus": "Bika",
-            "gemini": "Ikrek",
-            "cancer": "Rák",
-            "leo": "Oroszlán",
-            "virgo": "Szűz",
-            "libra": "Mérleg",
-            "scorpio": "Skorpió",
-            "sagittarius": "Nyilas",
-            "capricorn": "Bak",
-            "aquarius": "Vízöntő",
-            "pisces": "Halak"
+                "name": "Állatövi jegy a következő újholdkor",
+                "state": {
+                    "aries": "Kos",
+                    "taurus": "Bika",
+                    "gemini": "Ikrek",
+                    "cancer": "Rák",
+                    "leo": "Oroszlán",
+                    "virgo": "Szűz",
+                    "libra": "Mérleg",
+                    "scorpio": "Skorpió",
+                    "sagittarius": "Nyilas",
+                    "capricorn": "Bak",
+                    "aquarius": "Vízöntő",
+                    "pisces": "Halak"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Kos",
-            "taurus": "Bika",
-            "gemini": "Ikrek",
-            "cancer": "Rák",
-            "leo": "Oroszlán",
-            "virgo": "Szűz",
-            "libra": "Mérleg",
-            "scorpio": "Skorpió",
-            "sagittarius": "Nyilas",
-            "capricorn": "Bak",
-            "aquarius": "Vízöntő",
-            "pisces": "Halak"
+                "name": "Állatövi jegy a következő teliholdkor",
+                "state": {
+                    "aries": "Kos",
+                    "taurus": "Bika",
+                    "gemini": "Ikrek",
+                    "cancer": "Rák",
+                    "leo": "Oroszlán",
+                    "virgo": "Szűz",
+                    "libra": "Mérleg",
+                    "scorpio": "Skorpió",
+                    "sagittarius": "Nyilas",
+                    "capricorn": "Bak",
+                    "aquarius": "Vízöntő",
+                    "pisces": "Halak"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Fok az állatövben a következő újholdkor"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Fok az állatövben a következő teliholdkor"
             }
         }
     }

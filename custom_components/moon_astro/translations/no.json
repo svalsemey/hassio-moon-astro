@@ -27,70 +27,111 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fase" },
-            "sensor_azimuth": { "name": "Asimut" },
-            "sensor_elevation": { "name": "Elevasjon" },
-            "sensor_illumination": { "name": "Belysning" },
-            "sensor_distance": { "name": "Avstand" },
-            "sensor_parallax": { "name": "Parallaksevinkel" },
-    
-            "sensor_next_rise": { "name": "Neste måneoppgang" },
-            "sensor_next_set": { "name": "Neste månenedgang" },
-            "sensor_next_apogee": { "name": "Neste apogeum" },
-            "sensor_next_perigee": { "name": "Neste perigeum" },
-            "sensor_next_new_moon": { "name": "Neste nymåne" },
-            "sensor_next_first_quarter": { "name": "Neste første kvarter" },
-            "sensor_next_full_moon": { "name": "Neste fullmåne" },
-            "sensor_next_last_quarter": { "name": "Neste siste kvarter" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptisk lengdegrad (toposentrisk)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptisk breddegrad (toposentrisk)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptisk lengdegrad (geosentrisk)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptisk breddegrad (geosentrisk)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptisk lengdegrad ved neste fullmåne" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptisk breddegrad ved neste fullmåne" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptisk lengdegrad ved neste nymåne" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptisk breddegrad ved neste nymåne" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Stjernetegn ved neste nymåne" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Stjernetegn ved neste fullmåne" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Grad i tegn ved neste nymåne" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Grad i tegn ved neste fullmåne" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Månen over horisonten" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Fase"
+            },
+            "sensor_azimuth": {
+                "name": "Asimut"
+            },
+            "sensor_elevation": {
+                "name": "Høydevinkel"
+            },
+            "sensor_illumination": {
+                "name": "Belysning"
+            },
+            "sensor_distance": {
+                "name": "Avstand"
+            },
+            "sensor_parallax": {
+                "name": "Parallakse"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptisk lengdegrad (toposentrisk)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptisk breddegrad (toposentrisk)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptisk lengdegrad (geosentrisk)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptisk breddegrad (geosentrisk)"
+            },
+            "sensor_next_rise": {
+                "name": "Neste måneoppgang"
+            },
+            "sensor_next_set": {
+                "name": "Neste månenedgang"
+            },
+            "sensor_next_apogee": {
+                "name": "Neste apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Neste perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Neste nymåne"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Neste første kvarter"
+            },
+            "sensor_next_full_moon": {
+                "name": "Neste fullmåne"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Neste siste kvarter"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptisk lengdegrad ved neste fullmåne"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptisk breddegrad ved neste fullmåne"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptisk lengdegrad ved neste nymåne"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptisk breddegrad ved neste nymåne"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Væren",
-            "taurus": "Tyren",
-            "gemini": "Tvillingene",
-            "cancer": "Krepsen",
-            "leo": "Løven",
-            "virgo": "Jomfruen",
-            "libra": "Vekten",
-            "scorpio": "Skorpionen",
-            "sagittarius": "Skytten",
-            "capricorn": "Steinbukken",
-            "aquarius": "Vannmannen",
-            "pisces": "Fiskene"
+                "name": "Stjernetegn ved neste nymåne",
+                "state": {
+                    "aries": "Væren",
+                    "taurus": "Tyren",
+                    "gemini": "Tvillingene",
+                    "cancer": "Krepsen",
+                    "leo": "Løven",
+                    "virgo": "Jomfruen",
+                    "libra": "Vekten",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Steinbukken",
+                    "aquarius": "Vannmannen",
+                    "pisces": "Fiskene"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Væren",
-            "taurus": "Tyren",
-            "gemini": "Tvillingene",
-            "cancer": "Krepsen",
-            "leo": "Løven",
-            "virgo": "Jomfruen",
-            "libra": "Vekten",
-            "scorpio": "Skorpionen",
-            "sagittarius": "Skytten",
-            "capricorn": "Steinbukken",
-            "aquarius": "Vannmannen",
-            "pisces": "Fiskene"
+                "name": "Stjernetegn ved neste fullmåne",
+                "state": {
+                    "aries": "Væren",
+                    "taurus": "Tyren",
+                    "gemini": "Tvillingene",
+                    "cancer": "Krepsen",
+                    "leo": "Løven",
+                    "virgo": "Jomfruen",
+                    "libra": "Vekten",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Steinbukken",
+                    "aquarius": "Vannmannen",
+                    "pisces": "Fiskene"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Grad i stjernetegn ved neste nymåne"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Grad i stjernetegn ved neste fullmåne"
             }
         }
     }

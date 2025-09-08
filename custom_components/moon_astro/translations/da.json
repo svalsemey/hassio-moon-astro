@@ -1,14 +1,14 @@
 {
-    "title": "Måne-astronomi",
+    "title": "Måne Astro",
     "config": {
         "step": {
             "user": {
-                "title": "Måne-astronomi",
-                "description": "Konfigurer Måne-astronomi",
+                "title": "Måne Astro",
+                "description": "Angiv dine GPS-koordinater og højde.",
                 "data": {
                     "latitude": "Breddegrad",
                     "longitude": "Længdegrad",
-                    "elevation": "Højde (m)"
+                    "altitude": "Højde (m)"
                 }
             }
         }
@@ -16,8 +16,8 @@
     "options": {
         "step": {
             "init": {
-                "title": "Indstillinger for Måne-astronomi",
-                "description": "Juster opdateringsinterval og tidszonehåndtering",
+                "title": "Indstillinger for Måne Astro",
+                "description": "Juster opdateringsinterval og håndtering af tidszone",
                 "data": {
                     "scan_interval": "Opdateringsinterval (sekunder)",
                     "use_ha_time_zone": "Brug Home Assistants tidszone"
@@ -27,32 +27,72 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fase" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Højde" },
-            "sensor_illumination": { "name": "Belysning" },
-            "sensor_distance": { "name": "Afstand" },
-            "sensor_parallax": { "name": "Parallakse" },
-
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptisk længdegrad (topocentrisk)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptisk breddegrad (topocentrisk)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptisk længdegrad (geocentrisk)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptisk breddegrad (geocentrisk)" },
-
-            "sensor_next_rise": { "name": "Næste måneopgang" },
-            "sensor_next_set": { "name": "Næste månenedgang" },
-            "sensor_next_apogee": { "name": "Næste apogeum" },
-            "sensor_next_perigee": { "name": "Næste perigeum" },
-            "sensor_next_new_moon": { "name": "Næste nymåne" },
-            "sensor_next_first_quarter": { "name": "Næste første kvarter" },
-            "sensor_next_full_moon": { "name": "Næste fuldmåne" },
-            "sensor_next_last_quarter": { "name": "Næste sidste kvarter" },
-
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptisk længdegrad ved næste fuldmåne" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptisk breddegrad ved næste fuldmåne" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptisk længdegrad ved næste nymåne" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptisk breddegrad ved næste nymåne" },
-
+            "sensor_phase": {
+                "name": "Fase"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Højde"
+            },
+            "sensor_illumination": {
+                "name": "Belysning"
+            },
+            "sensor_distance": {
+                "name": "Afstand"
+            },
+            "sensor_parallax": {
+                "name": "Parallakse"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptisk længdegrad (topocentrisk)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptisk breddegrad (topocentrisk)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptisk længdegrad (geocentrisk)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptisk breddegrad (geocentrisk)"
+            },
+            "sensor_next_rise": {
+                "name": "Næste måneopgang"
+            },
+            "sensor_next_set": {
+                "name": "Næste månenedgang"
+            },
+            "sensor_next_apogee": {
+                "name": "Næste apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Næste perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Næste nymåne"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Næste første kvarter"
+            },
+            "sensor_next_full_moon": {
+                "name": "Næste fuldmåne"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Næste sidste kvarter"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptisk længdegrad ved næste fuldmåne"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptisk breddegrad ved næste fuldmåne"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptisk længdegrad ved næste nymåne"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptisk breddegrad ved næste nymåne"
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Stjernetegn ved næste nymåne",
                 "state": {
@@ -67,7 +107,7 @@
                     "sagittarius": "Skytten",
                     "capricorn": "Stenbukken",
                     "aquarius": "Vandbæreren",
-                    "pisces": "Fisken"
+                    "pisces": "Fiskene"
                 }
             },
             "sensor_zodiac_sign_next_full_moon": {
@@ -84,12 +124,15 @@
                     "sagittarius": "Skytten",
                     "capricorn": "Stenbukken",
                     "aquarius": "Vandbæreren",
-                    "pisces": "Fisken"
+                    "pisces": "Fiskene"
                 }
             },
-
-            "sensor_zodiac_degree_next_new_moon": { "name": "Grad i stjernetegn ved næste nymåne" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Grad i stjernetegn ved næste fuldmåne" }
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Grad i stjernetegn ved næste nymåne"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Grad i stjernetegn ved næste fuldmåne"
+            }
         }
     }
 }

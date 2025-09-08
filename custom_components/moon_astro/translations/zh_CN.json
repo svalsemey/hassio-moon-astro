@@ -1,9 +1,9 @@
 {
-    "title": "月相天文",
+    "title": "月亮阿斯特罗",
     "config": {
         "step": {
             "user": {
-                "title": "月相 Astro",
+                "title": "月亮阿斯特罗",
                 "description": "设置你的 GPS 坐标和海拔高度。",
                 "data": {
                     "latitude": "纬度",
@@ -16,7 +16,7 @@
     "options": {
         "step": {
             "init": {
-                "title": "月相 Astro 选项",
+                "title": "月相天文选项",
                 "description": "调整更新间隔与时区处理方式",
                 "data": {
                     "scan_interval": "扫描间隔（秒）",

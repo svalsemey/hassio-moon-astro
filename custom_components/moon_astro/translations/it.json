@@ -18,79 +18,120 @@
             "init": {
             "title": "Opzioni di Luna Astro",
             "description": "Aggiorna l'intervallo di polling e il comportamento del fuso orario.",
-            "data": {
-                "scan_interval": "Intervallo di scansione (secondi)",
-                "use_ha_time_zone": "Usa il fuso orario di Home Assistant"
-            }
+                "data": {
+                    "scan_interval": "Intervallo di scansione (secondi)",
+                    "use_ha_time_zone": "Usa il fuso orario di Home Assistant"
+                }
             }
         }
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fase" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Elevazione" },
-            "sensor_illumination": { "name": "Illuminazione" },
-            "sensor_distance": { "name": "Distanza" },
-            "sensor_parallax": { "name": "Angolo di parallasse" },
-    
-            "sensor_next_rise": { "name": "Prossima levata" },
-            "sensor_next_set": { "name": "Prossimo tramonto" },
-            "sensor_next_apogee": { "name": "Prossimo apogeo" },
-            "sensor_next_perigee": { "name": "Prossimo perigeo" },
-            "sensor_next_new_moon": { "name": "Prossima luna nuova" },
-            "sensor_next_first_quarter": { "name": "Primo quarto successivo" },
-            "sensor_next_full_moon": { "name": "Prossima luna piena" },
-            "sensor_next_last_quarter": { "name": "Ultimo quarto successivo" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Longitudine eclittica (topocentrica)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Latitudine eclittica (topocentrica)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Longitudine eclittica (geocentrica)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Latitudine eclittica (geocentrica)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Longitudine eclittica alla prossima luna piena" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Latitudine eclittica alla prossima luna piena" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Longitudine eclittica alla prossima luna nuova" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Latitudine eclittica alla prossima luna nuova" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Segno zodiacale alla prossima luna nuova" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Segno zodiacale alla prossima luna piena" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Grado zodiacale alla prossima luna nuova" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Grado zodiacale alla prossima luna piena" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Luna sopra l'orizzonte" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Fase"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Elevazione"
+            },
+            "sensor_illumination": {
+                "name": "Illuminazione"
+            },
+            "sensor_distance": {
+                "name": "Distanza"
+            },
+            "sensor_parallax": {
+                "name": "Parallasse"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Longitudine eclittica (topocentrica)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Latitudine eclittica (topocentrica)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Longitudine eclittica (geocentrica)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Latitudine eclittica (geocentrica)"
+            },
+            "sensor_next_rise": {
+                "name": "Prossimo sorgere"
+            },
+            "sensor_next_set": {
+                "name": "Prossimo tramonto"
+            },
+            "sensor_next_apogee": {
+                "name": "Prossimo apogeo"
+            },
+            "sensor_next_perigee": {
+                "name": "Prossimo perigeo"
+            },
+            "sensor_next_new_moon": {
+                "name": "Prossima luna nuova"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Prossimo primo quarto"
+            },
+            "sensor_next_full_moon": {
+                "name": "Prossima luna piena"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Prossimo ultimo quarto"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Longitudine eclittica alla prossima luna piena"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Latitudine eclittica alla prossima luna piena"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Longitudine eclittica alla prossima luna nuova"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Latitudine eclittica alla prossima luna nuova"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Ariete",
-            "taurus": "Toro",
-            "gemini": "Gemelli",
-            "cancer": "Cancro",
-            "leo": "Leone",
-            "virgo": "Vergine",
-            "libra": "Bilancia",
-            "scorpio": "Scorpione",
-            "sagittarius": "Sagittario",
-            "capricorn": "Capricorno",
-            "aquarius": "Acquario",
-            "pisces": "Pesci"
+                "name": "Segno zodiacale alla prossima luna nuova",
+                "state": {
+                    "aries": "Ariete",
+                    "taurus": "Toro",
+                    "gemini": "Gemelli",
+                    "cancer": "Cancro",
+                    "leo": "Leone",
+                    "virgo": "Vergine",
+                    "libra": "Bilancia",
+                    "scorpio": "Scorpione",
+                    "sagittarius": "Sagittario",
+                    "capricorn": "Capricorno",
+                    "aquarius": "Acquario",
+                    "pisces": "Pesci"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Ariete",
-            "taurus": "Toro",
-            "gemini": "Gemelli",
-            "cancer": "Cancro",
-            "leo": "Leone",
-            "virgo": "Vergine",
-            "libra": "Bilancia",
-            "scorpio": "Scorpione",
-            "sagittarius": "Sagittario",
-            "capricorn": "Capricorno",
-            "aquarius": "Acquario",
-            "pisces": "Pesci"
+                "name": "Segno zodiacale alla prossima luna piena",
+                "state": {
+                    "aries": "Ariete",
+                    "taurus": "Toro",
+                    "gemini": "Gemelli",
+                    "cancer": "Cancro",
+                    "leo": "Leone",
+                    "virgo": "Vergine",
+                    "libra": "Bilancia",
+                    "scorpio": "Scorpione",
+                    "sagittarius": "Sagittario",
+                    "capricorn": "Capricorno",
+                    "aquarius": "Acquario",
+                    "pisces": "Pesci"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Grado zodiacale alla prossima luna nuova"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Grado zodiacale alla prossima luna piena"
             }
         }
     }

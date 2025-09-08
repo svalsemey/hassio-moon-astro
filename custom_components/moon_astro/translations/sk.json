@@ -27,70 +27,111 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "Fáza" },
-            "sensor_azimuth": { "name": "Azimut" },
-            "sensor_elevation": { "name": "Výška" },
-            "sensor_illumination": { "name": "Osvetlenie" },
-            "sensor_distance": { "name": "Vzdialenosť" },
-            "sensor_parallax": { "name": "Paralaktický uhol" },
-    
-            "sensor_next_rise": { "name": "Najbližší východ" },
-            "sensor_next_set": { "name": "Najbližší západ" },
-            "sensor_next_apogee": { "name": "Najbližšie apogeum" },
-            "sensor_next_perigee": { "name": "Najbližšie perigeum" },
-            "sensor_next_new_moon": { "name": "Najbližší nov" },
-            "sensor_next_first_quarter": { "name": "Najbližšia prvá štvrť" },
-            "sensor_next_full_moon": { "name": "Najbližší spln" },
-            "sensor_next_last_quarter": { "name": "Najbližšia posledná štvrť" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptikálna dĺžka (topocentrická)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptikálna šírka (topocentrická)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptikálna dĺžka (geocentrická)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptikálna šírka (geocentrická)" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptikálna dĺžka pri najbližšom splne" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptikálna šírka pri najbližšom splne" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptikálna dĺžka pri najbližšom nove" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptikálna šírka pri najbližšom nove" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "Znamenie zverokruhu pri najbližšom nove" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "Znamenie zverokruhu pri najbližšom splne" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "Stupeň v znamení pri najbližšom nove" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "Stupeň v znamení pri najbližšom splne" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "Mesiac nad horizontom" }
-        }
-    },
-    "state": {
-        "sensor": {
+            "sensor_phase": {
+                "name": "Fáza"
+            },
+            "sensor_azimuth": {
+                "name": "Azimut"
+            },
+            "sensor_elevation": {
+                "name": "Výška"
+            },
+            "sensor_illumination": {
+                "name": "Osvetlenie"
+            },
+            "sensor_distance": {
+                "name": "Vzdialenosť"
+            },
+            "sensor_parallax": {
+                "name": "Paralaxa"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "Ekliptikálna dĺžka (topocentrická)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "Ekliptikálna šírka (topocentrická)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "Ekliptikálna dĺžka (geocentrická)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "Ekliptikálna šírka (geocentrická)"
+            },
+            "sensor_next_rise": {
+                "name": "Najbližší východ"
+            },
+            "sensor_next_set": {
+                "name": "Najbližší západ"
+            },
+            "sensor_next_apogee": {
+                "name": "Najbližšie apogeum"
+            },
+            "sensor_next_perigee": {
+                "name": "Najbližšie perigeum"
+            },
+            "sensor_next_new_moon": {
+                "name": "Najbližší nov"
+            },
+            "sensor_next_first_quarter": {
+                "name": "Najbližšia prvá štvrť"
+            },
+            "sensor_next_full_moon": {
+                "name": "Najbližší spln"
+            },
+            "sensor_next_last_quarter": {
+                "name": "Najbližšia posledná štvrť"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "Ekliptikálna dĺžka pri najbližšom splne"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "Ekliptikálna šírka pri najbližšom splne"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "Ekliptikálna dĺžka pri najbližšom nove"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "Ekliptikálna šírka pri najbližšom nove"
+            },
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "Baran",
-            "taurus": "Býk",
-            "gemini": "Blíženci",
-            "cancer": "Rak",
-            "leo": "Lev",
-            "virgo": "Panna",
-            "libra": "Váhy",
-            "scorpio": "Škorpión",
-            "sagittarius": "Strelec",
-            "capricorn": "Kozorožec",
-            "aquarius": "Vodnár",
-            "pisces": "Ryby"
+                "name": "Znamenie zverokruhu pri najbližšom nove",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Býk",
+                    "gemini": "Blíženci",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Panna",
+                    "libra": "Váhy",
+                    "scorpio": "Škorpión",
+                    "sagittarius": "Strelec",
+                    "capricorn": "Kozorožec",
+                    "aquarius": "Vodnár",
+                    "pisces": "Ryby"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "Baran",
-            "taurus": "Býk",
-            "gemini": "Blíženci",
-            "cancer": "Rak",
-            "leo": "Lev",
-            "virgo": "Panna",
-            "libra": "Váhy",
-            "scorpio": "Škorpión",
-            "sagittarius": "Strelec",
-            "capricorn": "Kozorožec",
-            "aquarius": "Vodnár",
-            "pisces": "Ryby"
+                "name": "Znamenie zverokruhu pri najbližšom splne",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Býk",
+                    "gemini": "Blíženci",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Panna",
+                    "libra": "Váhy",
+                    "scorpio": "Škorpión",
+                    "sagittarius": "Strelec",
+                    "capricorn": "Kozorožec",
+                    "aquarius": "Vodnár",
+                    "pisces": "Ryby"
+                }
+            },
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "Stupeň zverokruhu pri najbližšom nove"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "Stupeň zverokruhu pri najbližšom splne"
             }
         }
     }

@@ -1,9 +1,9 @@
 {
-    "title": "فلك القمر",
+    "title": "قمر أسترو",
     "config": {
         "step": {
             "user": {
-                "title": "فلك القمر",
+                "title": "قمر أسترو",
                 "description": "اضبط إحداثيات نظام تحديد المواقع (GPS) والارتفاع.",
                 "data": {
                     "latitude": "خط العرض",
@@ -16,7 +16,7 @@
     "options": {
         "step": {
             "init": {
-                "title": "خيارات فلك القمر",
+                "title": "خيارات قمر أسترو",
                 "description": "اضبط فترة التحديث وآلية التعامل مع المنطقة الزمنية",
                 "data": {
                     "scan_interval": "فاصل التحديث (بالثواني)",
@@ -27,32 +27,72 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "الطور" },
-            "sensor_azimuth": { "name": "السمت" },
-            "sensor_elevation": { "name": "الارتفاع الزاوي" },
-            "sensor_illumination": { "name": "الإضاءة" },
-            "sensor_distance": { "name": "المسافة" },
-            "sensor_parallax": { "name": "اختلاف المنظر" },
-
-            "sensor_ecliptic_longitude_topocentric": { "name": "خط الطول الكسوفي (موضعي)" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "خط العرض الكسوفي (موضعي)" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "خط الطول الكسوفي (مركزي أرضي)" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "خط العرض الكسوفي (مركزي أرضي)" },
-
-            "sensor_next_rise": { "name": "موعد الشروق التالي" },
-            "sensor_next_set": { "name": "موعد الغروب التالي" },
-            "sensor_next_apogee": { "name": "الأوج التالي" },
-            "sensor_next_perigee": { "name": "الحضيض التالي" },
-            "sensor_next_new_moon": { "name": "المحاق التالي" },
-            "sensor_next_first_quarter": { "name": "التربيع الأول التالي" },
-            "sensor_next_full_moon": { "name": "البدر التالي" },
-            "sensor_next_last_quarter": { "name": "التربيع الأخير التالي" },
-
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "خط الطول الكسوفي عند البدر التالي" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "خط العرض الكسوفي عند البدر التالي" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "خط الطول الكسوفي عند المحاق التالي" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "خط العرض الكسوفي عند المحاق التالي" },
-
+            "sensor_phase": {
+                "name": "الطور"
+            },
+            "sensor_azimuth": {
+                "name": "السمت"
+            },
+            "sensor_elevation": {
+                "name": "الارتفاع الزاوي"
+            },
+            "sensor_illumination": {
+                "name": "الإضاءة"
+            },
+            "sensor_distance": {
+                "name": "المسافة"
+            },
+            "sensor_parallax": {
+                "name": "اختلاف المنظر"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "خط الطول الكسوفي (موضعي)"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "خط العرض الكسوفي (موضعي)"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "خط الطول الكسوفي (مركزي أرضي)"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "خط العرض الكسوفي (مركزي أرضي)"
+            },
+            "sensor_next_rise": {
+                "name": "موعد الشروق التالي"
+            },
+            "sensor_next_set": {
+                "name": "موعد الغروب التالي"
+            },
+            "sensor_next_apogee": {
+                "name": "الأوج التالي"
+            },
+            "sensor_next_perigee": {
+                "name": "الحضيض التالي"
+            },
+            "sensor_next_new_moon": {
+                "name": "المحاق التالي"
+            },
+            "sensor_next_first_quarter": {
+                "name": "التربيع الأول التالي"
+            },
+            "sensor_next_full_moon": {
+                "name": "البدر التالي"
+            },
+            "sensor_next_last_quarter": {
+                "name": "التربيع الأخير التالي"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "خط الطول الكسوفي عند البدر التالي"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "خط العرض الكسوفي عند البدر التالي"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "خط الطول الكسوفي عند المحاق التالي"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "خط العرض الكسوفي عند المحاق التالي"
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "برج البروج عند المحاق التالي",
                 "state": {
@@ -87,9 +127,12 @@
                     "pisces": "الحوت"
                 }
             },
-
-            "sensor_zodiac_degree_next_new_moon": { "name": "درجة البروج عند المحاق التالي" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "درجة البروج عند البدر التالي" }
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "درجة البروج عند المحاق التالي"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "درجة البروج عند البدر التالي"
+            }
         }
     }
 }
