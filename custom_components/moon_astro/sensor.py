@@ -18,31 +18,31 @@ from .const import (
     DOMAIN,
     KEY_AZ,
     KEY_DISTANCE,
-    KEY_ECLIPTIC_LAT_GEO,
-    KEY_ECLIPTIC_LAT_NEXT_FULL,
-    KEY_ECLIPTIC_LAT_NEXT_NEW,
-    KEY_ECLIPTIC_LAT_TOPO,
-    KEY_ECLIPTIC_LON_GEO,
-    KEY_ECLIPTIC_LON_NEXT_FULL,
-    KEY_ECLIPTIC_LON_NEXT_NEW,
-    KEY_ECLIPTIC_LON_TOPO,
+    KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
+    KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
+    KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
+    KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
+    KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
+    KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
     KEY_EL,
     KEY_ILLUM,
     KEY_NEXT_APOGEE,
-    KEY_NEXT_FIRST,
-    KEY_NEXT_FULL,
-    KEY_NEXT_LAST,
-    KEY_NEXT_NEW,
+    KEY_NEXT_FIRST_QUARTER,
+    KEY_NEXT_FULL_MOON,
+    KEY_NEXT_LAST_QUARTER,
+    KEY_NEXT_NEW_MOON,
     KEY_NEXT_PERIGEE,
     KEY_NEXT_RISE,
     KEY_NEXT_SET,
     KEY_PARALLAX,
     KEY_PHASE,
     KEY_WAXING,
-    KEY_ZODIAC_DEGREE_NEXT_FULL,
-    KEY_ZODIAC_DEGREE_NEXT_NEW,
-    KEY_ZODIAC_SIGN_NEXT_FULL,
-    KEY_ZODIAC_SIGN_NEXT_NEW,
+    KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+    KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+    KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+    KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
     PRECISION_AZ,
     PRECISION_DISTANCE,
     PRECISION_ECL_GEO,
@@ -66,31 +66,31 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
     (KEY_DISTANCE, "sensor_distance", "km", None, PRECISION_DISTANCE),
     (KEY_PARALLAX, "sensor_parallax", "°", None, PRECISION_PARALLAX),
     # Topocentric ecliptic coordinates (current)
-    (KEY_ECLIPTIC_LON_TOPO, "sensor_ecliptic_longitude_topocentric", "°", None, PRECISION_ECL_TOPO),
-    (KEY_ECLIPTIC_LAT_TOPO, "sensor_ecliptic_latitude_topocentric", "°", None, PRECISION_ECL_TOPO),
+    (KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC, "sensor_ecliptic_longitude_topocentric", "°", None, PRECISION_ECL_TOPO),
+    (KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC, "sensor_ecliptic_latitude_topocentric", "°", None, PRECISION_ECL_TOPO),
     # Geocentric ecliptic coordinates (current)
-    (KEY_ECLIPTIC_LON_GEO, "sensor_ecliptic_longitude_geocentric", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LAT_GEO, "sensor_ecliptic_latitude_geocentric", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC, "sensor_ecliptic_longitude_geocentric", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LATITUDE_GEOCENTRIC, "sensor_ecliptic_latitude_geocentric", "°", None, PRECISION_ECL_GEO),
     # Time sensors
     (KEY_NEXT_RISE, "sensor_next_rise", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_SET, "sensor_next_set", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_APOGEE, "sensor_next_apogee", None, SensorDeviceClass.TIMESTAMP, None),
     (KEY_NEXT_PERIGEE, "sensor_next_perigee", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_NEW, "sensor_next_new_moon", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_FIRST, "sensor_next_first_quarter", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_FULL, "sensor_next_full_moon", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_LAST, "sensor_next_last_quarter", None, SensorDeviceClass.TIMESTAMP, None),
+    (KEY_NEXT_NEW_MOON, "sensor_next_new_moon", None, SensorDeviceClass.TIMESTAMP, None),
+    (KEY_NEXT_FIRST_QUARTER, "sensor_next_first_quarter", None, SensorDeviceClass.TIMESTAMP, None),
+    (KEY_NEXT_FULL_MOON, "sensor_next_full_moon", None, SensorDeviceClass.TIMESTAMP, None),
+    (KEY_NEXT_LAST_QUARTER, "sensor_next_last_quarter", None, SensorDeviceClass.TIMESTAMP, None),
     # Ecliptic coordinates at next lunations (geocentric, true-of-date)
-    (KEY_ECLIPTIC_LON_NEXT_FULL, "sensor_ecliptic_longitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LAT_NEXT_FULL, "sensor_ecliptic_latitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LON_NEXT_NEW, "sensor_ecliptic_longitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LAT_NEXT_NEW, "sensor_ecliptic_latitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON, "sensor_ecliptic_longitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON, "sensor_ecliptic_latitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON, "sensor_ecliptic_longitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
+    (KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON, "sensor_ecliptic_latitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
     # Zodiac sign sensors (string states)
-    (KEY_ZODIAC_SIGN_NEXT_NEW, "sensor_zodiac_sign_next_new_moon", None, None, None),
-    (KEY_ZODIAC_SIGN_NEXT_FULL, "sensor_zodiac_sign_next_full_moon", None, None, None),
+    (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, "sensor_zodiac_sign_next_new_moon", None, None, None),
+    (KEY_ZODIAC_SIGN_NEXT_FULL_MOON, "sensor_zodiac_sign_next_full_moon", None, None, None),
     # Zodiac degree sensors (floats 0..30)
-    (KEY_ZODIAC_DEGREE_NEXT_NEW, "sensor_zodiac_degree_next_new_moon", "°", None, PRECISION_ZODIAC_DEGREE),
-    (KEY_ZODIAC_DEGREE_NEXT_FULL, "sensor_zodiac_degree_next_full_moon", "°", None, PRECISION_ZODIAC_DEGREE),
+    (KEY_ZODIAC_DEGREE_NEXT_NEW_MOON, "sensor_zodiac_degree_next_new_moon", "°", None, PRECISION_ZODIAC_DEGREE),
+    (KEY_ZODIAC_DEGREE_NEXT_FULL_MOON, "sensor_zodiac_degree_next_full_moon", "°", None, PRECISION_ZODIAC_DEGREE),
 ]
 
 # Stable, non-localized slugs for initial entity_id creation
@@ -101,26 +101,26 @@ SUGGESTED_SLUGS: dict[str, str] = {
     KEY_ILLUM: "illumination",
     KEY_DISTANCE: "distance",
     KEY_PARALLAX: "parallax",
-    KEY_ECLIPTIC_LON_TOPO: "ecliptic_longitude_topocentric",
-    KEY_ECLIPTIC_LAT_TOPO: "ecliptic_latitude_topocentric",
-    KEY_ECLIPTIC_LON_GEO: "ecliptic_longitude_geocentric",
-    KEY_ECLIPTIC_LAT_GEO: "ecliptic_latitude_geocentric",
-    KEY_ECLIPTIC_LON_NEXT_FULL: "ecliptic_longitude_next_full_moon",
-    KEY_ECLIPTIC_LAT_NEXT_FULL: "ecliptic_latitude_next_full_moon",
-    KEY_ECLIPTIC_LON_NEXT_NEW: "ecliptic_longitude_next_new_moon",
-    KEY_ECLIPTIC_LAT_NEXT_NEW: "ecliptic_latitude_next_new_moon",
+    KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC: "ecliptic_longitude_topocentric",
+    KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC: "ecliptic_latitude_topocentric",
+    KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC: "ecliptic_longitude_geocentric",
+    KEY_ECLIPTIC_LATITUDE_GEOCENTRIC: "ecliptic_latitude_geocentric",
+    KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON: "ecliptic_longitude_next_full_moon",
+    KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON: "ecliptic_latitude_next_full_moon",
+    KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON: "ecliptic_longitude_next_new_moon",
+    KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON: "ecliptic_latitude_next_new_moon",
     KEY_NEXT_RISE: "next_rise",
     KEY_NEXT_SET: "next_set",
     KEY_NEXT_APOGEE: "next_apogee",
     KEY_NEXT_PERIGEE: "next_perigee",
-    KEY_NEXT_NEW: "next_new_moon",
-    KEY_NEXT_FIRST: "next_first_quarter",
-    KEY_NEXT_FULL: "next_full_moon",
-    KEY_NEXT_LAST: "next_last_quarter",
-    KEY_ZODIAC_SIGN_NEXT_NEW: "zodiac_sign_next_new_moon",
-    KEY_ZODIAC_SIGN_NEXT_FULL: "zodiac_sign_next_full_moon",
-    KEY_ZODIAC_DEGREE_NEXT_NEW: "zodiac_degree_next_new_moon",
-    KEY_ZODIAC_DEGREE_NEXT_FULL: "zodiac_degree_next_full_moon",
+    KEY_NEXT_NEW_MOON: "next_new_moon",
+    KEY_NEXT_FIRST_QUARTER: "next_first_quarter",
+    KEY_NEXT_FULL_MOON: "next_full_moon",
+    KEY_NEXT_LAST_QUARTER: "next_last_quarter",
+    KEY_ZODIAC_SIGN_NEXT_NEW_MOON: "zodiac_sign_next_new_moon",
+    KEY_ZODIAC_SIGN_NEXT_FULL_MOON: "zodiac_sign_next_full_moon",
+    KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: "zodiac_degree_next_new_moon",
+    KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: "zodiac_degree_next_full_moon",
 }
 
 
@@ -209,7 +209,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             return dt
 
         # Normalize zodiac sign string states to canonical lowercase keys
-        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW, KEY_ZODIAC_SIGN_NEXT_FULL):
+        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, KEY_ZODIAC_SIGN_NEXT_FULL_MOON):
             if value is None:
                 return None
             try:
@@ -274,13 +274,13 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             return "mdi:moon-full"
 
         # Canonical phase-related icons for specific next events
-        if self._key in (KEY_NEXT_NEW, KEY_ZODIAC_DEGREE_NEXT_NEW):
+        if self._key in (KEY_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON):
             return "mdi:moon-new"
-        if self._key in (KEY_NEXT_FULL, KEY_ZODIAC_DEGREE_NEXT_FULL):
+        if self._key in (KEY_NEXT_FULL_MOON, KEY_ZODIAC_DEGREE_NEXT_FULL_MOON):
             return "mdi:moon-full"
-        if self._key == KEY_NEXT_FIRST:
+        if self._key == KEY_NEXT_FIRST_QUARTER:
             return "mdi:moon-first-quarter"
-        if self._key == KEY_NEXT_LAST:
+        if self._key == KEY_NEXT_LAST_QUARTER:
             return "mdi:moon-last-quarter"
 
         # Instant angles and measurements
@@ -297,19 +297,19 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
 
         # Ecliptic longitudes
         if self._key in (
-            KEY_ECLIPTIC_LON_TOPO,
-            KEY_ECLIPTIC_LON_GEO,
-            KEY_ECLIPTIC_LON_NEXT_FULL,
-            KEY_ECLIPTIC_LON_NEXT_NEW,
+            KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
+            KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
+            KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
+            KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
         ):
             return "mdi:longitude"
 
         # Ecliptic latitudes
         if self._key in (
-            KEY_ECLIPTIC_LAT_TOPO,
-            KEY_ECLIPTIC_LAT_GEO,
-            KEY_ECLIPTIC_LAT_NEXT_FULL,
-            KEY_ECLIPTIC_LAT_NEXT_NEW,
+            KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
+            KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
+            KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
+            KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
         ):
             return "mdi:latitude"
 
@@ -322,7 +322,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             return "mdi:orbit"
 
         # Zodiac sensors
-        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW, KEY_ZODIAC_SIGN_NEXT_FULL):
+        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, KEY_ZODIAC_SIGN_NEXT_FULL_MOON):
             data = self.coordinator.data or {}
             raw = data.get(self._key)
             sign = str(raw).strip().lower() if raw is not None else ""
