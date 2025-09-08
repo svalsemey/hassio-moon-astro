@@ -1,5 +1,5 @@
 {
-    "title": "月相 Astro",
+    "title": "月相天文",
     "config": {
         "step": {
             "user": {
@@ -17,7 +17,7 @@
         "step": {
             "init": {
                 "title": "月相 Astro 选项",
-                "description": "更新轮询间隔和时区行为。",
+                "description": "调整更新间隔与时区处理方式",
                 "data": {
                     "scan_interval": "扫描间隔（秒）",
                     "use_ha_time_zone": "使用 Home Assistant 的时区"
@@ -27,13 +27,18 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "相位" },
+            "sensor_phase": { "name": "月相" },
             "sensor_azimuth": { "name": "方位角" },
             "sensor_elevation": { "name": "高度角" },
-            "sensor_illumination": { "name": "照度" },
+            "sensor_illumination": { "name": "照明度" },
             "sensor_distance": { "name": "距离" },
-            "sensor_parallax": { "name": "视差角" },
-    
+            "sensor_parallax": { "name": "视差" },
+
+            "sensor_ecliptic_longitude_topocentric": { "name": "黄经（地表观测）" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "黄纬（地表观测）" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "黄经（地心）" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "黄纬（地心）" },
+
             "sensor_next_rise": { "name": "下次月出" },
             "sensor_next_set": { "name": "下次月落" },
             "sensor_next_apogee": { "name": "下次远地点" },
@@ -42,56 +47,49 @@
             "sensor_next_first_quarter": { "name": "下次上弦月" },
             "sensor_next_full_moon": { "name": "下次满月" },
             "sensor_next_last_quarter": { "name": "下次下弦月" },
-    
-            "sensor_ecliptic_longitude_topocentric": { "name": "黄道经度（地面观测点）" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "黄道纬度（地面观测点）" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "黄道经度（地心）" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "黄道纬度（地心）" },
-    
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "下次满月时的黄道经度" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "下次满月时的黄道纬度" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "下次新月时的黄道经度" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "下次新月时的黄道纬度" },
-    
-            "sensor_zodiac_sign_next_new_moon": { "name": "下次新月的黄道星座" },
-            "sensor_zodiac_sign_next_full_moon": { "name": "下次满月的黄道星座" },
-            "sensor_zodiac_degree_next_new_moon": { "name": "下次新月的星座度数" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "下次满月的星座度数" }
-        },
-        "binary_sensor": {
-            "binary_above_horizon": { "name": "地平线上方的月亮" }
-        }
-    },
-    "state": {
-        "sensor": {
+
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "下次满月时的黄经" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "下次满月时的黄纬" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "下次新月时的黄经" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "下次新月时的黄纬" },
+
             "sensor_zodiac_sign_next_new_moon": {
-            "aries": "白羊座",
-            "taurus": "金牛座",
-            "gemini": "双子座",
-            "cancer": "巨蟹座",
-            "leo": "狮子座",
-            "virgo": "处女座",
-            "libra": "天秤座",
-            "scorpio": "天蝎座",
-            "sagittarius": "射手座",
-            "capricorn": "摩羯座",
-            "aquarius": "水瓶座",
-            "pisces": "双鱼座"
+                "name": "下次新月所在星座",
+                "state": {
+                    "aries": "白羊座",
+                    "taurus": "金牛座",
+                    "gemini": "双子座",
+                    "cancer": "巨蟹座",
+                    "leo": "狮子座",
+                    "virgo": "处女座",
+                    "libra": "天秤座",
+                    "scorpio": "天蝎座",
+                    "sagittarius": "射手座",
+                    "capricorn": "摩羯座",
+                    "aquarius": "水瓶座",
+                    "pisces": "双鱼座"
+                }
             },
             "sensor_zodiac_sign_next_full_moon": {
-            "aries": "白羊座",
-            "taurus": "金牛座",
-            "gemini": "双子座",
-            "cancer": "巨蟹座",
-            "leo": "狮子座",
-            "virgo": "处女座",
-            "libra": "天秤座",
-            "scorpio": "天蝎座",
-            "sagittarius": "射手座",
-            "capricorn": "摩羯座",
-            "aquarius": "水瓶座",
-            "pisces": "双鱼座"
-            }
+                "name": "下次满月所在星座",
+                "state": {
+                    "aries": "白羊座",
+                    "taurus": "金牛座",
+                    "gemini": "双子座",
+                    "cancer": "巨蟹座",
+                    "leo": "狮子座",
+                    "virgo": "处女座",
+                    "libra": "天秤座",
+                    "scorpio": "天蝎座",
+                    "sagittarius": "射手座",
+                    "capricorn": "摩羯座",
+                    "aquarius": "水瓶座",
+                    "pisces": "双鱼座"
+                }
+            },
+
+            "sensor_zodiac_degree_next_new_moon": { "name": "下次新月的星座度数" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "下次满月的星座度数" }
         }
     }
 }
