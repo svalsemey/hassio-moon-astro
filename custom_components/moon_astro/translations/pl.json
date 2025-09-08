@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Faza"
+                "name": "Faza",
+                "state": {
+                    "new_moon": "Nów",
+                    "waxing_crescent": "Przybywający sierp",
+                    "first_quarter": "Pierwsza kwadra",
+                    "waxing_gibbous": "Przybywający garbaty",
+                    "full_moon": "Pełnia",
+                    "waning_gibbous": "Ubywający garbaty",
+                    "last_quarter": "Ostatnia kwadra",
+                    "waning_crescent": "Ubywający sierp",
+                    "unknown": "Nieznana"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azymut"

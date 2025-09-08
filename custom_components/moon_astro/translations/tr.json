@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Evre"
+                "name": "Evre",
+                "state": {
+                    "new_moon": "Yeni ay",
+                    "waxing_crescent": "Hilal (büyüyen)",
+                    "first_quarter": "İlk dördün",
+                    "waxing_gibbous": "Şişkin ay (büyüyen)",
+                    "full_moon": "Dolunay",
+                    "waning_gibbous": "Şişkin ay (küçülen)",
+                    "last_quarter": "Son dördün",
+                    "waning_crescent": "Hilal (küçülen)",
+                    "unknown": "Bilinmiyor"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

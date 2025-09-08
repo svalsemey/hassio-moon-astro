@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "위상"
+                "name": "위상",
+                "state": {
+                    "new_moon": "삭",
+                    "waxing_crescent": "초승달",
+                    "first_quarter": "상현",
+                    "waxing_gibbous": "상현 후 볼록달",
+                    "full_moon": "보름달",
+                    "waning_gibbous": "하현 전 볼록달",
+                    "last_quarter": "하현",
+                    "waning_crescent": "그믐달",
+                    "unknown": "알 수 없음"
+                }
             },
             "sensor_azimuth": {
                 "name": "방위각"

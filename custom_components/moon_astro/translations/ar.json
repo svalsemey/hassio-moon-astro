@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "الطور"
+                "name": "الطور",
+                "state": {
+                    "new_moon": "المحاق",
+                    "waxing_crescent": "هلال متزايد",
+                    "first_quarter": "التربيع الأول",
+                    "waxing_gibbous": "أحدب متزايد",
+                    "full_moon": "البدر",
+                    "waning_gibbous": "أحدب متناقص",
+                    "last_quarter": "التربيع الأخير",
+                    "waning_crescent": "هلال متناقص",
+                    "unknown": "غير معروف"
+                }
             },
             "sensor_azimuth": {
                 "name": "السمت"

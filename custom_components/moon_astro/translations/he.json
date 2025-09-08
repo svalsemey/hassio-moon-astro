@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "מופע"
+                "name": "מופע",
+                "state": {
+                    "new_moon": "מולד",
+                    "waxing_crescent": "סהר מתמלא",
+                    "first_quarter": "רבע ראשון",
+                    "waxing_gibbous": "בטן מתמלאת",
+                    "full_moon": "ירח מלא",
+                    "waning_gibbous": "בטן מתמעטת",
+                    "last_quarter": "רבע אחרון",
+                    "waning_crescent": "סהר מתמעט",
+                    "unknown": "לא ידוע"
+                }
             },
             "sensor_azimuth": {
                 "name": "אזימוט"

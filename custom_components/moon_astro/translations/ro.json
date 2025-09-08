@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fază"
+                "name": "Fază",
+                "state": {
+                    "new_moon": "Lună nouă",
+                    "waxing_crescent": "Semilună în creștere",
+                    "first_quarter": "Primul pătrar",
+                    "waxing_gibbous": "Gibos în creștere",
+                    "full_moon": "Lună plină",
+                    "waning_gibbous": "Gibos în descreștere",
+                    "last_quarter": "Ultimul pătrar",
+                    "waning_crescent": "Semilună în descreștere",
+                    "unknown": "Necunoscută"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

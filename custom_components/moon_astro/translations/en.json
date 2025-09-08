@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Phase"
+                "name": "Phase",
+                "state": {
+                    "new_moon": "New moon",
+                    "waxing_crescent": "Waxing crescent",
+                    "first_quarter": "First quarter",
+                    "waxing_gibbous": "Waxing gibbous",
+                    "full_moon": "Full moon",
+                    "waning_gibbous": "Waning gibbous",
+                    "last_quarter": "Last quarter",
+                    "waning_crescent": "Waning crescent",
+                    "unknown": "Unknown"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimuth"

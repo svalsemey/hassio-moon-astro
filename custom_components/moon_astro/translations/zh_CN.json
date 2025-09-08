@@ -27,32 +27,83 @@
     },
     "entity": {
         "sensor": {
-            "sensor_phase": { "name": "月相" },
-            "sensor_azimuth": { "name": "方位角" },
-            "sensor_elevation": { "name": "高度角" },
-            "sensor_illumination": { "name": "照明度" },
-            "sensor_distance": { "name": "距离" },
-            "sensor_parallax": { "name": "视差" },
-
-            "sensor_ecliptic_longitude_topocentric": { "name": "黄经（地表观测）" },
-            "sensor_ecliptic_latitude_topocentric": { "name": "黄纬（地表观测）" },
-            "sensor_ecliptic_longitude_geocentric": { "name": "黄经（地心）" },
-            "sensor_ecliptic_latitude_geocentric": { "name": "黄纬（地心）" },
-
-            "sensor_next_rise": { "name": "下次月出" },
-            "sensor_next_set": { "name": "下次月落" },
-            "sensor_next_apogee": { "name": "下次远地点" },
-            "sensor_next_perigee": { "name": "下次近地点" },
-            "sensor_next_new_moon": { "name": "下次新月" },
-            "sensor_next_first_quarter": { "name": "下次上弦月" },
-            "sensor_next_full_moon": { "name": "下次满月" },
-            "sensor_next_last_quarter": { "name": "下次下弦月" },
-
-            "sensor_ecliptic_longitude_next_full_moon": { "name": "下次满月时的黄经" },
-            "sensor_ecliptic_latitude_next_full_moon": { "name": "下次满月时的黄纬" },
-            "sensor_ecliptic_longitude_next_new_moon": { "name": "下次新月时的黄经" },
-            "sensor_ecliptic_latitude_next_new_moon": { "name": "下次新月时的黄纬" },
-
+            "sensor_phase": {
+                "name": "月相",
+                "state": {
+                    "new_moon": "新月",
+                    "waxing_crescent": "娥眉月",
+                    "first_quarter": "上弦月",
+                    "waxing_gibbous": "盈凸月",
+                    "full_moon": "满月",
+                    "waning_gibbous": "亏凸月",
+                    "last_quarter": "下弦月",
+                    "waning_crescent": "残月",
+                    "unknown": "未知"
+                }
+            },
+            "sensor_azimuth": {
+                "name": "方位角"
+            },
+            "sensor_elevation": {
+                "name": "高度角"
+            },
+            "sensor_illumination": {
+                "name": "照明度"
+            },
+            "sensor_distance": {
+                "name": "距离"
+            },
+            "sensor_parallax": {
+                "name": "视差"
+            },
+            "sensor_ecliptic_longitude_topocentric": {
+                "name": "黄经（地表观测）"
+            },
+            "sensor_ecliptic_latitude_topocentric": {
+                "name": "黄纬（地表观测）"
+            },
+            "sensor_ecliptic_longitude_geocentric": {
+                "name": "黄经（地心）"
+            },
+            "sensor_ecliptic_latitude_geocentric": {
+                "name": "黄纬（地心）"
+            },
+            "sensor_next_rise": {
+                "name": "下次月出"
+            },
+            "sensor_next_set": {
+                "name": "下次月落"
+            },
+            "sensor_next_apogee": {
+                "name": "下次远地点"
+            },
+            "sensor_next_perigee": {
+                "name": "下次近地点"
+            },
+            "sensor_next_new_moon": {
+                "name": "下次新月"
+            },
+            "sensor_next_first_quarter": {
+                "name": "下次上弦月"
+            },
+            "sensor_next_full_moon": {
+                "name": "下次满月"
+            },
+            "sensor_next_last_quarter": {
+                "name": "下次下弦月"
+            },
+            "sensor_ecliptic_longitude_next_full_moon": {
+                "name": "下次满月时的黄经"
+            },
+            "sensor_ecliptic_latitude_next_full_moon": {
+                "name": "下次满月时的黄纬"
+            },
+            "sensor_ecliptic_longitude_next_new_moon": {
+                "name": "下次新月时的黄经"
+            },
+            "sensor_ecliptic_latitude_next_new_moon": {
+                "name": "下次新月时的黄纬"
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "下次新月所在星座",
                 "state": {
@@ -87,9 +138,12 @@
                     "pisces": "双鱼座"
                 }
             },
-
-            "sensor_zodiac_degree_next_new_moon": { "name": "下次新月的星座度数" },
-            "sensor_zodiac_degree_next_full_moon": { "name": "下次满月的星座度数" }
+            "sensor_zodiac_degree_next_new_moon": {
+                "name": "下次新月的星座度数"
+            },
+            "sensor_zodiac_degree_next_full_moon": {
+                "name": "下次满月的星座度数"
+            }
         }
     }
 }

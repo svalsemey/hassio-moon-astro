@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "位相"
+                "name": "位相",
+                "state": {
+                    "new_moon": "新月",
+                    "waxing_crescent": "三日月（上弦前）",
+                    "first_quarter": "上弦",
+                    "waxing_gibbous": "十三夜（上弦後）",
+                    "full_moon": "満月",
+                    "waning_gibbous": "居待月（下弦前）",
+                    "last_quarter": "下弦",
+                    "waning_crescent": "三日月（下弦後）",
+                    "unknown": "不明"
+                }
             },
             "sensor_azimuth": {
                 "name": "方位角"

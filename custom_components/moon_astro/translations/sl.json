@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Faza"
+                "name": "Faza",
+                "state": {
+                    "new_moon": "Mlaj",
+                    "waxing_crescent": "Prirastoči srp",
+                    "first_quarter": "Prvi krajec",
+                    "waxing_gibbous": "Prirastoča izbočena",
+                    "full_moon": "Ščip (polna luna)",
+                    "waning_gibbous": "Upadajoča izbočena",
+                    "last_quarter": "Zadnji krajec",
+                    "waning_crescent": "Zadnji srp",
+                    "unknown": "Neznano"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

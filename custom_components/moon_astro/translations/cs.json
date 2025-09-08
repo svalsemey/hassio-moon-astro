@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fáze"
+                "name": "Fáze",
+                "state": {
+                    "new_moon": "Nov",
+                    "waxing_crescent": "Dorůstající srpek",
+                    "first_quarter": "První čtvrť",
+                    "waxing_gibbous": "Dorůstající vypouklý",
+                    "full_moon": "Úplněk",
+                    "waning_gibbous": "Couvající vypouklý",
+                    "last_quarter": "Poslední čtvrť",
+                    "waning_crescent": "Couvající srpek",
+                    "unknown": "Neznámé"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

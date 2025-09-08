@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Φάση"
+                "name": "Φάση",
+                "state": {
+                    "new_moon": "Νέα σελήνη",
+                    "waxing_crescent": "Αύξων μηνίσκος",
+                    "first_quarter": "Πρώτο τέταρτο",
+                    "waxing_gibbous": "Αύξουσα κυρτή",
+                    "full_moon": "Πανσέληνος",
+                    "waning_gibbous": "Φθίνουσα κυρτή",
+                    "last_quarter": "Τελευταίο τέταρτο",
+                    "waning_crescent": "Φθίνων μηνίσκος",
+                    "unknown": "Άγνωστο"
+                }
             },
             "sensor_azimuth": {
                 "name": "Αζιμούθιο"

@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Phase"
+                "name": "Phase",
+                "state": {
+                    "new_moon": "Neumond",
+                    "waxing_crescent": "Zunehmende Sichel",
+                    "first_quarter": "Erstes Viertel",
+                    "waxing_gibbous": "Zunehmender Mond",
+                    "full_moon": "Vollmond",
+                    "waning_gibbous": "Abnehmender Mond",
+                    "last_quarter": "Letztes Viertel",
+                    "waning_crescent": "Abnehmende Sichel",
+                    "unknown": "Unbekannt"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

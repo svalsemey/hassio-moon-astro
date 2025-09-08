@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "चरण"
+                "name": "चरण",
+                "state": {
+                    "new_moon": "अमावस्या",
+                    "waxing_crescent": "शुक्ल, कृतिका",
+                    "first_quarter": "प्रथम चतुर्थी",
+                    "waxing_gibbous": "शुक्ल बृद्धि",
+                    "full_moon": "पूर्णिमा",
+                    "waning_gibbous": "कृष्ण क्षय",
+                    "last_quarter": "अंतिम चतुर्थी",
+                    "waning_crescent": "कृष्ण, क्षीण शशि",
+                    "unknown": "अज्ञात"
+                }
             },
             "sensor_azimuth": {
                 "name": "अज़िमुथ"

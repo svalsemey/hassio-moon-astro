@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fase"
+                "name": "Fase",
+                "state": {
+                    "new_moon": "Nieuwe maan",
+                    "waxing_crescent": "Wassende sikkel",
+                    "first_quarter": "Eerste kwartier",
+                    "waxing_gibbous": "Wassende maan",
+                    "full_moon": "Volle maan",
+                    "waning_gibbous": "Afnemende maan",
+                    "last_quarter": "Laatste kwartier",
+                    "waning_crescent": "Afnemende sikkel",
+                    "unknown": "Onbekend"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

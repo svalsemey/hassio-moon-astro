@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Фаза"
+                "name": "Фаза",
+                "state": {
+                    "new_moon": "Новолуние",
+                    "waxing_crescent": "Растущий серп",
+                    "first_quarter": "Первая четверть",
+                    "waxing_gibbous": "Растущая выпуклая",
+                    "full_moon": "Полнолуние",
+                    "waning_gibbous": "Убывающая выпуклая",
+                    "last_quarter": "Последняя четверть",
+                    "waning_crescent": "Стареющий серп",
+                    "unknown": "Неизвестно"
+                }
             },
             "sensor_azimuth": {
                 "name": "Азимут"

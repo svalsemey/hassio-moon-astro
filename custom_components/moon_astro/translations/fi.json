@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Vaihe"
+                "name": "Vaihe",
+                "state": {
+                    "new_moon": "Uusikuu",
+                    "waxing_crescent": "Kasvava sirppi",
+                    "first_quarter": "Ensimmäinen neljännes",
+                    "waxing_gibbous": "Kasvava kuu",
+                    "full_moon": "Täysikuu",
+                    "waning_gibbous": "Vähenevä kuu",
+                    "last_quarter": "Viimeinen neljännes",
+                    "waning_crescent": "Vähenevä sirppi",
+                    "unknown": "Tuntematon"
+                }
             },
             "sensor_azimuth": {
                 "name": "Atsimuutti"

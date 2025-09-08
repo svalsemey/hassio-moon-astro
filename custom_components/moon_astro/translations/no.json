@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fase"
+                "name": "Fase",
+                "state": {
+                    "new_moon": "Nymåne",
+                    "waxing_crescent": "Tiltagende halvmåne",
+                    "first_quarter": "Første kvarter",
+                    "waxing_gibbous": "Tiltagende måne",
+                    "full_moon": "Fullmåne",
+                    "waning_gibbous": "Avtagende måne",
+                    "last_quarter": "Siste kvarter",
+                    "waning_crescent": "Avtagende halvmåne",
+                    "unknown": "Ukjent"
+                }
             },
             "sensor_azimuth": {
                 "name": "Asimut"

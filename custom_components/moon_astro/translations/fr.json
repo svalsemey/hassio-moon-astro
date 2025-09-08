@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Phase"
+                "name": "Phase",
+                "state": {
+                    "new_moon": "Nouvelle lune",
+                    "waxing_crescent": "Premier croissant",
+                    "first_quarter": "Premier quartier",
+                    "waxing_gibbous": "Gibbeuse croissante",
+                    "full_moon": "Pleine lune",
+                    "waning_gibbous": "Gibbeuse décroissante",
+                    "last_quarter": "Dernier quartier",
+                    "waning_crescent": "Dernier croissant",
+                    "unknown": "Inconnue"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

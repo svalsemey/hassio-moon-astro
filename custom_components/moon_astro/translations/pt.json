@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fase"
+                "name": "Fase",
+                "state": {
+                    "new_moon": "Lua nova",
+                    "waxing_crescent": "Crescente",
+                    "first_quarter": "Quarto crescente",
+                    "waxing_gibbous": "Gibosa crescente",
+                    "full_moon": "Lua cheia",
+                    "waning_gibbous": "Gibosa minguante",
+                    "last_quarter": "Quarto minguante",
+                    "waning_crescent": "Minguante",
+                    "unknown": "Desconhecida"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimute"

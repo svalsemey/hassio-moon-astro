@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fázis"
+                "name": "Fázis",
+                "state": {
+                    "new_moon": "Újhold",
+                    "waxing_crescent": "Növő sarló",
+                    "first_quarter": "Első negyed",
+                    "waxing_gibbous": "Növő domború",
+                    "full_moon": "Telihold",
+                    "waning_gibbous": "Fogyó domború",
+                    "last_quarter": "Utolsó negyed",
+                    "waning_crescent": "Fogyó sarló",
+                    "unknown": "Ismeretlen"
+                }
             },
             "sensor_azimuth": {
                 "name": "Azimut"

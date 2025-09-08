@@ -28,7 +28,18 @@
     "entity": {
         "sensor": {
             "sensor_phase": {
-                "name": "Fase"
+                "name": "Fase",
+                "state": {
+                    "new_moon": "Luna nueva",
+                    "waxing_crescent": "Creciente",
+                    "first_quarter": "Cuarto creciente",
+                    "waxing_gibbous": "Gibosa creciente",
+                    "full_moon": "Luna llena",
+                    "waning_gibbous": "Gibosa menguante",
+                    "last_quarter": "Cuarto menguante",
+                    "waning_crescent": "Menguante",
+                    "unknown": "Desconocida"
+                }
             },
             "sensor_azimuth": {
                 "name": "Acimut"
