@@ -110,7 +110,7 @@ Issues and PRs are welcome!
 
 ## License
 
-MIT © Your Name
+MIT © Sébastien VALSEMEY
 
 ## Credits
 
