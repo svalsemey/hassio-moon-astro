@@ -1,0 +1,97 @@
+{
+    "title": "Місяць Астро",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Місяць Астро",
+                "description": "Вкажіть координати GPS і висоту.",
+                "data": {
+                    "latitude": "Широта",
+                    "longitude": "Довгота",
+                    "altitude": "Висота (м)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Параметри «Місяць Астро»",
+                "description": "Оновіть інтервал опитування та поведінку часової зони.",
+                "data": {
+                    "scan_interval": "Інтервал сканування (секунди)",
+                    "use_ha_time_zone": "Використовувати часову зону Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Фаза" },
+            "sensor_azimuth": { "name": "Азимут" },
+            "sensor_elevation": { "name": "Кут піднесення" },
+            "sensor_illumination": { "name": "Освітленість" },
+            "sensor_distance": { "name": "Відстань" },
+            "sensor_parallax": { "name": "Кут паралакса" },
+    
+            "sensor_next_rise": { "name": "Наступний місяцехід" },
+            "sensor_next_set": { "name": "Наступний захід Місяця" },
+            "sensor_next_apogee": { "name": "Наступний апогей" },
+            "sensor_next_perigee": { "name": "Наступний перигей" },
+            "sensor_next_new_moon": { "name": "Наступне молодик" },
+            "sensor_next_first_quarter": { "name": "Наступна перша чверть" },
+            "sensor_next_full_moon": { "name": "Наступна повня" },
+            "sensor_next_last_quarter": { "name": "Наступна остання чверть" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Екліптична довгота (топоцентрична)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Екліптична широта (топоцентрична)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Екліптична довгота (геоцентрична)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Екліптична широта (геоцентрична)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Екліптична довгота під час наступної повні" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Екліптична широта під час наступної повні" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Екліптична довгота під час наступного молодика" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Екліптична широта під час наступного молодика" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Знак зодіаку під час наступного молодика" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Знак зодіаку під час наступної повні" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Градус у знаку під час наступного молодика" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Градус у знаку під час наступної повні" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Місяць над горизонтом" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Овен",
+            "taurus": "Телець",
+            "gemini": "Близнюки",
+            "cancer": "Рак",
+            "leo": "Лев",
+            "virgo": "Діва",
+            "libra": "Терези",
+            "scorpio": "Скорпіон",
+            "sagittarius": "Стрілець",
+            "capricorn": "Козоріг",
+            "aquarius": "Водолій",
+            "pisces": "Риби"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Овен",
+            "taurus": "Телець",
+            "gemini": "Близнюки",
+            "cancer": "Рак",
+            "leo": "Лев",
+            "virgo": "Діва",
+            "libra": "Терези",
+            "scorpio": "Скорпіон",
+            "sagittarius": "Стрілець",
+            "capricorn": "Козоріг",
+            "aquarius": "Водолій",
+            "pisces": "Риби"
+            }
+        }
+    }
+}

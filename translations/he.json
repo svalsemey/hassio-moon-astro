@@ -1,0 +1,97 @@
+{
+    "title": "מון אסטרו",
+    "config": {
+        "step": {
+            "user": {
+                "title": "מון אסטרו",
+                "description": "הגדר/י את קואורדינטות ה־GPS והגובה שלך.",
+                "data": {
+                    "latitude": "קו רוחב",
+                    "longitude": "קו אורך",
+                    "altitude": "גובה (מ׳)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "אפשרויות מון אסטרו",
+                "description": "עדכון מרווח הדגימה והתנהגות אזור הזמן.",
+                "data": {
+                    "scan_interval": "מרווח סריקה (שניות)",
+                    "use_ha_time_zone": "השתמש באזור הזמן של Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "מופע" },
+            "sensor_azimuth": { "name": "אזימוט" },
+            "sensor_elevation": { "name": "גובה זוויתי" },
+            "sensor_illumination": { "name": "הארה" },
+            "sensor_distance": { "name": "מרחק" },
+            "sensor_parallax": { "name": "זווית פרלקסה" },
+    
+            "sensor_next_rise": { "name": "זריחה הבאה" },
+            "sensor_next_set": { "name": "שקיעה הבאה" },
+            "sensor_next_apogee": { "name": "אפוגיאה הבאה" },
+            "sensor_next_perigee": { "name": "פריגיאה הבאה" },
+            "sensor_next_new_moon": { "name": "מולד ירח הבא" },
+            "sensor_next_first_quarter": { "name": "רבע ראשון הבא" },
+            "sensor_next_full_moon": { "name": "ירח מלא הבא" },
+            "sensor_next_last_quarter": { "name": "רבע אחרון הבא" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "אורך אקליפטי (טופוצנטרי)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "רוחב אקליפטי (טופוצנטרי)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "אורך אקליפטי (גיאוצנטרי)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "רוחב אקליפטי (גיאוצנטרי)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "אורך אקליפטי בירח מלא הבא" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "רוחב אקליפטי בירח מלא הבא" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "אורך אקליפטי במולד הירח הבא" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "רוחב אקליפטי במולד הירח הבא" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "מזל אסטרולוגי במולד הירח הבא" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "מזל אסטרולוגי בירח מלא הבא" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "מעלה אסטרולוגית במולד הירח הבא" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "מעלה אסטרולוגית בירח מלא הבא" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "הירח מעל האופק" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "טלה",
+            "taurus": "שור",
+            "gemini": "תאומים",
+            "cancer": "סרטן",
+            "leo": "אריה",
+            "virgo": "בתולה",
+            "libra": "מאזניים",
+            "scorpio": "עקרב",
+            "sagittarius": "קשת",
+            "capricorn": "גדי",
+            "aquarius": "דלי",
+            "pisces": "דגים"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "טלה",
+            "taurus": "שור",
+            "gemini": "תאומים",
+            "cancer": "סרטן",
+            "leo": "אריה",
+            "virgo": "בתולה",
+            "libra": "מאזניים",
+            "scorpio": "עקרב",
+            "sagittarius": "קשת",
+            "capricorn": "גדי",
+            "aquarius": "דלי",
+            "pisces": "דגים"
+            }
+        }
+    }
+}

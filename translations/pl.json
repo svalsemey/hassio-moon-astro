@@ -1,0 +1,97 @@
+{
+    "title": "Księżyc Astro",
+    "config": {
+        "step": {
+            "user": {
+            "title": "Księżyc Astro",
+            "description": "Ustaw swoje współrzędne GPS i wysokość.",
+            "data": {
+                "latitude": "Szerokość geograficzna",
+                "longitude": "Długość geograficzna",
+                "altitude": "Wysokość (m)"
+            }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+            "title": "Opcje Księżyc Astro",
+            "description": "Zaktualizuj interwał odpytywania i zachowanie strefy czasowej.",
+            "data": {
+                "scan_interval": "Interwał skanowania (sekundy)",
+                "use_ha_time_zone": "Użyj strefy czasowej Home Assistant"
+            }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Faza" },
+            "sensor_azimuth": { "name": "Azymut" },
+            "sensor_elevation": { "name": "Wysokość kątowa" },
+            "sensor_illumination": { "name": "Oświetlenie" },
+            "sensor_distance": { "name": "Odległość" },
+            "sensor_parallax": { "name": "Kąt paralaksy" },
+    
+            "sensor_next_rise": { "name": "Następny wschód Księżyca" },
+            "sensor_next_set": { "name": "Następny zachód Księżyca" },
+            "sensor_next_apogee": { "name": "Następne apogeum" },
+            "sensor_next_perigee": { "name": "Następne perygeum" },
+            "sensor_next_new_moon": { "name": "Następny nów" },
+            "sensor_next_first_quarter": { "name": "Następna pierwsza kwadra" },
+            "sensor_next_full_moon": { "name": "Następna pełnia" },
+            "sensor_next_last_quarter": { "name": "Następna ostatnia kwadra" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Długość ekliptyczna (topocentryczna)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Szerokość ekliptyczna (topocentryczna)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Długość ekliptyczna (geocentryczna)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Szerokość ekliptyczna (geocentryczna)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Długość ekliptyczna przy następnej pełni" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Szerokość ekliptyczna przy następnej pełni" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Długość ekliptyczna przy następnym nowiu" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Szerokość ekliptyczna przy następnym nowiu" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Znak zodiaku przy następnym nowiu" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Znak zodiaku przy następnej pełni" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Stopień w znaku przy następnym nowiu" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Stopień w znaku przy następnej pełni" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Księżyc nad horyzontem" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Baran",
+            "taurus": "Byk",
+            "gemini": "Bliźnięta",
+            "cancer": "Rak",
+            "leo": "Lew",
+            "virgo": "Panna",
+            "libra": "Waga",
+            "scorpio": "Skorpion",
+            "sagittarius": "Strzelec",
+            "capricorn": "Koziorożec",
+            "aquarius": "Wodnik",
+            "pisces": "Ryby"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Baran",
+            "taurus": "Byk",
+            "gemini": "Bliźnięta",
+            "cancer": "Rak",
+            "leo": "Lew",
+            "virgo": "Panna",
+            "libra": "Waga",
+            "scorpio": "Skorpion",
+            "sagittarius": "Strzelec",
+            "capricorn": "Koziorożec",
+            "aquarius": "Wodnik",
+            "pisces": "Ryby"
+            }
+        }
+    }
+}

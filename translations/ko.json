@@ -1,0 +1,97 @@
+{
+    "title": "문 아스트로",
+    "config": {
+        "step": {
+            "user": {
+                "title": "문 아스트로",
+                "description": "GPS 좌표와 고도를 설정하세요.",
+                "data": {
+                    "latitude": "위도",
+                    "longitude": "경도",
+                    "altitude": "고도 (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "문 아스트로 옵션",
+                "description": "폴링 간격과 시간대 동작을 업데이트합니다.",
+                "data": {
+                    "scan_interval": "스캔 간격(초)",
+                    "use_ha_time_zone": "Home Assistant의 시간대 사용"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "위상" },
+            "sensor_azimuth": { "name": "방위각" },
+            "sensor_elevation": { "name": "고도각" },
+            "sensor_illumination": { "name": "조도" },
+            "sensor_distance": { "name": "거리" },
+            "sensor_parallax": { "name": "시차각" },
+    
+            "sensor_next_rise": { "name": "다음 월출" },
+            "sensor_next_set": { "name": "다음 월몰" },
+            "sensor_next_apogee": { "name": "다음 원지점" },
+            "sensor_next_perigee": { "name": "다음 근지점" },
+            "sensor_next_new_moon": { "name": "다음 삭(신월)" },
+            "sensor_next_first_quarter": { "name": "다음 상현" },
+            "sensor_next_full_moon": { "name": "다음 보름달(만월)" },
+            "sensor_next_last_quarter": { "name": "다음 하현" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "황경(지평좌표 중심)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "황위(지평좌표 중심)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "황경(지구중심)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "황위(지구중심)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "다음 보름달 때의 황경" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "다음 보름달 때의 황위" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "다음 삭(신월) 때의 황경" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "다음 삭(신월) 때의 황위" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "다음 삭(신월)의 별자리" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "다음 보름달의 별자리" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "다음 삭(신월)의 별자리 각도" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "다음 보름달의 별자리 각도" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "수평선 위의 달" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "양자리",
+            "taurus": "황소자리",
+            "gemini": "쌍둥이자리",
+            "cancer": "게자리",
+            "leo": "사자자리",
+            "virgo": "처녀자리",
+            "libra": "천칭자리",
+            "scorpio": "전갈자리",
+            "sagittarius": "사수자리",
+            "capricorn": "염소자리",
+            "aquarius": "물병자리",
+            "pisces": "물고기자리"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "양자리",
+            "taurus": "황소자리",
+            "gemini": "쌍둥이자리",
+            "cancer": "게자리",
+            "leo": "사자자리",
+            "virgo": "처녀자리",
+            "libra": "천칭자리",
+            "scorpio": "전갈자리",
+            "sagittarius": "사수자리",
+            "capricorn": "염소자리",
+            "aquarius": "물병자리",
+            "pisces": "물고기자리"
+            }
+        }
+    }
+}

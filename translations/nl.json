@@ -1,0 +1,97 @@
+{
+    "title": "Maan Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Maan Astro",
+                "description": "Stel je GPS-coördinaten en hoogte in.",
+                "data": {
+                    "latitude": "Breedtegraad",
+                    "longitude": "Lengtegraad",
+                    "altitude": "Hoogte (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Maan Astro-opties",
+                "description": "Werk het poll-interval en het tijdzonegedrag bij.",
+                "data": {
+                    "scan_interval": "Scaninterval (seconden)",
+                    "use_ha_time_zone": "Tijdzone van Home Assistant gebruiken"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Fase" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Elevatie" },
+            "sensor_illumination": { "name": "Verlichting" },
+            "sensor_distance": { "name": "Afstand" },
+            "sensor_parallax": { "name": "Parallaxhoek" },
+    
+            "sensor_next_rise": { "name": "Volgende maansopkomst" },
+            "sensor_next_set": { "name": "Volgende maansondergang" },
+            "sensor_next_apogee": { "name": "Volgend apogeum" },
+            "sensor_next_perigee": { "name": "Volgend perigeum" },
+            "sensor_next_new_moon": { "name": "Volgende nieuwe maan" },
+            "sensor_next_first_quarter": { "name": "Volgend eerste kwartier" },
+            "sensor_next_full_moon": { "name": "Volgende volle maan" },
+            "sensor_next_last_quarter": { "name": "Volgend laatste kwartier" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ecliptische lengte (topocentrisch)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ecliptische breedte (topocentrisch)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ecliptische lengte (geocentrisch)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ecliptische breedte (geocentrisch)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ecliptische lengte bij de volgende volle maan" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ecliptische breedte bij de volgende volle maan" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ecliptische lengte bij de volgende nieuwe maan" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ecliptische breedte bij de volgende nieuwe maan" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Dierenriemteken bij de volgende nieuwe maan" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Dierenriemteken bij de volgende volle maan" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Graden binnen teken bij de volgende nieuwe maan" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Graden binnen teken bij de volgende volle maan" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Maan boven de horizon" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Ram",
+            "taurus": "Stier",
+            "gemini": "Tweelingen",
+            "cancer": "Kreeft",
+            "leo": "Leeuw",
+            "virgo": "Maagd",
+            "libra": "Weegschaal",
+            "scorpio": "Schorpioen",
+            "sagittarius": "Boogschutter",
+            "capricorn": "Steenbok",
+            "aquarius": "Waterman",
+            "pisces": "Vissen"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Ram",
+            "taurus": "Stier",
+            "gemini": "Tweelingen",
+            "cancer": "Kreeft",
+            "leo": "Leeuw",
+            "virgo": "Maagd",
+            "libra": "Weegschaal",
+            "scorpio": "Schorpioen",
+            "sagittarius": "Boogschutter",
+            "capricorn": "Steenbok",
+            "aquarius": "Waterman",
+            "pisces": "Vissen"
+            }
+        }
+    }
+}

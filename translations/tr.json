@@ -1,0 +1,97 @@
+{
+    "title": "Ay Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Ay Astro",
+                "description": "GPS koordinatlarınızı ve rakımınızı ayarlayın.",
+                "data": {
+                    "latitude": "Enlem",
+                    "longitude": "Boylam",
+                    "altitude": "Rakım (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Ay Astro seçenekleri",
+                "description": "Yoklama aralığını ve saat dilimi davranışını güncelleyin.",
+                "data": {
+                    "scan_interval": "Tarama aralığı (saniye)",
+                    "use_ha_time_zone": "Home Assistant saat dilimini kullan"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Evresi" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Yükseklik açısı" },
+            "sensor_illumination": { "name": "Aydınlanma" },
+            "sensor_distance": { "name": "Mesafe" },
+            "sensor_parallax": { "name": "Paralaks açısı" },
+    
+            "sensor_next_rise": { "name": "Sonraki doğuş" },
+            "sensor_next_set": { "name": "Sonraki batış" },
+            "sensor_next_apogee": { "name": "Sonraki apogee" },
+            "sensor_next_perigee": { "name": "Sonraki perigee" },
+            "sensor_next_new_moon": { "name": "Sonraki yeniay" },
+            "sensor_next_first_quarter": { "name": "Sonraki ilk dördün" },
+            "sensor_next_full_moon": { "name": "Sonraki dolunay" },
+            "sensor_next_last_quarter": { "name": "Sonraki son dördün" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptik boylam (toposentrik)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptik enlem (toposentrik)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptik boylam (jeosentrik)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptik enlem (jeosentrik)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Sonraki dolunayda ekliptik boylam" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Sonraki dolunayda ekliptik enlem" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Sonraki yeniayda ekliptik boylam" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Sonraki yeniayda ekliptik enlem" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Sonraki yeniayda burç" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Sonraki dolunayda burç" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Sonraki yeniayda burç derecesi" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Sonraki dolunayda burç derecesi" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Ay ufkun üzerinde" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Koç",
+            "taurus": "Boğa",
+            "gemini": "İkizler",
+            "cancer": "Yengeç",
+            "leo": "Aslan",
+            "virgo": "Başak",
+            "libra": "Terazi",
+            "scorpio": "Akrep",
+            "sagittarius": "Yay",
+            "capricorn": "Oğlak",
+            "aquarius": "Kova",
+            "pisces": "Balık"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Koç",
+            "taurus": "Boğa",
+            "gemini": "İkizler",
+            "cancer": "Yengeç",
+            "leo": "Aslan",
+            "virgo": "Başak",
+            "libra": "Terazi",
+            "scorpio": "Akrep",
+            "sagittarius": "Yay",
+            "capricorn": "Oğlak",
+            "aquarius": "Kova",
+            "pisces": "Balık"
+            }
+        }
+    }
+}

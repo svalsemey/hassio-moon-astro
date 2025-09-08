@@ -1,0 +1,97 @@
+{
+    "title": "ムーンアストロ",
+    "config": {
+        "step": {
+            "user": {
+                "title": "ムーンアストロ",
+                "description": "GPS 座標と標高を設定してください。",
+                "data": {
+                    "latitude": "緯度",
+                    "longitude": "経度",
+                    "altitude": "標高 (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "ムーンアストロのオプション",
+                "description": "ポーリング間隔とタイムゾーンの挙動を更新します。",
+                "data": {
+                    "scan_interval": "スキャン間隔（秒）",
+                    "use_ha_time_zone": "Home Assistant のタイムゾーンを使用する"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "位相" },
+            "sensor_azimuth": { "name": "方位角" },
+            "sensor_elevation": { "name": "高度角" },
+            "sensor_illumination": { "name": "照度" },
+            "sensor_distance": { "name": "距離" },
+            "sensor_parallax": { "name": "視差角" },
+    
+            "sensor_next_rise": { "name": "次の月の出" },
+            "sensor_next_set": { "name": "次の月の入" },
+            "sensor_next_apogee": { "name": "次の遠地点" },
+            "sensor_next_perigee": { "name": "次の近地点" },
+            "sensor_next_new_moon": { "name": "次の新月" },
+            "sensor_next_first_quarter": { "name": "次の上弦の月" },
+            "sensor_next_full_moon": { "name": "次の満月" },
+            "sensor_next_last_quarter": { "name": "次の下弦の月" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "黄道経度（地心距離補正：地上観測点）" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "黄道緯度（地心距離補正：地上観測点）" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "黄道経度（地心）" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "黄道緯度（地心）" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "次の満月における黄道経度" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "次の満月における黄道緯度" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "次の新月における黄道経度" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "次の新月における黄道緯度" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "次の新月の黄道十二宮" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "次の満月の黄道十二宮" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "次の新月のサイン内度数" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "次の満月のサイン内度数" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "地平線上の月" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "牡羊座",
+            "taurus": "牡牛座",
+            "gemini": "双子座",
+            "cancer": "蟹座",
+            "leo": "獅子座",
+            "virgo": "乙女座",
+            "libra": "天秤座",
+            "scorpio": "蠍座",
+            "sagittarius": "射手座",
+            "capricorn": "山羊座",
+            "aquarius": "水瓶座",
+            "pisces": "魚座"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "牡羊座",
+            "taurus": "牡牛座",
+            "gemini": "双子座",
+            "cancer": "蟹座",
+            "leo": "獅子座",
+            "virgo": "乙女座",
+            "libra": "天秤座",
+            "scorpio": "蠍座",
+            "sagittarius": "射手座",
+            "capricorn": "山羊座",
+            "aquarius": "水瓶座",
+            "pisces": "魚座"
+            }
+        }
+    }
+}

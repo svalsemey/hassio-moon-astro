@@ -1,0 +1,97 @@
+{
+    "title": "Σεληνιακή Αστρονομία",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Σεληνιακή Αστρονομία",
+                "description": "Ορίστε τις συντεταγμένες GPS και το υψόμετρό σας.",
+                "data": {
+                    "latitude": "Γεωγραφικό πλάτος",
+                    "longitude": "Γεωγραφικό μήκος",
+                    "altitude": "Υψόμετρο (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Επιλογές Σεληνιακής Αστρονομίας",
+                "description": "Ενημερώστε το διάστημα δειγματοληψίας και τη συμπεριφορά ζώνης ώρας.",
+                "data": {
+                    "scan_interval": "Διάστημα σάρωσης (δευτερόλεπτα)",
+                    "use_ha_time_zone": "Χρήση της ζώνης ώρας του Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Φάση" },
+            "sensor_azimuth": { "name": "Αζιμούθιο" },
+            "sensor_elevation": { "name": "Ανύψωση" },
+            "sensor_illumination": { "name": "Φωτισμός" },
+            "sensor_distance": { "name": "Απόσταση" },
+            "sensor_parallax": { "name": "Γωνία παράλλαξης" },
+    
+            "sensor_next_rise": { "name": "Επόμενη ανατολή" },
+            "sensor_next_set": { "name": "Επόμενη δύση" },
+            "sensor_next_apogee": { "name": "Επόμενο απόγειο" },
+            "sensor_next_perigee": { "name": "Επόμενο περίγειο" },
+            "sensor_next_new_moon": { "name": "Επόμενη νέα σελήνη" },
+            "sensor_next_first_quarter": { "name": "Επόμενο πρώτο τέταρτο" },
+            "sensor_next_full_moon": { "name": "Επόμενη πανσέληνος" },
+            "sensor_next_last_quarter": { "name": "Επόμενο τελευταίο τέταρτο" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ηλιοκεντρικό μήκος (τοποκεντρικό)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ηλιοκεντρικό πλάτος (τοποκεντρικό)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ηλιοκεντρικό μήκος (γεωκεντρικό)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ηλιοκεντρικό πλάτος (γεωκεντρικό)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ηλιοκεντρικό μήκος στην επόμενη πανσέληνο" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ηλιοκεντρικό πλάτος στην επόμενη πανσέληνο" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ηλιοκεντρικό μήκος στην επόμενη νέα σελήνη" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ηλιοκεντρικό πλάτος στην επόμενη νέα σελήνη" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Ζώδιο στην επόμενη νέα σελήνη" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Ζώδιο στην επόμενη πανσέληνο" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Μοίρα ζωδίου στην επόμενη νέα σελήνη" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Μοίρα ζωδίου στην επόμενη πανσέληνο" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Σελήνη πάνω από τον ορίζοντα" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Κριός",
+            "taurus": "Ταύρος",
+            "gemini": "Δίδυμοι",
+            "cancer": "Καρκίνος",
+            "leo": "Λέων",
+            "virgo": "Παρθένος",
+            "libra": "Ζυγός",
+            "scorpio": "Σκορπιός",
+            "sagittarius": "Τοξότης",
+            "capricorn": "Αιγόκερως",
+            "aquarius": "Υδροχόος",
+            "pisces": "Ιχθύες"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Κριός",
+            "taurus": "Ταύρος",
+            "gemini": "Δίδυμοι",
+            "cancer": "Καρκίνος",
+            "leo": "Λέων",
+            "virgo": "Παρθένος",
+            "libra": "Ζυγός",
+            "scorpio": "Σκορπιός",
+            "sagittarius": "Τοξότης",
+            "capricorn": "Αιγόκερως",
+            "aquarius": "Υδροχόος",
+            "pisces": "Ιχθύες"
+            }
+        }
+    }
+}

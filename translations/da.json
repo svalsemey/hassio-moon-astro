@@ -1,0 +1,97 @@
+{
+    "title": "Måne Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Måne Astro",
+                "description": "Angiv dine GPS-koordinater og højde.",
+                "data": {
+                    "latitude": "Breddegrad",
+                    "longitude": "Længdegrad",
+                    "altitude": "Højde (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Måne Astro indstillinger",
+                "description": "Opdater polling-interval og tidszoneadfærd.",
+                "data": {
+                    "scan_interval": "Scan-interval (sekunder)",
+                    "use_ha_time_zone": "Brug Home Assistants tidszone"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Fase" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Højde" },
+            "sensor_illumination": { "name": "Belysning" },
+            "sensor_distance": { "name": "Afstand" },
+            "sensor_parallax": { "name": "Parallaksevinkel" },
+    
+            "sensor_next_rise": { "name": "Næste opgang" },
+            "sensor_next_set": { "name": "Næste nedgang" },
+            "sensor_next_apogee": { "name": "Næste apogæum" },
+            "sensor_next_perigee": { "name": "Næste perigæum" },
+            "sensor_next_new_moon": { "name": "Næste nymåne" },
+            "sensor_next_first_quarter": { "name": "Næste første kvartal" },
+            "sensor_next_full_moon": { "name": "Næste fuldmåne" },
+            "sensor_next_last_quarter": { "name": "Næste sidste kvartal" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptisk længdegrad (topocentrisk)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptisk breddegrad (topocentrisk)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptisk længdegrad (geocentrisk)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptisk breddegrad (geocentrisk)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptisk længdegrad ved næste fuldmåne" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptisk breddegrad ved næste fuldmåne" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptisk længdegrad ved næste nymåne" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptisk breddegrad ved næste nymåne" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Stjernetegn ved næste nymåne" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Stjernetegn ved næste fuldmåne" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Grad i tegn ved næste nymåne" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Grad i tegn ved næste fuldmåne" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Månen over horisonten" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Vædderen",
+            "taurus": "Tyren",
+            "gemini": "Tvillingerne",
+            "cancer": "Krebsen",
+            "leo": "Løven",
+            "virgo": "Jomfruen",
+            "libra": "Vægten",
+            "scorpio": "Skorpionen",
+            "sagittarius": "Skytten",
+            "capricorn": "Stenbukken",
+            "aquarius": "Vandmanden",
+            "pisces": "Fiskene"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Vædderen",
+            "taurus": "Tyren",
+            "gemini": "Tvillingerne",
+            "cancer": "Krebsen",
+            "leo": "Løven",
+            "virgo": "Jomfruen",
+            "libra": "Vægten",
+            "scorpio": "Skorpionen",
+            "sagittarius": "Skytten",
+            "capricorn": "Stenbukken",
+            "aquarius": "Vandmanden",
+            "pisces": "Fiskene"
+            }
+        }
+    }
+}

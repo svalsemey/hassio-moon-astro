@@ -1,0 +1,97 @@
+{
+    "title": "Luna Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Luna Astro",
+                "description": "Nastavite svoje GPS koordinate in nadmorsko višino.",
+                "data": {
+                    "latitude": "Zemljepisna širina",
+                    "longitude": "Zemljepisna dolžina",
+                    "altitude": "Nadmorska višina (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Možnosti Luna Astro",
+                "description": "Posodobite interval poizvedovanja in obnašanje časovnega pasu.",
+                "data": {
+                    "scan_interval": "Interval skeniranja (sekunde)",
+                    "use_ha_time_zone": "Uporabi časovni pas Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Faza" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Višina" },
+            "sensor_illumination": { "name": "Osvetljenost" },
+            "sensor_distance": { "name": "Razdalja" },
+            "sensor_parallax": { "name": "Paralaksonski kot" },
+    
+            "sensor_next_rise": { "name": "Naslednji vzhod" },
+            "sensor_next_set": { "name": "Naslednji zahod" },
+            "sensor_next_apogee": { "name": "Naslednji apogej" },
+            "sensor_next_perigee": { "name": "Naslednji perigej" },
+            "sensor_next_new_moon": { "name": "Naslednji mlaj" },
+            "sensor_next_first_quarter": { "name": "Naslednji prvi krajec" },
+            "sensor_next_full_moon": { "name": "Naslednja ščip" },
+            "sensor_next_last_quarter": { "name": "Naslednji zadnji krajec" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptična dolžina (topocentrična)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptična širina (topocentrična)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptična dolžina (geocentrična)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptična širina (geocentrična)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptična dolžina ob naslednji ščipu" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptična širina ob naslednji ščipu" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptična dolžina ob naslednjem mlaju" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptična širina ob naslednjem mlaju" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Zodiakalno znamenje ob naslednjem mlaju" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Zodiakalno znamenje ob naslednji ščipu" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Stopinje v znamenju ob naslednjem mlaju" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Stopinje v znamenju ob naslednji ščipu" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Luna nad obzorjem" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Oven",
+            "taurus": "Bik",
+            "gemini": "Dvojčka",
+            "cancer": "Rak",
+            "leo": "Lev",
+            "virgo": "Devica",
+            "libra": "Tehtnica",
+            "scorpio": "Škorpijon",
+            "sagittarius": "Strelec",
+            "capricorn": "Kozorog",
+            "aquarius": "Vodnar",
+            "pisces": "Ribi"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Oven",
+            "taurus": "Bik",
+            "gemini": "Dvojčka",
+            "cancer": "Rak",
+            "leo": "Lev",
+            "virgo": "Devica",
+            "libra": "Tehtnica",
+            "scorpio": "Škorpijon",
+            "sagittarius": "Strelec",
+            "capricorn": "Kozorog",
+            "aquarius": "Vodnar",
+            "pisces": "Ribi"
+            }
+        }
+    }
+}

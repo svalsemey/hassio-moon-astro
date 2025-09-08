@@ -1,0 +1,97 @@
+{
+    "title": "मून एस्ट्रो",
+    "config": {
+        "step": {
+            "user": {
+                "title": "मून एस्ट्रो",
+                "description": "अपनी GPS निर्देशांक और ऊँचाई सेट करें।",
+                "data": {
+                    "latitude": "अक्षांश",
+                    "longitude": "देशांतर",
+                    "altitude": "ऊँचाई (मीटर)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+            "title": "मून एस्ट्रो विकल्प",
+            "description": "पोलिंग अंतराल और समय क्षेत्र के व्यवहार को अपडेट करें।",
+                "data": {
+                    "scan_interval": "स्कैन अंतराल (सेकंड)",
+                    "use_ha_time_zone": "होम असिस्टेंट का समय क्षेत्र उपयोग करें"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "चरण" },
+            "sensor_azimuth": { "name": "अज़ीमुथ" },
+            "sensor_elevation": { "name": "ऊँचाई कोण" },
+            "sensor_illumination": { "name": "प्रकाशन" },
+            "sensor_distance": { "name": "दूरी" },
+            "sensor_parallax": { "name": "पैरालैक्स कोण" },
+    
+            "sensor_next_rise": { "name": "अगला उदय" },
+            "sensor_next_set": { "name": "अगला अस्त" },
+            "sensor_next_apogee": { "name": "अगला अपोगी" },
+            "sensor_next_perigee": { "name": "अगला पेरिगी" },
+            "sensor_next_new_moon": { "name": "अगला अमावस्या" },
+            "sensor_next_first_quarter": { "name": "अगला प्रथम चरण" },
+            "sensor_next_full_moon": { "name": "अगला पूर्णिमा" },
+            "sensor_next_last_quarter": { "name": "अगला अंतिम चरण" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "एक्लिप्टिक देशांतर (टोपोसेंट्रिक)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "एक्लिप्टिक अक्षांश (टोपोसेंट्रिक)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "एक्लिप्टिक देशांतर (जियोसेंट्रिक)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "एक्लिप्टिक अक्षांश (जियोसेंट्रिक)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "अगली पूर्णिमा पर एक्लिप्टिक देशांतर" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "अगली पूर्णिमा पर एक्लिप्टिक अक्षांश" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "अगली अमावस्या पर एक्लिप्टिक देशांतर" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "अगली अमावस्या पर एक्लिप्टिक अक्षांश" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "अगली अमावस्या पर राशि" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "अगली पूर्णिमा पर राशि" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "अगली अमावस्या पर राशि अंश" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "अगली पूर्णिमा पर राशि अंश" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "क्षितिज के ऊपर चंद्रमा" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "मेष",
+            "taurus": "वृषभ",
+            "gemini": "मिथुन",
+            "cancer": "कर्क",
+            "leo": "सिंह",
+            "virgo": "कन्या",
+            "libra": "तुला",
+            "scorpio": "वृश्चिक",
+            "sagittarius": "धनु",
+            "capricorn": "मकर",
+            "aquarius": "कुंभ",
+            "pisces": "मीन"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "मेष",
+            "taurus": "वृषभ",
+            "gemini": "मिथुन",
+            "cancer": "कर्क",
+            "leo": "सिंह",
+            "virgo": "कन्या",
+            "libra": "तुला",
+            "scorpio": "वृश्चिक",
+            "sagittarius": "धनु",
+            "capricorn": "मकर",
+            "aquarius": "कुंभ",
+            "pisces": "मीन"
+            }
+        }
+    }
+}

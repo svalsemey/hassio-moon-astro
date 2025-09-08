@@ -1,0 +1,97 @@
+{
+    "title": "Mond Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Mond Astro",
+                "description": "Legen Sie Ihre GPS‑Koordinaten und Höhe fest.",
+                "data": {
+                    "latitude": "Breitengrad",
+                    "longitude": "Längengrad",
+                    "altitude": "Höhe (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Mond Astro – Optionen",
+                "description": "Abfrageintervall und Zeitzonenverhalten aktualisieren.",
+                "data": {
+                    "scan_interval": "Scan‑Intervall (Sekunden)",
+                    "use_ha_time_zone": "Zeitzone von Home Assistant verwenden"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Phase" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Höhenwinkel" },
+            "sensor_illumination": { "name": "Beleuchtung" },
+            "sensor_distance": { "name": "Entfernung" },
+            "sensor_parallax": { "name": "Parallaxenwinkel" },
+    
+            "sensor_next_rise": { "name": "Nächster Aufgang" },
+            "sensor_next_set": { "name": "Nächster Untergang" },
+            "sensor_next_apogee": { "name": "Nächstes Apogäum" },
+            "sensor_next_perigee": { "name": "Nächstes Perigäum" },
+            "sensor_next_new_moon": { "name": "Nächster Neumond" },
+            "sensor_next_first_quarter": { "name": "Nächstes erstes Viertel" },
+            "sensor_next_full_moon": { "name": "Nächster Vollmond" },
+            "sensor_next_last_quarter": { "name": "Nächstes letztes Viertel" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Ekliptikale Länge (topozentrisch)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Ekliptikale Breite (topozentrisch)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Ekliptikale Länge (geozentrisch)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Ekliptikale Breite (geozentrisch)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Ekliptikale Länge beim nächsten Vollmond" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Ekliptikale Breite beim nächsten Vollmond" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Ekliptikale Länge beim nächsten Neumond" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Ekliptikale Breite beim nächsten Neumond" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Sternzeichen beim nächsten Neumond" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Sternzeichen beim nächsten Vollmond" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Grad im Zeichen beim nächsten Neumond" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Grad im Zeichen beim nächsten Vollmond" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Mond über dem Horizont" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Widder",
+            "taurus": "Stier",
+            "gemini": "Zwillinge",
+            "cancer": "Krebs",
+            "leo": "Löwe",
+            "virgo": "Jungfrau",
+            "libra": "Waage",
+            "scorpio": "Skorpion",
+            "sagittarius": "Schütze",
+            "capricorn": "Steinbock",
+            "aquarius": "Wassermann",
+            "pisces": "Fische"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Widder",
+            "taurus": "Stier",
+            "gemini": "Zwillinge",
+            "cancer": "Krebs",
+            "leo": "Löwe",
+            "virgo": "Jungfrau",
+            "libra": "Waage",
+            "scorpio": "Skorpion",
+            "sagittarius": "Schütze",
+            "capricorn": "Steinbock",
+            "aquarius": "Wassermann",
+            "pisces": "Fische"
+            }
+        }
+        }
+}

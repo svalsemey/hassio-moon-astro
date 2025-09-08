@@ -1,0 +1,97 @@
+{
+    "title": "Луна Астро",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Луна Астро",
+                "description": "Укажите ваши координаты GPS и высоту.",
+                "data": {
+                    "latitude": "Широта",
+                    "longitude": "Долгота",
+                    "altitude": "Высота (м)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Параметры Луна Астро",
+                "description": "Обновите интервал опроса и поведение часового пояса.",
+                "data": {
+                    "scan_interval": "Интервал сканирования (секунды)",
+                    "use_ha_time_zone": "Использовать часовой пояс Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Фаза" },
+            "sensor_azimuth": { "name": "Азимут" },
+            "sensor_elevation": { "name": "Высотный угол" },
+            "sensor_illumination": { "name": "Освещённость" },
+            "sensor_distance": { "name": "Расстояние" },
+            "sensor_parallax": { "name": "Угол параллакса" },
+    
+            "sensor_next_rise": { "name": "Следующий восход Луны" },
+            "sensor_next_set": { "name": "Следующий заход Луны" },
+            "sensor_next_apogee": { "name": "Следующее апогей" },
+            "sensor_next_perigee": { "name": "Следующее перигей" },
+            "sensor_next_new_moon": { "name": "Следующее новолуние" },
+            "sensor_next_first_quarter": { "name": "Следующая первая четверть" },
+            "sensor_next_full_moon": { "name": "Следующее полнолуние" },
+            "sensor_next_last_quarter": { "name": "Следующая последняя четверть" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Эклиптическая долгота (топоцентрическая)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Эклиптическая широта (топоцентрическая)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Эклиптическая долгота (геоцентрическая)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Эклиптическая широта (геоцентрическая)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Эклиптическая долгота при следующем полнолунии" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Эклиптическая широта при следующем полнолунии" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Эклиптическая долгота при следующем новолуниі" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Эклиптическая широта при следующем новолуниі" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Знак зодиака при следующем новолунии" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Знак зодиака при следующем полнолунии" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Градус в знаке при следующем новолунии" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Градус в знаке при следующем полнолунии" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Луна над горизонтом" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Овен",
+            "taurus": "Телец",
+            "gemini": "Близнецы",
+            "cancer": "Рак",
+            "leo": "Лев",
+            "virgo": "Дева",
+            "libra": "Весы",
+            "scorpio": "Скорпион",
+            "sagittarius": "Стрелец",
+            "capricorn": "Козерог",
+            "aquarius": "Водолей",
+            "pisces": "Рыбы"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Овен",
+            "taurus": "Телец",
+            "gemini": "Близнецы",
+            "cancer": "Рак",
+            "leo": "Лев",
+            "virgo": "Дева",
+            "libra": "Весы",
+            "scorpio": "Скорпион",
+            "sagittarius": "Стрелец",
+            "capricorn": "Козерог",
+            "aquarius": "Водолей",
+            "pisces": "Рыбы"
+            }
+        }
+    }
+}

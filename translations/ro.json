@@ -1,0 +1,97 @@
+{
+    "title": "Luna Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Luna Astro",
+                "description": "Setează coordonatele GPS și altitudinea.",
+                "data": {
+                    "latitude": "Latitudine",
+                    "longitude": "Longitudine",
+                    "altitude": "Altitudine (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opțiuni Luna Astro",
+                "description": "Actualizează intervalul de interogare și comportamentul fusului orar.",
+                "data": {
+                    "scan_interval": "Interval de scanare (secunde)",
+                    "use_ha_time_zone": "Folosește fusul orar al Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Fază" },
+            "sensor_azimuth": { "name": "Azimut" },
+            "sensor_elevation": { "name": "Elevație" },
+            "sensor_illumination": { "name": "Iluminare" },
+            "sensor_distance": { "name": "Distanță" },
+            "sensor_parallax": { "name": "Unghi de paralaxă" },
+    
+            "sensor_next_rise": { "name": "Următoarea răsărire" },
+            "sensor_next_set": { "name": "Următoarea apus" },
+            "sensor_next_apogee": { "name": "Următorul apogeu" },
+            "sensor_next_perigee": { "name": "Următorul perigeu" },
+            "sensor_next_new_moon": { "name": "Următoarea lună nouă" },
+            "sensor_next_first_quarter": { "name": "Următorul prim pătrar" },
+            "sensor_next_full_moon": { "name": "Următoarea lună plină" },
+            "sensor_next_last_quarter": { "name": "Următorul ultim pătrar" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Longitudine ecliptică (topocentrică)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Latitudine ecliptică (topocentrică)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Longitudine ecliptică (geocentrică)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Latitudine ecliptică (geocentrică)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Longitudine ecliptică la următoarea lună plină" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Latitudine ecliptică la următoarea lună plină" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Longitudine ecliptică la următoarea lună nouă" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Latitudine ecliptică la următoarea lună nouă" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Semn zodiacal la următoarea lună nouă" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Semn zodiacal la următoarea lună plină" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Grad zodiacal la următoarea lună nouă" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Grad zodiacal la următoarea lună plină" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Luna deasupra orizontului" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Berbec",
+            "taurus": "Taur",
+            "gemini": "Gemeni",
+            "cancer": "Rac",
+            "leo": "Leu",
+            "virgo": "Fecioară",
+            "libra": "Balanță",
+            "scorpio": "Scorpion",
+            "sagittarius": "Săgetător",
+            "capricorn": "Capricorn",
+            "aquarius": "Vărsător",
+            "pisces": "Pești"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Berbec",
+            "taurus": "Taur",
+            "gemini": "Gemeni",
+            "cancer": "Rac",
+            "leo": "Leu",
+            "virgo": "Fecioară",
+            "libra": "Balanță",
+            "scorpio": "Scorpion",
+            "sagittarius": "Săgetător",
+            "capricorn": "Capricorn",
+            "aquarius": "Vărsător",
+            "pisces": "Pești"
+            }
+        }
+    }
+}

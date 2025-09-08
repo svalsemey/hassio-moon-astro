@@ -1,0 +1,97 @@
+{
+    "title": "Lua Astro",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Lua Astro",
+                "description": "Defina suas coordenadas de GPS e altitude.",
+                "data": {
+                    "latitude": "Latitude",
+                    "longitude": "Longitude",
+                    "altitude": "Altitude (m)"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opções do Lua Astro",
+                "description": "Atualize o intervalo de pesquisa e o comportamento do fuso horário.",
+                "data": {
+                    "scan_interval": "Intervalo de varredura (segundos)",
+                    "use_ha_time_zone": "Usar o fuso horário do Home Assistant"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_phase": { "name": "Fase" },
+            "sensor_azimuth": { "name": "Azimute" },
+            "sensor_elevation": { "name": "Elevação" },
+            "sensor_illumination": { "name": "Iluminação" },
+            "sensor_distance": { "name": "Distância" },
+            "sensor_parallax": { "name": "Ângulo de paralaxe" },
+    
+            "sensor_next_rise": { "name": "Próximo nascer" },
+            "sensor_next_set": { "name": "Próximo ocaso" },
+            "sensor_next_apogee": { "name": "Próximo apogeu" },
+            "sensor_next_perigee": { "name": "Próximo perigeu" },
+            "sensor_next_new_moon": { "name": "Próxima lua nova" },
+            "sensor_next_first_quarter": { "name": "Próximo quarto crescente" },
+            "sensor_next_full_moon": { "name": "Próxima lua cheia" },
+            "sensor_next_last_quarter": { "name": "Próximo quarto minguante" },
+    
+            "sensor_ecliptic_longitude_topocentric": { "name": "Longitude eclíptica (topocêntrica)" },
+            "sensor_ecliptic_latitude_topocentric": { "name": "Latitude eclíptica (topocêntrica)" },
+            "sensor_ecliptic_longitude_geocentric": { "name": "Longitude eclíptica (geocêntrica)" },
+            "sensor_ecliptic_latitude_geocentric": { "name": "Latitude eclíptica (geocêntrica)" },
+    
+            "sensor_ecliptic_longitude_next_full_moon": { "name": "Longitude eclíptica na próxima lua cheia" },
+            "sensor_ecliptic_latitude_next_full_moon": { "name": "Latitude eclíptica na próxima lua cheia" },
+            "sensor_ecliptic_longitude_next_new_moon": { "name": "Longitude eclíptica na próxima lua nova" },
+            "sensor_ecliptic_latitude_next_new_moon": { "name": "Latitude eclíptica na próxima lua nova" },
+    
+            "sensor_zodiac_sign_next_new_moon": { "name": "Signo do zodíaco na próxima lua nova" },
+            "sensor_zodiac_sign_next_full_moon": { "name": "Signo do zodíaco na próxima lua cheia" },
+            "sensor_zodiac_degree_next_new_moon": { "name": "Grau no signo na próxima lua nova" },
+            "sensor_zodiac_degree_next_full_moon": { "name": "Grau no signo na próxima lua cheia" }
+        },
+        "binary_sensor": {
+            "binary_above_horizon": { "name": "Lua acima do horizonte" }
+        }
+    },
+    "state": {
+        "sensor": {
+            "sensor_zodiac_sign_next_new_moon": {
+            "aries": "Áries",
+            "taurus": "Touro",
+            "gemini": "Gêmeos",
+            "cancer": "Câncer",
+            "leo": "Leão",
+            "virgo": "Virgem",
+            "libra": "Libra",
+            "scorpio": "Escorpião",
+            "sagittarius": "Sagitário",
+            "capricorn": "Capricórnio",
+            "aquarius": "Aquário",
+            "pisces": "Peixes"
+            },
+            "sensor_zodiac_sign_next_full_moon": {
+            "aries": "Áries",
+            "taurus": "Touro",
+            "gemini": "Gêmeos",
+            "cancer": "Câncer",
+            "leo": "Leão",
+            "virgo": "Virgem",
+            "libra": "Libra",
+            "scorpio": "Escorpião",
+            "sagittarius": "Sagitário",
+            "capricorn": "Capricórnio",
+            "aquarius": "Aquário",
+            "pisces": "Peixes"
+            }
+        }
+    }
+}
