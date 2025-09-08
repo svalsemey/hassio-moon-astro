@@ -32,7 +32,7 @@ Manual install:
 4. Go to Settings → Devices & Services → Add Integration → search for “Moon Astro”.
 
 HACS (recommended):
-1. In HACS → Integrations → Custom repositories, add `https://github.com/your-user/your-repo` as type “Integration”.
+1. In HACS → Integrations → Custom repositories, add `https://github.com/svalsemey/hassio-moon-astro/` as type “Integration”.
 2. Install “Moon Astro”.
 3. Restart Home Assistant and add the integration from Devices & Services.
 
@@ -105,7 +105,7 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
 ## Contributing
 
 Issues and PRs are welcome!
-- Issues: https://github.com/your-user/your-repo/issues
+- Issues: https://github.com/svalsemey/hassio-moon-astro/issues
 - Pull requests: please lint and follow HA integration best practices.
 
 ## License
