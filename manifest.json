@@ -2,8 +2,8 @@
     "domain": "moon_astro",
     "name": "Moon Astro",
     "version": "0.1.0",
-    "documentation": "https://github.com/svalsemey/hassio-moon-extended",
-    "issue_tracker": "https://github.com/svalsemey/hassio-moon-extended/issues",
+    "documentation": "https://github.com/svalsemey/hassio-moon-astro",
+    "issue_tracker": "https://github.com/svalsemey/hassio-moon-astro/issues",
     "requirements": [
         "skyfield>=1.53",
         "timezonefinder>=6.2.0"
