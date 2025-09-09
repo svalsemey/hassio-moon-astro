@@ -208,34 +208,6 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 dt = dt.astimezone(timezone.utc)
             return dt
 
-        # Normalize zodiac sign string states to canonical lowercase keys
-        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, KEY_ZODIAC_SIGN_NEXT_FULL_MOON):
-            if value is None:
-                return None
-            try:
-                value_str = str(value).strip().lower()
-            except Exception:  # noqa: BLE001
-                return None
-            aliases = {
-                "aries": "aries",
-                "taurus": "taurus",
-                "gemini": "gemini",
-                "cancer": "cancer",
-                "leo": "leo",
-                "virgo": "virgo",
-                "libra": "libra",
-                "scorpio": "scorpio",
-                "sagittarius": "sagittarius",
-                "capricorn": "capricorn",
-                "aquarius": "aquarius",
-                "pisces": "pisces",
-            }
-            resolved = aliases.get(value_str, value_str)
-            _LOGGER.debug(
-                "Zodiac state for %s -> %r (from %r)", self._attr_translation_key, resolved, value
-            )
-            return resolved
-
         _LOGGER.debug("Sensor %s (%s) raw value: %r", self._key, self._attr_translation_key, value)
         return value
 
