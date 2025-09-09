@@ -26,6 +26,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Above horizon",
+                "state": {
+                    "on": "Above horizon",
+                    "off": "Below horizon"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Phase",

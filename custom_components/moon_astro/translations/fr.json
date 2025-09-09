@@ -26,6 +26,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Au-dessus de l’horizon",
+                "state": {
+                    "on": "Au-dessus de l’horizon",
+                    "off": "En dessous de l’horizon"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Phase",
