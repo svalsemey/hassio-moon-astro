@@ -24,17 +24,17 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 
 ## Installation
 
+HACS (recommended):
+1. In HACS → Integrations → Custom repositories, add `https://github.com/svalsemey/hassio-moon-astro/` as type “Integration”.
+2. Install “Moon Astro”.
+3. Restart Home Assistant and add the integration from Devices & Services.
+
 Manual install:
 1. Download or clone the repository.
 2. Copy the folder `custom_components/moon_astro` to your Home Assistant config directory:
    - Final path: `<config>/custom_components/moon_astro`
 3. Restart Home Assistant.
 4. Go to Settings → Devices & Services → Add Integration → search for “Moon Astro”.
-
-HACS (recommended):
-1. In HACS → Integrations → Custom repositories, add `https://github.com/svalsemey/hassio-moon-astro/` as type “Integration”.
-2. Install “Moon Astro”.
-3. Restart Home Assistant and add the integration from Devices & Services.
 
 ## Configuration
 
