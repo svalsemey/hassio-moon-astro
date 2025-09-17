@@ -12,5 +12,5 @@
         "skyfield>=1.53",
         "timezonefinder>=6.2.0"
     ],
-    "version": "0.1.0"
+    "version": "0.1.1"
 }
