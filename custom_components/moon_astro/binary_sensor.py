@@ -45,4 +45,4 @@ class MoonAboveHorizonBinary(CoordinatorEntity[MoonAstroCoordinator], BinarySens
     @property
     def icon(self) -> str:
         """Return MDI icon based on state."""
-        return "mdi:weather-night" if self.is_on else "mdi:weather-night-off"
+        return "mdi:chevron-up-circle" if self.is_on else "mdi:chevron-down-circle-outline"

@@ -287,9 +287,9 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
 
         # Time-based events
         if self._key == KEY_NEXT_RISE:
-            return "mdi:chevron-up-circle"
+            return "mdi:arrow-up-circle"
         if self._key == KEY_NEXT_SET:
-            return "mdi:chevron-down-circle"
+            return "mdi:arrow-down-circle"
         if self._key in (KEY_NEXT_APOGEE, KEY_NEXT_PERIGEE):
             return "mdi:orbit"
 
