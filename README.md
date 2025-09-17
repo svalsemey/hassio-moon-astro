@@ -17,8 +17,8 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
   - Apogee, Perigee
   - New Moon, First Quarter, Full Moon, Last Quarter
 - Lunation context:
-  - Geocentric ecliptic longitude/latitude at next New/Full Moon (true-of-date)
-  - Zodiac sign and degree at next New/Full Moon
+  - Geocentric ecliptic longitude/latitude at next new/full moon (true-of-date)
+  - Zodiac sign and degree at next new/full Moon
 - Binary sensor:
   - Moon above horizon (on/off)
 
@@ -58,8 +58,8 @@ Sensors (examples of entity names; actual names are localized):
 - Next moonrise / moonset (timestamp)
 - Next apogee / perigee (timestamp)
 - Next new moon / first quarter / full moon / last quarter (timestamp)
-- Ecliptic lon/lat at next new moon
-- Ecliptic lon/lat at next full moon
+- Ecliptic longitude/latitude at next new moon
+- Ecliptic longitude/latitude at next full moon
 - Zodiac sign at next new/full moon
 - Zodiac degree at next new/full moon
 
