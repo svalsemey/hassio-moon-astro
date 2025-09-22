@@ -3,7 +3,7 @@
 High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, next lunation timestamps, apogee/perigee, and zodiac information at the next new/full moon.
 
 - Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
-- Topocentric Alt/Az from your configured location
+- Topocentric elevation/azimuth from your configured location
 - Fully localized entities and state translations
 - Config flow with options for scan interval and time zone handling
 
@@ -55,8 +55,8 @@ Sensors (examples of entity names; actual names are localized):
 - Parallax (°)
 - Ecliptic longitude/latitude (topocentric)
 - Ecliptic longitude/latitude (geocentric)
-- Next moonrise / moonset (timestamp)
-- Next apogee / perigee (timestamp)
+- Next moonrise/moonset (timestamp)
+- Next apogee/perigee (timestamp)
 - Next new moon / first quarter / full moon / last quarter (timestamp)
 - Ecliptic longitude/latitude at next new moon
 - Ecliptic longitude/latitude at next full moon
@@ -68,7 +68,7 @@ Binary sensors:
 
 ## Localization
 
-Translations included for multiple languages (e.g., en, sv, tr, uk, zh_CN, sl, etc.). Entity names and certain state texts are localized via Home Assistant’s translation system.
+Translations included for multiple languages (ar, cs, da, de, el, es, fi, fr, he, hi, hu, it, ja, ko, nl, no, pl, pt, ro, ru, sk, sl, sv, tr, uk, zh_CN). Entity names are localized via Home Assistant’s translation system.
 
 ## Requirements
 
