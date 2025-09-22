@@ -234,16 +234,14 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 return "mdi:moon-first-quarter"
             if phase == "last_quarter":
                 return "mdi:moon-last-quarter"
-
-            if illum < 5.0:
-                return "mdi:moon-new"
-            if illum <= 45.0:
-                return "mdi:moon-waxing-crescent" if waxing else "mdi:moon-waning-crescent"
-            if 45.0 < illum < 55.0:
-                return "mdi:moon-first-quarter" if waxing else "mdi:moon-last-quarter"
-            if illum < 99.0:
-                return "mdi:moon-waxing-gibbous" if waxing else "mdi:moon-waning-gibbous"
-            return "mdi:moon-full"
+            if phase == "waning_crescent":
+                return "mdi:moon-waning-crescent"
+            if phase == "waning_gibbous":
+                return "mdi:moon-waning-gibbous"
+            if phase == "waxing_crescent":
+                return "mdi:moon-waxing-crescent"
+            if phase == "waxing_gibbous":
+                return "mdi:moon-waxing-gibbous"
 
         # Canonical phase-related icons for specific next events
         if self._key in (KEY_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON):
