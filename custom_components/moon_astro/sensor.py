@@ -219,12 +219,6 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         if self._key == KEY_PHASE:
             data = self.coordinator.data or {}
             phase = (data.get(KEY_PHASE) or "unknown") or "unknown"
-            illum = 0.0
-            try:
-                illum = float(data.get(KEY_ILLUM, 0.0) or 0.0)
-            except Exception:  # noqa: BLE001
-                illum = 0.0
-            waxing = bool(data.get(KEY_WAXING, False))
 
             if phase == "new_moon":
                 return "mdi:moon-new"
