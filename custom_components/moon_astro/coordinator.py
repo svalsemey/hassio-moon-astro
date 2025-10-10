@@ -105,6 +105,16 @@ def _moon_illumination_percentage(eph, t):
 
 
 def _moon_phase_name(eph, t, ts=None):
+    """
+    Determine a readable moon phase name.
+
+    Strategy:
+    - Compute illumination at t and t+6h to infer waxing.
+    - Query discrete moon phase events around t (±30 days).
+    - If last_ev is a canonical phase, check proximity windows (in hours) to label exact names.
+    Especially for full_moon: only within ±6h of the event.
+    - Otherwise, fallback to generic mapping based on illumination and waxing.
+    """
     illum_now = float(almanac.fraction_illuminated(eph, "moon", t) * 100.0)
 
     if ts is not None:
@@ -119,6 +129,7 @@ def _moon_phase_name(eph, t, ts=None):
     t1 = t + 30.0
     times, phases = almanac.find_discrete(t0, t1, f)
 
+    # Identify surrounding phase events
     last_ev = None
     next_ev = None
     for ti, pv in zip(times, phases):
@@ -130,25 +141,51 @@ def _moon_phase_name(eph, t, ts=None):
     def close_to(pct, target, tol=QUARTER_TOL_PCT):
         return abs(pct - target) <= tol
 
+    # Windows (hours) for "exact" labels
+    WIN_FULL_H = 6.0
+    WIN_QUARTER_H = 6.0
+    WIN_NEW_H = 6.0
+
+    # Helper to test time proximity
+    def _within_hours(t_event, hours_window: float) -> bool:
+        if t_event is None:
+            return False
+        return abs((t_event.tt - t.tt) * 24.0) <= hours_window
+
+    # Find nearest known event types around t
+    last_type = last_ev[1] if last_ev else None
+    next_type = next_ev[1] if next_ev else None
+    last_time = last_ev[0] if last_ev else None
+    next_time = next_ev[0] if next_ev else None
+
+    # Exact event labeling using proximity windows
+    # New moon
+    if (last_type == DARK_MOON and _within_hours(last_time, WIN_NEW_H)) or (next_type == DARK_MOON and _within_hours(next_time, WIN_NEW_H)):
+        return "new_moon"
+    # First quarter
+    if (last_type == FIRST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (next_type == FIRST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)):
+        return "first_quarter" if waxing else "last_quarter"
+    # Full moon (strict proximity)
+    if (last_type == FULL_MOON and _within_hours(last_time, WIN_FULL_H)) or (next_type == FULL_MOON and _within_hours(next_time, WIN_FULL_H)):
+        return "full_moon"
+    # Last quarter
+    if (last_type == LAST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (next_type == LAST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)):
+        return "last_quarter" if not waxing else "first_quarter"
+
+    # If not within windows, keep gentle hints from last event but avoid forcing "full_moon"
     if last_ev is not None:
         _, phase_value = last_ev
-
         if phase_value == DARK_MOON:
             if waxing and illum_now <= NEW_MOON_STRICT_PCT:
                 return "new_moon"
-
         elif phase_value == FIRST_QUARTER:
             if close_to(illum_now, 50.0) and waxing:
                 return "first_quarter"
-
-        elif phase_value == FULL_MOON:
-            if (not waxing) or illum_now >= FULL_MOON_STRICT_PCT:
-                return "full_moon"
-
         elif phase_value == LAST_QUARTER:
             if close_to(illum_now, 50.0) and (not waxing):
                 return "last_quarter"
 
+    # Generic mapping by illumination and waxing
     if illum_now <= NEW_MOON_STRICT_PCT:
         return "new_moon" if waxing else "waning_crescent"
     if illum_now <= 45.0:
@@ -157,8 +194,8 @@ def _moon_phase_name(eph, t, ts=None):
         return "first_quarter" if waxing else "last_quarter"
     if illum_now < FULL_MOON_STRICT_PCT:
         return "waxing_gibbous" if waxing else "waning_gibbous"
-    return "full_moon"
-
+    # Close to 100% but not in the proximity window: choose gibbous based on waxing state
+    return "waxing_gibbous" if waxing else "waning_gibbous"
 
 def _topocentric_vectors(eph, t, lat, lon, alt_m):
     earth = eph["earth"]
