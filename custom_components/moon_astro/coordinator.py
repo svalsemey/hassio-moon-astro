@@ -1,8 +1,7 @@
 """Data coordinator for Moon Astro.
 
 This module implements the data coordinator responsible for computing high-precision
-Moon position and related ephemerides for Home Assistant. All functions are fully
-type-annotated and include docstrings to facilitate static analysis and linters.
+Moon position and related ephemerides for Home Assistant.
 """
 
 from __future__ import annotations
@@ -10,7 +9,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from importlib import import_module
 import logging
 import math
 from pathlib import Path
@@ -21,6 +19,7 @@ import numpy as np
 from skyfield import almanac
 from skyfield.api import Loader, wgs84
 from skyfield.timelib import Time
+from timezonefinder import TimezoneFinder
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -106,7 +105,7 @@ _LOGGER = logging.getLogger(__name__)
 def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
     """Return a best-effort ZoneInfo for given coordinates.
 
-    If timezonefinder is missing or cannot be used, UTC is returned.
+    If timezone cannot be found, UTC is returned.
 
     Args:
     lat: Latitude in decimal degrees.
@@ -116,14 +115,7 @@ def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
     A ZoneInfo instance representing the local timezone or UTC as fallback.
     """
     tzname: str | None = None
-    try:
-        # Lazy import to avoid hard dependency at import time.
-        tf = import_module("timezonefinder").TimezoneFinder()
-        tzname = tf.timezone_at(lat=lat, lng=lon)
-    except ModuleNotFoundError as exc:
-        # Auto-detection is optional; fall back to UTC if unavailable.
-        _LOGGER.debug("Timezone auto-detection unavailable: %r", exc)
-        tzname = None
+    tzname = TimezoneFinder().timezone_at(lat=lat, lng=lon)
 
     try:
         return ZoneInfo(tzname) if tzname else ZoneInfo("UTC")
