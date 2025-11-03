@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from datetime import timedelta
 import importlib
-from typing import List
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, DEFAULT_SCAN_INTERVAL, CONF_SCAN_INTERVAL
+from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
 from .coordinator import MoonAstroCoordinator
 
-PLATFORMS: List[str] = ["sensor", "binary_sensor"]
+PLATFORMS: list[str] = ["binary_sensor", "sensor"]
 
 
 async def _import_platform(hass: HomeAssistant, platform: str) -> None:

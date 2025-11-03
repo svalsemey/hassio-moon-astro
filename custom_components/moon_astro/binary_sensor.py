@@ -1,4 +1,4 @@
-"""Binary sensors for Moon Astro"""
+"""Binary sensors for Moon Astro."""
 
 from __future__ import annotations
 
@@ -6,14 +6,16 @@ from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, KEY_ABOVE_HORIZON
 from .coordinator import MoonAstroCoordinator
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+):
     """Set up binary sensor entities."""
     coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
     device_info = DeviceInfo(
@@ -22,13 +24,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         model="Skyfield DE440",
         name="Moon Astro",
     )
-    async_add_entities([MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)], True)
+    async_add_entities(
+        [MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)], True
+    )
 
 
-class MoonAboveHorizonBinary(CoordinatorEntity[MoonAstroCoordinator], BinarySensorEntity):
+class MoonAboveHorizonBinary(
+    CoordinatorEntity[MoonAstroCoordinator], BinarySensorEntity
+):
     """Binary sensor indicating whether the Moon is above the horizon."""
 
-    def __init__(self, coordinator: MoonAstroCoordinator, entry_id: str, device_info: DeviceInfo) -> None:
+    def __init__(
+        self, coordinator: MoonAstroCoordinator, entry_id: str, device_info: DeviceInfo
+    ) -> None:
+        """Initialize the Moon above horizon binary sensor."""
         super().__init__(coordinator)
         self._attr_unique_id = f"moon_astro_{entry_id}_above_horizon"
         self._attr_has_entity_name = True
@@ -45,4 +54,6 @@ class MoonAboveHorizonBinary(CoordinatorEntity[MoonAstroCoordinator], BinarySens
     @property
     def icon(self) -> str:
         """Return MDI icon based on state."""
-        return "mdi:chevron-up-circle" if self.is_on else "mdi:chevron-down-circle-outline"
+        return (
+            "mdi:chevron-up-circle" if self.is_on else "mdi:chevron-down-circle-outline"
+        )

@@ -1,20 +1,21 @@
-"""Config and Options flow for Moon Astro"""
+"""Config and Options flow for Moon Astro."""
 
 from __future__ import annotations
 
 import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
-    DOMAIN,
+    CONF_ALT,
     CONF_LAT,
     CONF_LON,
-    CONF_ALT,
     CONF_SCAN_INTERVAL,
     CONF_USE_HA_TZ,
     DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
 )
 
 
@@ -49,7 +50,9 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Support YAML import if needed in the future."""
         return await self.async_step_user(user_input)
 
-    async def async_step_reconfigure(self, user_input: dict | None = None) -> FlowResult:
+    async def async_step_reconfigure(
+        self, user_input: dict | None = None
+    ) -> FlowResult:
         """Handle reconfiguration (reserved for future)."""
         return await self.async_step_user(user_input)
 

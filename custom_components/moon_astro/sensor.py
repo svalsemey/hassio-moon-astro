@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
-
 import logging
+from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -58,38 +57,194 @@ _LOGGER = logging.getLogger(__name__)
 
 # key, translation_key, unit, device_class, suggested_display_precision
 SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]] = [
-    (KEY_PHASE, "sensor_phase", None, None, None),
-    (KEY_AZ, "sensor_azimuth", "°", None, PRECISION_AZ),
-    (KEY_EL, "sensor_elevation", "°", None, PRECISION_EL),
-    (KEY_ILLUM, "sensor_illumination", "%", None, PRECISION_ILLUM),
-    (KEY_DISTANCE, "sensor_distance", "km", None, PRECISION_DISTANCE),
-    (KEY_PARALLAX, "sensor_parallax", "°", None, PRECISION_PARALLAX),
+    (
+        KEY_PHASE,
+        "sensor_phase",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_AZ,
+        "sensor_azimuth",
+        "°",
+        None,
+        PRECISION_AZ,
+    ),
+    (
+        KEY_EL,
+        "sensor_elevation",
+        "°",
+        None,
+        PRECISION_EL,
+    ),
+    (
+        KEY_ILLUM,
+        "sensor_illumination",
+        "%",
+        None,
+        PRECISION_ILLUM,
+    ),
+    (
+        KEY_DISTANCE,
+        "sensor_distance",
+        "km",
+        None,
+        PRECISION_DISTANCE,
+    ),
+    (
+        KEY_PARALLAX,
+        "sensor_parallax",
+        "°",
+        None,
+        PRECISION_PARALLAX,
+    ),
     # Topocentric ecliptic coordinates (current)
-    (KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC, "sensor_ecliptic_longitude_topocentric", "°", None, PRECISION_ECL_TOPO),
-    (KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC, "sensor_ecliptic_latitude_topocentric", "°", None, PRECISION_ECL_TOPO),
+    (
+        KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
+        "sensor_ecliptic_longitude_topocentric",
+        "°",
+        None,
+        PRECISION_ECL_TOPO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
+        "sensor_ecliptic_latitude_topocentric",
+        "°",
+        None,
+        PRECISION_ECL_TOPO,
+    ),
     # Geocentric ecliptic coordinates (current)
-    (KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC, "sensor_ecliptic_longitude_geocentric", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LATITUDE_GEOCENTRIC, "sensor_ecliptic_latitude_geocentric", "°", None, PRECISION_ECL_GEO),
+    (
+        KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
+        "sensor_ecliptic_longitude_geocentric",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
+        "sensor_ecliptic_latitude_geocentric",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
     # Time sensors
-    (KEY_NEXT_RISE, "sensor_next_rise", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_SET, "sensor_next_set", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_APOGEE, "sensor_next_apogee", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_PERIGEE, "sensor_next_perigee", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_NEW_MOON, "sensor_next_new_moon", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_FIRST_QUARTER, "sensor_next_first_quarter", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_FULL_MOON, "sensor_next_full_moon", None, SensorDeviceClass.TIMESTAMP, None),
-    (KEY_NEXT_LAST_QUARTER, "sensor_next_last_quarter", None, SensorDeviceClass.TIMESTAMP, None),
+    (
+        KEY_NEXT_RISE,
+        "sensor_next_rise",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_SET,
+        "sensor_next_set",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_APOGEE,
+        "sensor_next_apogee",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_PERIGEE,
+        "sensor_next_perigee",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_NEW_MOON,
+        "sensor_next_new_moon",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_FIRST_QUARTER,
+        "sensor_next_first_quarter",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_FULL_MOON,
+        "sensor_next_full_moon",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_LAST_QUARTER,
+        "sensor_next_last_quarter",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
     # Ecliptic coordinates at next lunations (geocentric, true-of-date)
-    (KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON, "sensor_ecliptic_longitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON, "sensor_ecliptic_latitude_next_full_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON, "sensor_ecliptic_longitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
-    (KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON, "sensor_ecliptic_latitude_next_new_moon", "°", None, PRECISION_ECL_GEO),
+    (
+        KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
+        "sensor_ecliptic_longitude_next_full_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
+        "sensor_ecliptic_latitude_next_full_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+        "sensor_ecliptic_longitude_next_new_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+        "sensor_ecliptic_latitude_next_new_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
     # Zodiac sign sensors (string states)
-    (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, "sensor_zodiac_sign_next_new_moon", None, None, None),
-    (KEY_ZODIAC_SIGN_NEXT_FULL_MOON, "sensor_zodiac_sign_next_full_moon", None, None, None),
+    (
+        KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
+        "sensor_zodiac_sign_next_new_moon",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+        "sensor_zodiac_sign_next_full_moon",
+        None,
+        None,
+        None,
+    ),
     # Zodiac degree sensors (floats 0..30)
-    (KEY_ZODIAC_DEGREE_NEXT_NEW_MOON, "sensor_zodiac_degree_next_new_moon", "°", None, PRECISION_ZODIAC_DEGREE),
-    (KEY_ZODIAC_DEGREE_NEXT_FULL_MOON, "sensor_zodiac_degree_next_full_moon", "°", None, PRECISION_ZODIAC_DEGREE),
+    (
+        KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+        "sensor_zodiac_degree_next_new_moon",
+        "°",
+        None,
+        PRECISION_ZODIAC_DEGREE,
+    ),
+    (
+        KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+        "sensor_zodiac_degree_next_full_moon",
+        "°",
+        None,
+        PRECISION_ZODIAC_DEGREE,
+    ),
 ]
 
 # Stable, non-localized slugs for initial entity_id creation
@@ -207,7 +362,9 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 dt = dt.astimezone(timezone.utc)
             return dt
 
-        _LOGGER.debug("Sensor %s (%s) raw value: %r", self._key, self._attr_translation_key, value)
+        _LOGGER.debug(
+            "Sensor %s (%s) raw value: %r", self._key, self._attr_translation_key, value
+        )
         return value
 
     @property
