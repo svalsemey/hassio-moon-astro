@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import logging
 from typing import Any
 
@@ -327,6 +327,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         device_info: DeviceInfo,
         suggested_object_id: str,
     ) -> None:
+        """Initialize the sensor."""
         super().__init__(coordinator)
         self._key = key
         self._attr_unique_id = f"moon_astro_{entry_id}_{key}"
@@ -345,6 +346,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
 
     @property
     def native_value(self) -> Any:
+        """Return the state of the sensor."""
         data = self.coordinator.data or {}
         value = data.get(self._key)
 
@@ -357,9 +359,9 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             except Exception:  # noqa: BLE001
                 return None
             if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
+                dt = dt.replace(tzinfo=UTC)
             else:
-                dt = dt.astimezone(timezone.utc)
+                dt = dt.astimezone(UTC)
             return dt
 
         _LOGGER.debug(

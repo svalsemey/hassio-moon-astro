@@ -48,6 +48,7 @@ class MoonAboveHorizonBinary(
 
     @property
     def is_on(self) -> bool:
+        """Return true if the Moon is above the horizon."""
         data = self.coordinator.data or {}
         return bool(data.get(KEY_ABOVE_HORIZON, False))
 
