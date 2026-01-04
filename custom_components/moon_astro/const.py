@@ -12,6 +12,7 @@ CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
 
 # Files and external resources
+CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
 
 # Moon phase codes from Skyfield almanac (integers)

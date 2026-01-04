@@ -11,6 +11,13 @@
                     "altitude": "Altitude (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Downloading Skyfield DE440 ephemeris (> 100 MB). Please do not close this window during the download..."
+        },
+        "abort": {
+            "already_configured": "Moon Astro is already configured",
+            "missing_data": "Configuration data missing"
         }
     },
     "options": {

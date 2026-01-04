@@ -11,6 +11,13 @@
                     "altitude": "Altitude (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Téléchargement de l’éphéméride Skyfield DE440 (> 100 Mo). Veuillez ne pas fermer cette fenêtre pendant le téléchargement..."
+        },
+        "abort": {
+            "already_configured": "Lune Astro est déjà configuré",
+            "missing_data": "Données de configuration manquantes"
         }
     },
     "options": {

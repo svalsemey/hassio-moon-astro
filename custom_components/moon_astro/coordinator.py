@@ -26,6 +26,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
+    CACHE_DIR_NAME,
     CONF_ALT,
     CONF_LAT,
     CONF_LON,
@@ -1081,7 +1082,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _load() -> tuple[Ephemeris, Timescale]:
             """Blocking loader executed in the executor."""
-            cache_dir = self._hass.config.path(".skyfield")
+            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
             Path(cache_dir).mkdir(parents=True, exist_ok=True)
             load = Loader(cache_dir)
             eph: Ephemeris = load(DE440_FILE)

@@ -16,7 +16,16 @@ from .coordinator import MoonAstroCoordinator
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
-    """Set up binary sensor entities."""
+    """Set up binary sensor entities.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: The config entry being set up.
+        async_add_entities: Callback used to register entities.
+
+    Returns:
+        None.
+    """
     coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
     device_info = DeviceInfo(
         identifiers={(DOMAIN, entry.entry_id)},
@@ -25,7 +34,8 @@ async def async_setup_entry(
         name="Moon Astro",
     )
     async_add_entities(
-        [MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)], True
+        [MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)],
+        update_before_add=False,
     )
 
 
@@ -37,7 +47,16 @@ class MoonAboveHorizonBinary(
     def __init__(
         self, coordinator: MoonAstroCoordinator, entry_id: str, device_info: DeviceInfo
     ) -> None:
-        """Initialize the Moon above horizon binary sensor."""
+        """Initialize the Moon above horizon binary sensor.
+
+        Args:
+            coordinator: Data coordinator instance.
+            entry_id: Config entry identifier.
+            device_info: Device metadata shared by all entities of the entry.
+
+        Returns:
+            None.
+        """
         super().__init__(coordinator)
         self._attr_unique_id = f"moon_astro_{entry_id}_above_horizon"
         self._attr_has_entity_name = True
@@ -47,14 +66,26 @@ class MoonAboveHorizonBinary(
         self._attr_suggested_object_id = "above_horizon"
 
     @property
-    def is_on(self) -> bool:
-        """Return true if the Moon is above the horizon."""
-        data = self.coordinator.data or {}
+    def is_on(self) -> bool | None:
+        """Return the current binary state.
+
+        Returns:
+            True if the Moon is above the horizon, False if below, or None if no
+            data is available yet.
+        """
+        data = self.coordinator.data
+        if data is None:
+            return None
         return bool(data.get(KEY_ABOVE_HORIZON, False))
 
     @property
     def icon(self) -> str:
-        """Return MDI icon based on state."""
-        return (
-            "mdi:chevron-up-circle" if self.is_on else "mdi:chevron-down-circle-outline"
-        )
+        """Return an icon for the current state.
+
+        Returns:
+            An MDI icon name.
+        """
+        state = self.is_on
+        if state is None:
+            return "mdi:help-circle-outline"
+        return "mdi:chevron-up-circle" if state else "mdi:chevron-down-circle-outline"
