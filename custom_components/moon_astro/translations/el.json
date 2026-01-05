@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Εκλειπτική πλάτος στην επόμενη νέα σελήνη"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Ζώδιο (τρέχον)",
+                "state": {
+                    "aries": "Κριός",
+                    "taurus": "Ταύρος",
+                    "gemini": "Δίδυμοι",
+                    "cancer": "Καρκίνος",
+                    "leo": "Λέων",
+                    "virgo": "Παρθένος",
+                    "libra": "Ζυγός",
+                    "scorpio": "Σκορπιός",
+                    "sagittarius": "Τοξότης",
+                    "capricorn": "Αιγόκερως",
+                    "aquarius": "Υδροχόος",
+                    "pisces": "Ιχθύες"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Ζώδιο στην επόμενη νέα σελήνη",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Υδροχόος",
                     "pisces": "Ιχθύες"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Μοίρα ζωδίου (τρέχουσα)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Μοίρα ζωδίου στην επόμενη νέα σελήνη"

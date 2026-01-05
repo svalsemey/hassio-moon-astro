@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ecliptische breedte bij de volgende nieuwe maan"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Dierenriemteken (huidig)",
+                "state": {
+                    "aries": "Ram",
+                    "taurus": "Stier",
+                    "gemini": "Tweelingen",
+                    "cancer": "Kreeft",
+                    "leo": "Leeuw",
+                    "virgo": "Maagd",
+                    "libra": "Weegschaal",
+                    "scorpio": "Schorpioen",
+                    "sagittarius": "Boogschutter",
+                    "capricorn": "Steenbok",
+                    "aquarius": "Waterman",
+                    "pisces": "Vissen"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Dierenriemteken bij de volgende nieuwe maan",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Waterman",
                     "pisces": "Vissen"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Dierenriemgraad (huidig)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Dierenriemgraad bij de volgende nieuwe maan"

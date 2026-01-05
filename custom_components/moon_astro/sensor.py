@@ -37,8 +37,10 @@ from .const import (
     KEY_NEXT_SET,
     KEY_PARALLAX,
     KEY_PHASE,
+    KEY_ZODIAC_DEGREE_CURRENT_MOON,
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+    KEY_ZODIAC_SIGN_CURRENT_MOON,
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
     PRECISION_AZ,
@@ -217,6 +219,13 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
     ),
     # Zodiac sign sensors (string states)
     (
+        KEY_ZODIAC_SIGN_CURRENT_MOON,
+        "sensor_zodiac_sign_current_moon",
+        None,
+        None,
+        None,
+    ),
+    (
         KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
         "sensor_zodiac_sign_next_new_moon",
         None,
@@ -231,6 +240,13 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
     ),
     # Zodiac degree sensors (floats 0..30)
+    (
+        KEY_ZODIAC_DEGREE_CURRENT_MOON,
+        "sensor_zodiac_degree_current_moon",
+        "°",
+        None,
+        PRECISION_ZODIAC_DEGREE,
+    ),
     (
         KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
         "sensor_zodiac_degree_next_new_moon",
@@ -271,8 +287,10 @@ SUGGESTED_SLUGS: dict[str, str] = {
     KEY_NEXT_FIRST_QUARTER: "next_first_quarter",
     KEY_NEXT_FULL_MOON: "next_full_moon",
     KEY_NEXT_LAST_QUARTER: "next_last_quarter",
+    KEY_ZODIAC_SIGN_CURRENT_MOON: "zodiac_sign_current_moon",
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON: "zodiac_sign_next_new_moon",
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON: "zodiac_sign_next_full_moon",
+    KEY_ZODIAC_DEGREE_CURRENT_MOON: "zodiac_degree_current_moon",
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: "zodiac_degree_next_new_moon",
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: "zodiac_degree_next_full_moon",
 }
@@ -395,6 +413,10 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             if phase == "waxing_gibbous":
                 return "mdi:moon-waxing-gibbous"
 
+        # Zodiac degree current moon icon (canonical waning crescent)
+        if self._key == KEY_ZODIAC_DEGREE_CURRENT_MOON:
+            return "mdi:moon-waning-crescent"
+
         # Canonical phase-related icons for specific next events
         if self._key in (KEY_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON):
             return "mdi:moon-new"
@@ -444,7 +466,11 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             return "mdi:orbit"
 
         # Zodiac sensors
-        if self._key in (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, KEY_ZODIAC_SIGN_NEXT_FULL_MOON):
+        if self._key in (
+            KEY_ZODIAC_SIGN_CURRENT_MOON,
+            KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
+            KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+        ):
             data = self.coordinator.data or {}
             raw = data.get(self._key)
             sign = str(raw).strip().lower() if raw is not None else ""

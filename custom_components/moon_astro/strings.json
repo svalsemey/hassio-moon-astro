@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ecliptic latitude at next new moon"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Zodiac sign (current)",
+                "state": {
+                    "aries": "Aries",
+                    "taurus": "Taurus",
+                    "gemini": "Gemini",
+                    "cancer": "Cancer",
+                    "leo": "Leo",
+                    "virgo": "Virgo",
+                    "libra": "Libra",
+                    "scorpio": "Scorpio",
+                    "sagittarius": "Sagittarius",
+                    "capricorn": "Capricorn",
+                    "aquarius": "Aquarius",
+                    "pisces": "Pisces"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Zodiac sign at next new moon",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Aquarius",
                     "pisces": "Pisces"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Zodiac degree (current)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Zodiac degree at next new moon"

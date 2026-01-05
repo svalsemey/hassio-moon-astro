@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "רוחב אקליפטי במולד הירח הבא"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "מזל בגלגל המזלות (נוכחי)",
+                "state": {
+                    "aries": "טלה",
+                    "taurus": "שור",
+                    "gemini": "תאומים",
+                    "cancer": "סרטן",
+                    "leo": "אריה",
+                    "virgo": "בתולה",
+                    "libra": "מאזניים",
+                    "scorpio": "עקרב",
+                    "sagittarius": "קשת",
+                    "capricorn": "גדי",
+                    "aquarius": "דלי",
+                    "pisces": "דגים"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "מזל בגלגל המזלות במולד הירח הבא",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "דלי",
                     "pisces": "דגים"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "מעלה בגלגל המזלות (נוכחי)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "מעלה בגלגל המזלות במולד הירח הבא"

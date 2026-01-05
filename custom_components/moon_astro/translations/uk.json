@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Екліптична широта під час наступного молодика"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Знак зодіаку (поточний)",
+                "state": {
+                    "aries": "Овен",
+                    "taurus": "Телець",
+                    "gemini": "Близнюки",
+                    "cancer": "Рак",
+                    "leo": "Лев",
+                    "virgo": "Діва",
+                    "libra": "Терези",
+                    "scorpio": "Скорпіон",
+                    "sagittarius": "Стрілець",
+                    "capricorn": "Козоріг",
+                    "aquarius": "Водолій",
+                    "pisces": "Риби"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Знак зодіаку під час наступного молодика",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Водолій",
                     "pisces": "Риби"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Градус зодіаку (поточний)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Градус зодіаку під час наступного молодика"

@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "خط العرض الكسوفي عند المحاق التالي"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "برج البروج (الحالي)",
+                "state": {
+                    "aries": "الحمل",
+                    "taurus": "الثور",
+                    "gemini": "الجوزاء",
+                    "cancer": "السرطان",
+                    "leo": "الأسد",
+                    "virgo": "العذراء",
+                    "libra": "الميزان",
+                    "scorpio": "العقرب",
+                    "sagittarius": "القوس",
+                    "capricorn": "الجدي",
+                    "aquarius": "الدلو",
+                    "pisces": "الحوت"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "برج البروج عند المحاق التالي",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "الدلو",
                     "pisces": "الحوت"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "درجة البروج (الحالية)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "درجة البروج عند المحاق التالي"

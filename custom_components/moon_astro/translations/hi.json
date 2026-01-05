@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "अगली अमावस्या पर क्रांतिवृत्त अक्षांश"
             },
+            "sensor_zodiac_sign_current_moon": {
+            "name": "राशि चिह्न (वर्तमान)",
+            "state": {
+                "aries": "मेष",
+                "taurus": "वृषभ",
+                "gemini": "मिथुन",
+                "cancer": "कर्क",
+                "leo": "सिंह",
+                "virgo": "कन्या",
+                "libra": "तुला",
+                "scorpio": "वृश्चिक",
+                "sagittarius": "धनु",
+                "capricorn": "मकर",
+                "aquarius": "कुंभ",
+                "pisces": "मीन"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "अगली अमावस्या पर राशि चिह्न",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "कुंभ",
                     "pisces": "मीन"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "राशि अंश (वर्तमान)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "अगली अमावस्या पर राशि अंश"

@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "次の新月時の黄緯"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "黄道十二宮（現在）",
+                "state": {
+                    "aries": "おひつじ座",
+                    "taurus": "おうし座",
+                    "gemini": "ふたご座",
+                    "cancer": "かに座",
+                    "leo": "しし座",
+                    "virgo": "おとめ座",
+                    "libra": "てんびん座",
+                    "scorpio": "さそり座",
+                    "sagittarius": "いて座",
+                    "capricorn": "やぎ座",
+                    "aquarius": "みずがめ座",
+                    "pisces": "うお座"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "次の新月時の黄道十二宮",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "みずがめ座",
                     "pisces": "うお座"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "黄道度数（現在）"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "次の新月時の黄道度数"

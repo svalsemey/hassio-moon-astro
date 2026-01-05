@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Sıradaki yeni ayda ekliptik enlem"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Burç (mevcut)",
+                "state": {
+                    "aries": "Koç",
+                    "taurus": "Boğa",
+                    "gemini": "İkizler",
+                    "cancer": "Yengeç",
+                    "leo": "Aslan",
+                    "virgo": "Başak",
+                    "libra": "Terazi",
+                    "scorpio": "Akrep",
+                    "sagittarius": "Yay",
+                    "capricorn": "Oğlak",
+                    "aquarius": "Kova",
+                    "pisces": "Balık"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Sıradaki yeni ayda burç",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Kova",
                     "pisces": "Balık"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Burç derecesi (mevcut)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Sıradaki yeni ayda burç derecesi"

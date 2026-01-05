@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Szerokość ekliptyczna przy następnym nowiu"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Znak zodiaku (aktualny)",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Byk",
+                    "gemini": "Bliźnięta",
+                    "cancer": "Rak",
+                    "leo": "Lew",
+                    "virgo": "Panna",
+                    "libra": "Waga",
+                    "scorpio": "Skorpion",
+                    "sagittarius": "Strzelec",
+                    "capricorn": "Koziorożec",
+                    "aquarius": "Wodnik",
+                    "pisces": "Ryby"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Znak zodiaku przy następnym nowiu",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Wodnik",
                     "pisces": "Ryby"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Stopień zodiaku (aktualny)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Stopień zodiaku przy następnym nowiu"

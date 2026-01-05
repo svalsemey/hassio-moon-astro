@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptična širina ob naslednjem mlaju"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Zodiakalno znamenje (trenutno)",
+                "state": {
+                    "aries": "Oven",
+                    "taurus": "Bik",
+                    "gemini": "Dvojčka",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Devica",
+                    "libra": "Tehtnica",
+                    "scorpio": "Škorpijon",
+                    "sagittarius": "Strelec",
+                    "capricorn": "Kozorog",
+                    "aquarius": "Vodnar",
+                    "pisces": "Ribi"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Zodiakalno znamenje ob naslednjem mlaju",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vodnar",
                     "pisces": "Ribi"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Stopinja zodiaka (trenutna)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Stopinja zodiaka ob naslednjem mlaju"

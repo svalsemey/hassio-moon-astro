@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Эклиптическая широта в следующее новолуние"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Знак зодиака (текущий)",
+                "state": {
+                    "aries": "Овен",
+                    "taurus": "Телец",
+                    "gemini": "Близнецы",
+                    "cancer": "Рак",
+                    "leo": "Лев",
+                    "virgo": "Дева",
+                    "libra": "Весы",
+                    "scorpio": "Скорпион",
+                    "sagittarius": "Стрелец",
+                    "capricorn": "Козерог",
+                    "aquarius": "Водолей",
+                    "pisces": "Рыбы"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Знак зодиака при следующем новолунии",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Водолей",
                     "pisces": "Рыбы"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Градус зодиака (текущий)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Градус зодиака при следующем новолунии"

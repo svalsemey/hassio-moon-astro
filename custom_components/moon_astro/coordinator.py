@@ -60,10 +60,13 @@ from .const import (
     KEY_PARALLAX,
     KEY_PHASE,
     KEY_WAXING,
+    KEY_ZODIAC_DEGREE_CURRENT_MOON,
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+    KEY_ZODIAC_ICON_CURRENT_MOON,
     KEY_ZODIAC_ICON_NEXT_FULL_MOON,
     KEY_ZODIAC_ICON_NEXT_NEW_MOON,
+    KEY_ZODIAC_SIGN_CURRENT_MOON,
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
     LAST_QUARTER,
@@ -1179,10 +1182,19 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     _LOGGER.debug("Failed ecliptic lon/lat at full moon: %r", exc)
                     lon_full = lat_full = None
 
+                zodiac_current: str | None = None
                 zodiac_new: str | None = None
                 zodiac_full: str | None = None
+                zodiac_degree_current: float | None = None
                 zodiac_degree_new: float | None = None
                 zodiac_degree_full: float | None = None
+                try:
+                    zodiac_current = _zodiac_sign_from_longitude_deg(ecl_lon_geo)
+                    zodiac_degree_current = round(_degree_within_sign(ecl_lon_geo), 4)
+                except (ValueError, ArithmeticError) as exc:
+                    _LOGGER.debug("Failed current zodiac computation: %r", exc)
+                    zodiac_current = None
+                    zodiac_degree_current = None
                 try:
                     if lon_new is not None:
                         zodiac_new = _zodiac_sign_from_longitude_deg(lon_new)
@@ -1216,6 +1228,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     zodiac_full = None
                     zodiac_degree_full = None
 
+                zodiac_icon_current = _zodiac_icon(zodiac_current)
                 zodiac_icon_new = _zodiac_icon(zodiac_new)
                 zodiac_icon_full = _zodiac_icon(zodiac_full)
 
@@ -1253,10 +1266,13 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     KEY_NEXT_FIRST_QUARTER: _safe_time_iso(t_first, self._tz),
                     KEY_NEXT_FULL_MOON: _safe_time_iso(t_full, self._tz),
                     KEY_NEXT_LAST_QUARTER: _safe_time_iso(t_last, self._tz),
+                    KEY_ZODIAC_SIGN_CURRENT_MOON: zodiac_current,
                     KEY_ZODIAC_SIGN_NEXT_NEW_MOON: zodiac_new,
                     KEY_ZODIAC_SIGN_NEXT_FULL_MOON: zodiac_full,
+                    KEY_ZODIAC_DEGREE_CURRENT_MOON: zodiac_degree_current,
                     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: zodiac_degree_new,
                     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: zodiac_degree_full,
+                    KEY_ZODIAC_ICON_CURRENT_MOON: zodiac_icon_current,
                     KEY_ZODIAC_ICON_NEXT_NEW_MOON: zodiac_icon_new,
                     KEY_ZODIAC_ICON_NEXT_FULL_MOON: zodiac_icon_full,
                     KEY_ABOVE_HORIZON: above,

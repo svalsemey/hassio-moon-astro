@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptisk latitud vid nästa nymåne"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Stjärntecken (nuvarande)",
+                "state": {
+                    "aries": "Väduren",
+                    "taurus": "Oxen",
+                    "gemini": "Tvillingarna",
+                    "cancer": "Kräftan",
+                    "leo": "Lejonet",
+                    "virgo": "Jungfrun",
+                    "libra": "Vågen",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbocken",
+                    "aquarius": "Vattumannen",
+                    "pisces": "Fiskarna"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Stjärntecken vid nästa nymåne",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vattumannen",
                     "pisces": "Fiskarna"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Zodiakgrad (nuvarande)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Zodiakgrad vid nästa nymåne"

@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "다음 신월 때의 황위"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "황도대 별자리(현재)",
+                "state": {
+                    "aries": "양자리",
+                    "taurus": "황소자리",
+                    "gemini": "쌍둥이자리",
+                    "cancer": "게자리",
+                    "leo": "사자자리",
+                    "virgo": "처녀자리",
+                    "libra": "천칭자리",
+                    "scorpio": "전갈자리",
+                    "sagittarius": "사수자리",
+                    "capricorn": "염소자리",
+                    "aquarius": "물병자리",
+                    "pisces": "물고기자리"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "다음 신월의 황도대 별자리",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "물병자리",
                     "pisces": "물고기자리"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "황도대 도수(현재)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "다음 신월의 황도대 도수"

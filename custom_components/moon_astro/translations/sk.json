@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptikálna šírka pri najbližšom nove"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Znamenie zverokruhu (aktuálne)",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Býk",
+                    "gemini": "Blíženci",
+                    "cancer": "Rak",
+                    "leo": "Lev",
+                    "virgo": "Panna",
+                    "libra": "Váhy",
+                    "scorpio": "Škorpión",
+                    "sagittarius": "Strelec",
+                    "capricorn": "Kozorožec",
+                    "aquarius": "Vodnár",
+                    "pisces": "Ryby"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Znamenie zverokruhu pri najbližšom nove",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vodnár",
                     "pisces": "Ryby"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Stupeň zverokruhu (aktuálny)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Stupeň zverokruhu pri najbližšom nove"

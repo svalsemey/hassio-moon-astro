@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptisk breddegrad ved næste nymåne"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Stjernetegn (aktuelt)",
+                "state": {
+                    "aries": "Vædderen",
+                    "taurus": "Tyren",
+                    "gemini": "Tvillingerne",
+                    "cancer": "Krebsen",
+                    "leo": "Løven",
+                    "virgo": "Jomfruen",
+                    "libra": "Vægten",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbukken",
+                    "aquarius": "Vandbæreren",
+                    "pisces": "Fiskene"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Stjernetegn ved næste nymåne",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vandbæreren",
                     "pisces": "Fiskene"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Grad i stjernetegn (aktuelt)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Grad i stjernetegn ved næste nymåne"

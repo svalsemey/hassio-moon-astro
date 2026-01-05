@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptinen leveys seuraavassa uudessakuussa"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Eläinradan merkki (nykyinen)",
+                "state": {
+                    "aries": "Oinas",
+                    "taurus": "Härkä",
+                    "gemini": "Kaksoset",
+                    "cancer": "Rapu",
+                    "leo": "Leijona",
+                    "virgo": "Neitsyt",
+                    "libra": "Vaaka",
+                    "scorpio": "Skorpioni",
+                    "sagittarius": "Jousimies",
+                    "capricorn": "Kauris",
+                    "aquarius": "Vesimies",
+                    "pisces": "Kalat"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Eläinradan merkki seuraavassa uudessakuussa",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vesimies",
                     "pisces": "Kalat"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Eläinradan aste (nykyinen)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Eläinradan aste seuraavassa uudessakuussa"

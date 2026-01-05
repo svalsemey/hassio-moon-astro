@@ -58,14 +58,17 @@ KEY_ABOVE_HORIZON = "above_horizon"
 KEY_WAXING = "waxing"
 
 # Zodiac sign sensors (strings)
+KEY_ZODIAC_SIGN_CURRENT_MOON = "zodiac_sign_current_moon"
 KEY_ZODIAC_SIGN_NEXT_NEW_MOON = "zodiac_sign_next_new_moon"
 KEY_ZODIAC_SIGN_NEXT_FULL_MOON = "zodiac_sign_next_full_moon"
 
 # Zodiac icons for next lunations (MDI icon names as strings)
+KEY_ZODIAC_ICON_CURRENT_MOON = "zodiac_icon_current_moon"
 KEY_ZODIAC_ICON_NEXT_NEW_MOON = "zodiac_icon_next_new_moon"
 KEY_ZODIAC_ICON_NEXT_FULL_MOON = "zodiac_icon_next_full_moon"
 
 # Zodiac degree sensors (floats, degrees within sign 0..30)
+KEY_ZODIAC_DEGREE_CURRENT_MOON = "zodiac_degree_current_moon"
 KEY_ZODIAC_DEGREE_NEXT_NEW_MOON = "zodiac_degree_next_new_moon"
 KEY_ZODIAC_DEGREE_NEXT_FULL_MOON = "zodiac_degree_next_full_moon"
 

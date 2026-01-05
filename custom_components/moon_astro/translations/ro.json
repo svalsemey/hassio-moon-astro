@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Latitudine ecliptică la următoarea lună nouă"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Semn zodiacal (curent)",
+                "state": {
+                    "aries": "Berbec",
+                    "taurus": "Taur",
+                    "gemini": "Gemeni",
+                    "cancer": "Rac",
+                    "leo": "Leu",
+                    "virgo": "Fecioară",
+                    "libra": "Balanță",
+                    "scorpio": "Scorpion",
+                    "sagittarius": "Săgetător",
+                    "capricorn": "Capricorn",
+                    "aquarius": "Vărsător",
+                    "pisces": "Pești"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Semn zodiacal la următoarea lună nouă",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vărsător",
                     "pisces": "Pești"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Grad zodiacal (curent)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Grad zodiacal la următoarea lună nouă"

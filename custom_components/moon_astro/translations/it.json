@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Latitudine eclittica alla prossima luna nuova"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Segno del zodiaco (attuale)",
+                "state": {
+                    "aries": "Ariete",
+                    "taurus": "Toro",
+                    "gemini": "Gemelli",
+                    "cancer": "Cancro",
+                    "leo": "Leone",
+                    "virgo": "Vergine",
+                    "libra": "Bilancia",
+                    "scorpio": "Scorpione",
+                    "sagittarius": "Sagittario",
+                    "capricorn": "Capricorno",
+                    "aquarius": "Acquario",
+                    "pisces": "Pesci"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Segno zodiacale alla prossima luna nuova",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Acquario",
                     "pisces": "Pesci"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Grado zodiacale (attuale)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Grado zodiacale alla prossima luna nuova"

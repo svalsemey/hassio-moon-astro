@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptikai szélesség a következő újholdkor"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Állatövi jegy (aktuális)",
+                "state": {
+                    "aries": "Kos",
+                    "taurus": "Bika",
+                    "gemini": "Ikrek",
+                    "cancer": "Rák",
+                    "leo": "Oroszlán",
+                    "virgo": "Szűz",
+                    "libra": "Mérleg",
+                    "scorpio": "Skorpió",
+                    "sagittarius": "Nyilas",
+                    "capricorn": "Bak",
+                    "aquarius": "Vízöntő",
+                    "pisces": "Halak"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Állatövi jegy a következő újholdkor",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Vízöntő",
                     "pisces": "Halak"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Zodiákus fok (aktuális)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Fok az állatövben a következő újholdkor"

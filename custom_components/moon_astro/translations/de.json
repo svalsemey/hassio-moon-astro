@@ -120,6 +120,23 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptische Breite beim nächsten Neumond"
             },
+            "sensor_zodiac_sign_current_moon": {
+                "name": "Tierkreiszeichen (aktuell)",
+                "state": {
+                    "aries": "Widder",
+                    "taurus": "Stier",
+                    "gemini": "Zwillinge",
+                    "cancer": "Krebs",
+                    "leo": "Löwe",
+                    "virgo": "Jungfrau",
+                    "libra": "Waage",
+                    "scorpio": "Skorpion",
+                    "sagittarius": "Schütze",
+                    "capricorn": "Steinbock",
+                    "aquarius": "Wassermann",
+                    "pisces": "Fische"
+                }
+            },
             "sensor_zodiac_sign_next_new_moon": {
                 "name": "Tierkreiszeichen beim nächsten Neumond",
                 "state": {
@@ -153,6 +170,9 @@
                     "aquarius": "Wassermann",
                     "pisces": "Fische"
                 }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Grad im Tierkreis (aktuell)"
             },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Grad im Tierkreis beim nächsten Neumond"
