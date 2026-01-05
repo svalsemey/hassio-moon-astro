@@ -11,6 +11,13 @@
                     "altitude": "Nadmorska višina (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Prenašanje efemerid Skyfield DE440 (> 100 MB). Med prenosom prosimo ne zaprite tega okna..."
+        },
+        "abort": {
+            "already_configured": "Lunin Astro je že konfiguriran",
+            "missing_data": "Manjkajo konfiguracijski podatki"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Nad obzorjem",
+                "state": {
+                    "on": "Nad obzorjem",
+                    "off": "Pod obzorjem"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Faza",

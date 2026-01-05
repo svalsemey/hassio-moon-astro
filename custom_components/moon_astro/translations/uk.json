@@ -11,6 +11,13 @@
                     "altitude": "Висота (м)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Завантаження ефемериди Skyfield DE440 (> 100 МБ). Будь ласка, не закривайте це вікно під час завантаження..."
+        },
+        "abort": {
+            "already_configured": "Місяць Астро вже налаштовано",
+            "missing_data": "Відсутні дані конфігурації"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Над горизонтом",
+                "state": {
+                    "on": "Над горизонтом",
+                    "off": "Під горизонтом"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Фаза",

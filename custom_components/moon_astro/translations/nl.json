@@ -11,6 +11,13 @@
                     "altitude": "Hoogte (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Skyfield DE440-ephemeride downloaden (> 100 MB). Sluit dit venster niet tijdens het downloaden..."
+        },
+        "abort": {
+            "already_configured": "Maan Astro is al geconfigureerd",
+            "missing_data": "Configuratiegegevens ontbreken"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Boven de horizon",
+                "state": {
+                    "on": "Boven de horizon",
+                    "off": "Onder de horizon"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fase",

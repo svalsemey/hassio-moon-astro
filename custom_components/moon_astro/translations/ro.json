@@ -11,6 +11,13 @@
                     "altitude": "Altitudine (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Se descarcă efemerida Skyfield DE440 (> 100 MB). Vă rugăm să nu închideți această fereastră în timpul descărcării..."
+        },
+        "abort": {
+            "already_configured": "Lună Astro este deja configurat",
+            "missing_data": "Lipsesc datele de configurare"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Deasupra orizontului",
+                "state": {
+                    "on": "Deasupra orizontului",
+                    "off": "Sub orizont"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fază",

@@ -11,6 +11,13 @@
                     "altitude": "Rakım (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Skyfield DE440 efemerisi indiriliyor (> 100 MB). İndirme sırasında lütfen bu pencereyi kapatmayın..."
+        },
+        "abort": {
+            "already_configured": "Ay Astro zaten yapılandırılmış",
+            "missing_data": "Yapılandırma verileri eksik"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Ufkun üzerinde",
+                "state": {
+                    "on": "Ufkun üzerinde",
+                    "off": "Ufkun altında"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Evre",

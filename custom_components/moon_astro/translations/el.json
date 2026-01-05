@@ -11,6 +11,13 @@
                     "altitude": "Υψόμετρο (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Λήψη του εφημερίδιου Skyfield DE440 (> 100 MB). Παρακαλώ μην κλείσετε αυτό το παράθυρο κατά τη διάρκεια της λήψης..."
+        },
+        "abort": {
+            "already_configured": "Το Σελήνη Άστρο έχει ήδη ρυθμιστεί",
+            "missing_data": "Λείπουν δεδομένα ρύθμισης"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Πάνω από τον ορίζοντα",
+                "state": {
+                    "on": "Πάνω από τον ορίζοντα",
+                    "off": "Κάτω από τον ορίζοντα"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Φάση",

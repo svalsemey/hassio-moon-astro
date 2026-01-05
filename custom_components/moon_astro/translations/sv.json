@@ -11,6 +11,13 @@
                     "altitude": "Höjd (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Laddar ner Skyfield DE440-efemeriden (> 100 MB). Stäng inte detta fönster under nedladdningen..."
+        },
+        "abort": {
+            "already_configured": "Måne Astro är redan konfigurerad",
+            "missing_data": "Konfigurationsdata saknas"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Över horisonten",
+                "state": {
+                    "on": "Över horisonten",
+                    "off": "Under horisonten"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fas",

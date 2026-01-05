@@ -11,6 +11,13 @@
                     "altitude": "الارتفاع (م)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "جاري تنزيل تقويم Skyfield DE440 الفلكي (> 100 ميجابايت). يرجى عدم إغلاق هذه النافذة أثناء التنزيل..."
+        },
+        "abort": {
+            "already_configured": "قمر أسترو مُكوَّن بالفعل",
+            "missing_data": "بيانات التكوين مفقودة"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "فوق الأفق",
+                "state": {
+                    "on": "فوق الأفق",
+                    "off": "تحت الأفق"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "الطور",

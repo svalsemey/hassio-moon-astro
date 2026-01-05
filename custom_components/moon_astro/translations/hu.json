@@ -11,6 +11,13 @@
                     "altitude": "Magasság (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "A Skyfield DE440 efemerida letöltése (> 100 MB). Kérjük, a letöltés alatt ne zárja be ezt az ablakot..."
+        },
+        "abort": {
+            "already_configured": "A Hold Asztro már be van állítva",
+            "missing_data": "Hiányoznak a konfigurációs adatok"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "A horizont felett",
+                "state": {
+                    "on": "A horizont felett",
+                    "off": "A horizont alatt"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fázis",

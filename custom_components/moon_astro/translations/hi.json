@@ -11,6 +11,13 @@
                     "altitude": "ऊँचाई (मीटर)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Skyfield DE440 एफ़ेमेरिस (> 100 MB) डाउनलोड हो रही है। कृपया डाउनलोड के दौरान यह विंडो बंद न करें..."
+        },
+        "abort": {
+            "already_configured": "चंद्र एस्ट्रो पहले से कॉन्फ़िगर है",
+            "missing_data": "कॉन्फ़िगरेशन डेटा अनुपलब्ध है"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "क्षितिज के ऊपर",
+                "state": {
+                    "on": "क्षितिज के ऊपर",
+                    "off": "क्षितिज के नीचे"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "चरण",

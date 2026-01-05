@@ -11,6 +11,13 @@
                     "altitude": "標高 (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Skyfield DE440 暦表（> 100 MB）をダウンロードしています。ダウンロード中はこのウィンドウを閉じないでください..."
+        },
+        "abort": {
+            "already_configured": "ムーンアストロはすでに設定されています",
+            "missing_data": "設定データが不足しています"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "地平線の上",
+                "state": {
+                    "on": "地平線の上",
+                    "off": "地平線の下"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "位相",

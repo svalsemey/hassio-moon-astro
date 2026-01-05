@@ -11,6 +11,13 @@
                     "altitude": "Altitude (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Baixando a efeméride Skyfield DE440 (> 100 MB). Por favor, não feche esta janela durante o download..."
+        },
+        "abort": {
+            "already_configured": "Lua Astro já está configurado",
+            "missing_data": "Dados de configuração ausentes"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Acima do horizonte",
+                "state": {
+                    "on": "Acima do horizonte",
+                    "off": "Abaixo do horizonte"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fase",

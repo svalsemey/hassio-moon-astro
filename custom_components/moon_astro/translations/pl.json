@@ -11,6 +11,13 @@
                     "altitude": "Wysokość (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Pobieranie efemerydy Skyfield DE440 (> 100 MB). Proszę nie zamykać tego okna podczas pobierania..."
+        },
+        "abort": {
+            "already_configured": "Księżyc Astro jest już skonfigurowany",
+            "missing_data": "Brak danych konfiguracyjnych"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Powyżej horyzontu",
+                "state": {
+                    "on": "Powyżej horyzontu",
+                    "off": "Poniżej horyzontu"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Faza",

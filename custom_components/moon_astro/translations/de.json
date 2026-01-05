@@ -11,6 +11,13 @@
                     "altitude": "Höhe (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Lade die Skyfield DE440-Ephemeride herunter (> 100 MB). Bitte schließen Sie dieses Fenster während des Downloads nicht..."
+        },
+        "abort": {
+            "already_configured": "Mond Astro ist bereits konfiguriert",
+            "missing_data": "Konfigurationsdaten fehlen"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Über dem Horizont",
+                "state": {
+                    "on": "Über dem Horizont",
+                    "off": "Unter dem Horizont"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Phase",

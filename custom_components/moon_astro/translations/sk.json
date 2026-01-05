@@ -11,6 +11,13 @@
                     "altitude": "Nadmorská výška (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Sťahovanie efemeríd Skyfield DE440 (> 100 MB). Počas sťahovania prosím nezatvárajte toto okno..."
+        },
+        "abort": {
+            "already_configured": "Mesiac Astro je už nakonfigurovaný",
+            "missing_data": "Chýbajú konfiguračné údaje"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Nad obzorom",
+                "state": {
+                    "on": "Nad obzorom",
+                    "off": "Pod obzorom"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Fáza",

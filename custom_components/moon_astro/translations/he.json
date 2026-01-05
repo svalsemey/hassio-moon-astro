@@ -11,6 +11,13 @@
                     "altitude": "גובה (מ׳)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "מוריד את האפמריס Skyfield DE440 (> 100 MB). נא לא לסגור חלון זה במהלך ההורדה..."
+        },
+        "abort": {
+            "already_configured": "ירח אסטרו כבר מוגדר",
+            "missing_data": "נתוני תצורה חסרים"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "מעל האופק",
+                "state": {
+                    "on": "מעל האופק",
+                    "off": "מתחת לאופק"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "מופע",

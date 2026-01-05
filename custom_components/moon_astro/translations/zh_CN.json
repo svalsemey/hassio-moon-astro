@@ -11,6 +11,13 @@
                     "altitude": "海拔（米）"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "正在下载 Skyfield DE440 星历（> 100 MB）。下载过程中请不要关闭此窗口..."
+        },
+        "abort": {
+            "already_configured": "月亮阿斯特罗已配置",
+            "missing_data": "缺少配置数据"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "在地平线以上",
+                "state": {
+                    "on": "在地平线以上",
+                    "off": "在地平线以下"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "月相",

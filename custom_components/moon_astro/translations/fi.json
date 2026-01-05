@@ -11,6 +11,13 @@
                     "altitude": "Korkeus (m)"
                 }
             }
+        },
+        "progress": {
+            "download_ephemeris": "Ladataan Skyfield DE440 -efemeridiä (> 100 Mt). Älä sulje tätä ikkunaa latauksen aikana..."
+        },
+        "abort": {
+            "already_configured": "Kuu Astro on jo määritetty",
+            "missing_data": "Määritystiedot puuttuvat"
         }
     },
     "options": {
@@ -26,6 +33,15 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "binary_above_horizon": {
+                "name": "Horisontin yläpuolella",
+                "state": {
+                    "on": "Horisontin yläpuolella",
+                    "off": "Horisontin alapuolella"
+                }
+            }
+        },
         "sensor": {
             "sensor_phase": {
                 "name": "Vaihe",
