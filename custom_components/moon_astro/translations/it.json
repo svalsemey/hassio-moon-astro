@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Prossima luna piena"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Nome della prossima luna piena",
+                "state": {
+                    "wolf_moon": "Luna del Lupo",
+                    "snow_moon": "Luna della Neve",
+                    "worm_moon": "Luna dei Verme",
+                    "pink_moon": "Luna Rosa",
+                    "flower_moon": "Luna dei Fiori",
+                    "strawberry_moon": "Luna delle Fragole",
+                    "buck_moon": "Luna del Cervo",
+                    "sturgeon_moon": "Luna dello Storione",
+                    "harvest_moon": "Luna del Raccolto",
+                    "hunters_moon": "Luna del Cacciatore",
+                    "beaver_moon": "Luna del Castoro",
+                    "cold_moon": "Luna Fredda",
+                    "blue_moon": "Luna Blu",
+                    "unknown": "Sconosciuta"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Nomi alternativi della prossima luna piena",
+                "state": {
+                    "wolf_moon_alt_names": "Luna dopo Yule, Luna Stai-a-casa, Luna Silenziosa, Luna Severa, Luna Centrale",
+                    "snow_moon_alt_names": "Luna della Fame, Luna dell’Orso, Luna della Tempesta, Luna del Ghiaccio",
+                    "worm_moon_alt_names": "Luna di Quaresima, Luna del Corvo, Luna della Crosta di Neve, Luna Casta, Luna dello Zucchero, Luna della Linfa",
+                    "pink_moon_alt_names": "Luna del Ghiaccio che si Spezza, Luna dei Germogli, Luna del Risveglio, Luna delle Uova, Luna Pasquale",
+                    "flower_moon_alt_names": "Luna della Semina, Luna del Latte, Luna della Lepre, Luna dell’Erba, Luna delle Madri, Luna Luminosa",
+                    "strawberry_moon_alt_names": "Luna della Rosa, Luna Calda, Luna dell’Idromele, Luna dei Fiori, Luna della Semina",
+                    "buck_moon_alt_names": "Luna del Tuono, Luna del Fieno, Luna delle Erbe",
+                    "sturgeon_moon_alt_names": "Luna del Grano, Luna del Mais, Luna della Lince, Luna dei Fulmini",
+                    "harvest_moon_alt_names": "Piena Luna del Mais, Luna del Mais Verde, Luna del Mais, Luna del Vino, Luna del Canto, Luna dell’Orzo",
+                    "hunters_moon_alt_names": "Luna del Riso Essiccato, Luna delle Foglie che Cadono, Luna del Gelo, Luna di Sangue, Luna Sanguigna",
+                    "beaver_moon_alt_names": "Luna della Brina, Luna del Gelo, Luna del Commercio, Luna della Neve, Luna del Lutto, Luna delle Profondità più Oscure",
+                    "cold_moon_alt_names": "Luna delle Notti Lunghe, Luna prima di Yule, Luna della Quercia, Piena Luna Fredda",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Prossimo ultimo quarto"
             },

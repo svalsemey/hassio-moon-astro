@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Următoarea lună plină"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Numele următoarei luni pline",
+                "state": {
+                    "wolf_moon": "Luna Lupului",
+                    "snow_moon": "Luna Zăpezii",
+                    "worm_moon": "Luna Viermilor",
+                    "pink_moon": "Luna Roz",
+                    "flower_moon": "Luna Florilor",
+                    "strawberry_moon": "Luna Căpșunilor",
+                    "buck_moon": "Luna Cerbului",
+                    "sturgeon_moon": "Luna Sturionului",
+                    "harvest_moon": "Luna Recoltei",
+                    "hunters_moon": "Luna Vânătorului",
+                    "beaver_moon": "Luna Castorului",
+                    "cold_moon": "Luna Rece",
+                    "blue_moon": "Luna Albastră",
+                    "unknown": "Necunoscută"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Nume alternative ale următoarei luni pline",
+                "state": {
+                    "wolf_moon_alt_names": "Luna după Yule, Luna Stai Acasă, Luna Liniștită, Luna Aspră, Luna Centrală",
+                    "snow_moon_alt_names": "Luna Foametei, Luna Ursului, Luna Furtunilor, Luna Gheții",
+                    "worm_moon_alt_names": "Luna Postului, Luna Corbului, Luna Crustei de Zăpadă, Luna Castă, Luna Zahărului, Luna Sevei",
+                    "pink_moon_alt_names": "Luna Gheții Care Se Rupe, Luna Mugurilor, Luna Trezirii, Luna Ouălor, Luna Pascală",
+                    "flower_moon_alt_names": "Luna Plantării, Luna Laptelui, Luna Iepurelui, Luna Ierbii, Luna Mamelor, Luna Strălucitoare",
+                    "strawberry_moon_alt_names": "Luna Trandafirilor, Luna Caldă, Luna Miedului, Luna Florilor, Luna Plantării",
+                    "buck_moon_alt_names": "Luna Tunetului, Luna Fânului, Luna Ierburiilor",
+                    "sturgeon_moon_alt_names": "Luna Grânelor, Luna Porumbului, Luna Râsului, Luna Fulgerelor",
+                    "harvest_moon_alt_names": "Luna Porumbului (Plină), Luna Porumbului Verde, Luna Porumbului, Luna Vinului, Luna Cântecului, Luna Orzului",
+                    "hunters_moon_alt_names": "Luna Orezului Uscat, Luna Frunzelor Căzătoare, Luna Înghețului, Luna Sângelui, Luna Sanguină",
+                    "beaver_moon_alt_names": "Luna Brumei, Luna Înghețului, Luna Comerțului, Luna Zăpezii, Luna Doliului, Luna Adâncurilor Întunecate",
+                    "cold_moon_alt_names": "Luna Nopților Lungi, Luna Înainte de Yule, Luna Stejarului, Luna Rece (Plină)",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Următorul ultim pătrar"
             },

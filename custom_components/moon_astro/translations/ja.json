@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "次の満月"
             },
+            "sensor_next_full_moon_name": {
+                "name": "次の満月の名称",
+                "state": {
+                    "wolf_moon": "ウルフムーン",
+                    "snow_moon": "スノームーン",
+                    "worm_moon": "ワームムーン",
+                    "pink_moon": "ピンクムーン",
+                    "flower_moon": "フラワームーン",
+                    "strawberry_moon": "ストロベリームーン",
+                    "buck_moon": "バックムーン",
+                    "sturgeon_moon": "スタージョンムーン",
+                    "harvest_moon": "ハーベストムーン",
+                    "hunters_moon": "ハンターズムーン",
+                    "beaver_moon": "ビーバームーン",
+                    "cold_moon": "コールドムーン",
+                    "blue_moon": "ブルームーン",
+                    "unknown": "不明"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "次の満月の別名（一般的）",
+                "state": {
+                    "wolf_moon_alt_names": "ユールの後の月, 家にいる月, 静かな月, 厳しい月, 中央の月",
+                    "snow_moon_alt_names": "飢えの月, 熊の月, 嵐の月, 氷の月",
+                    "worm_moon_alt_names": "四旬節の月, カラスの月, 雪の皮の月, 貞節の月, 砂糖の月, 樹液の月",
+                    "pink_moon_alt_names": "氷解の月, 芽吹きの月, 目覚めの月, 卵の月, 復活祭の月",
+                    "flower_moon_alt_names": "植え付けの月, 乳の月, 野ウサギの月, 草の月, 母の月, 明るい月",
+                    "strawberry_moon_alt_names": "バラの月, 暑い月, 蜂蜜酒の月, 花の月, 植え付けの月",
+                    "buck_moon_alt_names": "雷の月, 干し草の月, 薬草の月",
+                    "sturgeon_moon_alt_names": "穀物の月, トウモロコシの月, オオヤマネコの月, 稲妻の月",
+                    "harvest_moon_alt_names": "トウモロコシの満月, 青いトウモロコシの月, トウモロコシの月, ワインの月, 歌の月, 大麦の月",
+                    "hunters_moon_alt_names": "乾燥米の月, 落葉の月, 凍結の月, 血の月, サングインムーン",
+                    "beaver_moon_alt_names": "霜の月, 凍結の月, 交易の月, 雪の月, 喪の月, 最も暗い深みの月",
+                    "cold_moon_alt_names": "長い夜の月, ユール前の月, オークの月, 寒い満月",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "次の下弦"
             },

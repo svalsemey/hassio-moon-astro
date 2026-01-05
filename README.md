@@ -1,6 +1,6 @@
 # Moon Astro
 
-High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, next lunation timestamps, apogee/perigee, and zodiac information at the next new/full moon.
+High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, next lunation timestamps, apogee/perigee, and zodiac information.
 
 - Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
 - Topocentric elevation/azimuth from your configured location
@@ -12,13 +12,16 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Current:
   - Phase, Azimuth, Elevation, Illumination (%), Distance (km), Parallax (°)
   - Ecliptic longitude/latitude (topocentric and geocentric)
+  - Zodiac sign and zodiac degree (current moon position)
 - Next events:
   - Moonrise, Moonset
   - Apogee, Perigee
   - New Moon, First Quarter, Full Moon, Last Quarter
 - Lunation context:
   - Geocentric ecliptic longitude/latitude at next new/full moon (true-of-date)
-  - Zodiac sign and degree at next new/full Moon
+  - Zodiac sign and zodiac degree at next new/full moon
+  - Next full moon name (Gregorian calendar)
+  - Next full moon alternative names (Gregorian calendar)
 - Binary sensor:
   - Moon above horizon (on/off)
 
@@ -53,22 +56,22 @@ Sensors (examples of entity names; actual names are localized):
 - Illumination (%)
 - Distance (km)
 - Parallax (°)
-- Ecliptic longitude/latitude (topocentric)
-- Ecliptic longitude/latitude (geocentric)
+- Ecliptic longitude/latitude (topocentric and geocentric)
 - Next moonrise/moonset (timestamp)
 - Next apogee/perigee (timestamp)
 - Next new moon / first quarter / full moon / last quarter (timestamp)
-- Ecliptic longitude/latitude at next new moon
-- Ecliptic longitude/latitude at next full moon
-- Zodiac sign at next new/full moon
-- Zodiac degree at next new/full moon
+- Ecliptic longitude/latitude at next new/full moon
+- Zodiac sign and degree at current moon position and next new/full moon
+- Next full moon name and alternative names (according to Gregorian calendar)
 
 Binary sensors:
 - Moon above horizon
 
 ## Localization
 
-Translations included for multiple languages (ar, cs, da, de, el, es, fi, fr, he, hi, hu, it, ja, ko, nl, no, pl, pt, ro, ru, sk, sl, sv, tr, uk, zh_CN). Entity names are localized via Home Assistant’s translation system.
+Translations are included for multiple languages (ar, cs, da, de, el, es, fi, fr, he, hi, hu, it, ja, ko, nl, no, pl, pt, ro, ru, sk, sl, sv, tr, uk, zh_CN). Entity names and some state values (for example zodiac signs and full moon names) are localized via Home Assistant’s translation system.
+
+If you notice that a translation is incomplete or inaccurate, contributions are very welcome.
 
 ## Requirements
 

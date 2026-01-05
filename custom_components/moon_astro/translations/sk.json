@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Najbližší spln"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Názov nasledujúceho splnu",
+                "state": {
+                    "wolf_moon": "Vlčí spln",
+                    "snow_moon": "Snehový spln",
+                    "worm_moon": "Červí spln",
+                    "pink_moon": "Ružový spln",
+                    "flower_moon": "Kvetinový spln",
+                    "strawberry_moon": "Jahodový spln",
+                    "buck_moon": "Jelení spln",
+                    "sturgeon_moon": "Jeseterový spln",
+                    "harvest_moon": "Zberový spln",
+                    "hunters_moon": "Lovecký spln",
+                    "beaver_moon": "Bobrí spln",
+                    "cold_moon": "Studený spln",
+                    "blue_moon": "Modrý spln",
+                    "unknown": "Neznáme"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternatívne názvy nasledujúceho splnu",
+                "state": {
+                    "wolf_moon_alt_names": "Mesiac po Yule, Domáci mesiac, Tichý mesiac, Prísny mesiac, Stredový mesiac",
+                    "snow_moon_alt_names": "Hladný mesiac, Medvedí mesiac, Búrkový mesiac, Ľadový mesiac",
+                    "worm_moon_alt_names": "Pôstny mesiac, Havraní mesiac, Kôrový mesiac, Cnostný mesiac, Cukrový mesiac, Miazgový mesiac",
+                    "pink_moon_alt_names": "Mesiac lámania ľadu, Pučiaci mesiac, Prebúdzajúci mesiac, Vajíčkový mesiac, Veľkonočný mesiac",
+                    "flower_moon_alt_names": "Sadiaci mesiac, Mliečny mesiac, Zajačí mesiac, Trávny mesiac, Materský mesiac, Jasný mesiac",
+                    "strawberry_moon_alt_names": "Ružový (Rose) mesiac, Horúci mesiac, Medovinový mesiac, Kvetinový mesiac, Sadiaci mesiac",
+                    "buck_moon_alt_names": "Hromový mesiac, Senný mesiac, Bylinkový mesiac",
+                    "sturgeon_moon_alt_names": "Obilný mesiac, Kukuričný mesiac, Rysí mesiac, Bleskový mesiac",
+                    "harvest_moon_alt_names": "Plný kukuričný mesiac, Mesiac zelenej kukurice, Kukuričný mesiac, Vínny mesiac, Piesňový mesiac, Jačmenný mesiac",
+                    "hunters_moon_alt_names": "Mesiac sušenia ryže, Mesiac padajúcich listov, Mrazivý mesiac, Krvavý mesiac, Sanguine mesiac",
+                    "beaver_moon_alt_names": "Inovaťový mesiac, Mrazivý mesiac, Obchodný mesiac, Snehový mesiac, Smútočný mesiac, Mesiac najtemnejších hlbín",
+                    "cold_moon_alt_names": "Mesiac dlhých nocí, Mesiac pred Yule, Dubový mesiac, Plný studený mesiac",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Najbližšia posledná štvrť"
             },

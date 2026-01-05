@@ -52,6 +52,8 @@ from .const import (
     KEY_NEXT_APOGEE,
     KEY_NEXT_FIRST_QUARTER,
     KEY_NEXT_FULL_MOON,
+    KEY_NEXT_FULL_MOON_ALT_NAMES,
+    KEY_NEXT_FULL_MOON_NAME,
     KEY_NEXT_LAST_QUARTER,
     KEY_NEXT_NEW_MOON,
     KEY_NEXT_PERIGEE,
@@ -949,6 +951,116 @@ def _find_phase_next(
     return None
 
 
+def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | None:
+    """Return the translation state code for full moon alternative names.
+
+    Args:
+        full_moon_name_code: Full moon name code (e.g. 'wolf_moon', 'blue_moon').
+
+    Returns:
+        A stable translation state code (e.g. 'wolf_moon_alt_names'), or None.
+    """
+    if not full_moon_name_code:
+        return None
+    if full_moon_name_code == "unknown":
+        return "unknown"
+    return f"{full_moon_name_code}_alt_names"
+
+
+def _full_moon_name_code(month: int) -> str:
+    """Return the canonical full moon name code for a given month.
+
+    Args:
+        month: Month number in [1..12].
+
+    Returns:
+        A lowercase string code used as sensor state.
+    """
+    mapping: dict[int, str] = {
+        1: "wolf_moon",
+        2: "snow_moon",
+        3: "worm_moon",
+        4: "pink_moon",
+        5: "flower_moon",
+        6: "strawberry_moon",
+        7: "buck_moon",
+        8: "sturgeon_moon",
+        9: "harvest_moon",
+        10: "hunters_moon",
+        11: "beaver_moon",
+        12: "cold_moon",
+    }
+    return mapping.get(month, "unknown")
+
+
+def _is_blue_moon(next_full: Time | None, following_full: Time | None) -> bool:
+    """Return True if next_full is a blue moon (second full moon in the same month).
+
+    Strategy:
+        A "blue moon" (common definition) is the second full moon occurring within
+        the same calendar month.
+
+        We detect it by checking whether the following full moon exists and occurs
+        in the same month/year as the next full moon.
+
+    Args:
+        next_full: The next full moon time.
+        following_full: The full moon after next_full.
+
+    Returns:
+        True if next_full is a blue moon, False otherwise.
+    """
+    if next_full is None or following_full is None:
+        return False
+
+    dt1 = next_full.utc_datetime()
+    dt2 = following_full.utc_datetime()
+
+    # Handle ndarray edge-cases defensively
+    if not isinstance(dt1, datetime):
+        dt1 = dt1.item() if hasattr(dt1, "item") else dt1[0]
+    if not isinstance(dt2, datetime):
+        dt2 = dt2.item() if hasattr(dt2, "item") else dt2[0]
+
+    return (dt1.year, dt1.month) == (dt2.year, dt2.month)
+
+
+def _next_full_moon_name_code(
+    ts: Timescale, eph: Ephemeris, t_start: Time
+) -> str | None:
+    """Compute the next full moon name code, handling 'blue_moon' when applicable.
+
+    Args:
+        ts: Skyfield Timescale.
+        eph: Loaded ephemeris.
+        t_start: Start time for the search.
+
+    Returns:
+        A string code among:
+        - 'blue_moon' when next full moon is the second full moon of the month
+        - otherwise a month-based full moon name code (e.g. 'wolf_moon')
+        - None if next full moon cannot be computed
+    """
+    try:
+        f = almanac.moon_phases(eph)
+        t_full_1 = _find_phase_next(ts, f, t_start, FULL_MOON)
+        if t_full_1 is None:
+            return None
+
+        # Look for the next full moon after the next full moon
+        t_full_2 = _find_phase_next(ts, f, t_full_1, FULL_MOON)
+        if _is_blue_moon(t_full_1, t_full_2):
+            return "blue_moon"
+
+        dt = t_full_1.utc_datetime()
+        if not isinstance(dt, datetime):
+            dt = dt.item() if hasattr(dt, "item") else dt[0]
+
+        return _full_moon_name_code(dt.month)
+    except _RECOVERABLE_SKYFIELD_ERRORS:
+        return None
+
+
 def _zodiac_sign_from_longitude_deg(lon_deg: float) -> str | None:
     """Map ecliptic longitude to a zodiac sign name.
 
@@ -1154,6 +1266,11 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     t_new = t_first = t_full = t_last = None
 
                 try:
+                    full_moon_name_code = _next_full_moon_name_code(ts, eph, t)
+                except (ValueError, RuntimeError):
+                    full_moon_name_code = None
+
+                try:
                     t_apogee = _find_next_apogee(eph, ts, t)
                 except _RECOVERABLE_NUMERIC_ERRORS:
                     t_apogee = None
@@ -1265,6 +1382,10 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     KEY_NEXT_NEW_MOON: _safe_time_iso(t_new, self._tz),
                     KEY_NEXT_FIRST_QUARTER: _safe_time_iso(t_first, self._tz),
                     KEY_NEXT_FULL_MOON: _safe_time_iso(t_full, self._tz),
+                    KEY_NEXT_FULL_MOON_NAME: full_moon_name_code,
+                    KEY_NEXT_FULL_MOON_ALT_NAMES: _full_moon_alt_names_state_code(
+                        full_moon_name_code
+                    ),
                     KEY_NEXT_LAST_QUARTER: _safe_time_iso(t_last, self._tz),
                     KEY_ZODIAC_SIGN_CURRENT_MOON: zodiac_current,
                     KEY_ZODIAC_SIGN_NEXT_NEW_MOON: zodiac_new,

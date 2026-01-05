@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Następna pełnia"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Nazwa następnej pełni",
+                "state": {
+                    "wolf_moon": "Wilcza Pełnia",
+                    "snow_moon": "Śnieżna Pełnia",
+                    "worm_moon": "Robacza Pełnia",
+                    "pink_moon": "Różowa Pełnia",
+                    "flower_moon": "Kwietna Pełnia",
+                    "strawberry_moon": "Truskawkowa Pełnia",
+                    "buck_moon": "Jeleniowa Pełnia",
+                    "sturgeon_moon": "Jesiotrowa Pełnia",
+                    "harvest_moon": "Żniwna Pełnia",
+                    "hunters_moon": "Myśliwska Pełnia",
+                    "beaver_moon": "Bobrowa Pełnia",
+                    "cold_moon": "Zimna Pełnia",
+                    "blue_moon": "Niebieska Pełnia",
+                    "unknown": "Nieznana"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternatywne nazwy następnej pełni",
+                "state": {
+                    "wolf_moon_alt_names": "Księżyc po Yule, Księżyc Zostań w Domu, Cichy Księżyc, Surowy Księżyc, Środkowy Księżyc",
+                    "snow_moon_alt_names": "Głodny Księżyc, Niedźwiedzi Księżyc, Burzowy Księżyc, Lodowy Księżyc",
+                    "worm_moon_alt_names": "Wielkopostny Księżyc, Kruczy Księżyc, Księżyc Skorupy Śnieżnej, Czysty Księżyc, Cukrowy Księżyc, Księżyc Soku Klonowego",
+                    "pink_moon_alt_names": "Księżyc Pękającego Lodu, Księżyc Pąków, Księżyc Przebudzenia, Księżyc Jaj, Księżyc Paschalny",
+                    "flower_moon_alt_names": "Księżyc Sadzenia, Mleczny Księżyc, Zajęczy Księżyc, Trawiasty Księżyc, Księżyc Matek, Jasny Księżyc",
+                    "strawberry_moon_alt_names": "Różany Księżyc, Gorący Księżyc, Księżyc Miodu Pitnego, Kwiatowy Księżyc, Księżyc Sadzenia",
+                    "buck_moon_alt_names": "Księżyc Grzmotów, Księżyc Siana, Księżyc Ziół",
+                    "sturgeon_moon_alt_names": "Księżyc Ziarna, Księżyc Kukurydzy, Księżyc Rysia, Księżyc Błyskawic",
+                    "harvest_moon_alt_names": "Pełnia Kukurydzy, Pełnia Zielonej Kukurydzy, Pełnia Kukurydzy, Księżyc Wina, Księżyc Pieśni, Księżyc Jęczmienia",
+                    "hunters_moon_alt_names": "Księżyc Suszenia Ryżu, Księżyc Spadających Liści, Księżyc Mrozu, Krwawy Księżyc, Sanguiniczny Księżyc",
+                    "beaver_moon_alt_names": "Księżyc Szronu, Księżyc Mrozu, Księżyc Handlu, Śnieżny Księżyc, Księżyc Żałoby, Księżyc Najciemniejszych Głębin",
+                    "cold_moon_alt_names": "Księżyc Długich Nocy, Księżyc Przed Yule, Dębowy Księżyc, Pełnia Zimna",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Następna ostatnia kwadra"
             },

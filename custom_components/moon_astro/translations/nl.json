@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Volgende volle maan"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Naam van de volgende volle maan",
+                "state": {
+                    "wolf_moon": "Wolfsmaan",
+                    "snow_moon": "Sneeuwmaan",
+                    "worm_moon": "Wormenmaan",
+                    "pink_moon": "Roze Maan",
+                    "flower_moon": "Bloemenmaan",
+                    "strawberry_moon": "Aardbeienmaan",
+                    "buck_moon": "Bokkenmaan",
+                    "sturgeon_moon": "Steurmaan",
+                    "harvest_moon": "Oogstmaan",
+                    "hunters_moon": "Jagersmaan",
+                    "beaver_moon": "Bevermaan",
+                    "cold_moon": "Koude Maan",
+                    "blue_moon": "Blauwe Maan",
+                    "unknown": "Onbekend"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternatieve namen van de volgende volle maan",
+                "state": {
+                    "wolf_moon_alt_names": "Maan na Yule, Blijf-thuismaan, Stille Maan, Strenge Maan, Middelpuntmaan",
+                    "snow_moon_alt_names": "Hongersmaan, Berenmaan, Stormmaan, IJsmaan",
+                    "worm_moon_alt_names": "Vastentijdmaan, Kraaienmaan, Sneeuwkorstmaan, Kuise Maan, Suikermaan, Sapmaan",
+                    "pink_moon_alt_names": "Breekijsmaan, Knoppenmaan, Ontwakingsmaan, Eimaan, Paasmaan",
+                    "flower_moon_alt_names": "Plantmaan, Melkmaan, Hazenmaan, Grasmaan, Moedersmaan, Heldere Maan",
+                    "strawberry_moon_alt_names": "Rozenmaan, Hete Maan, Mede-maan, Bloemenmaan, Plantmaan",
+                    "buck_moon_alt_names": "Dondermaan, Hooimaan, Kruidenmaan",
+                    "sturgeon_moon_alt_names": "Graanmaan, Maïsmaan, Lynxmaan, Bliksemmaan",
+                    "harvest_moon_alt_names": "Volle Maïsmaan, Groene Maïsmaan, Maïsmaan, Wijnmaan, Zangmaan, Gerstmaan",
+                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Sanguine Maan",
+                    "beaver_moon_alt_names": "Rijpmaan, Vriesmaan, Handelsmaan, Sneeuwmaan, Rouwmaan, Donkerste-dieptenmaan",
+                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Volgend laatste kwartier"
             },

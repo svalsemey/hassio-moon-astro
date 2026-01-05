@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "다음 보름달(만월)"
             },
+            "sensor_next_full_moon_name": {
+                "name": "다음 보름달 이름",
+                "state": {
+                    "wolf_moon": "울프 문",
+                    "snow_moon": "스노 문",
+                    "worm_moon": "웜 문",
+                    "pink_moon": "핑크 문",
+                    "flower_moon": "플라워 문",
+                    "strawberry_moon": "스트로베리 문",
+                    "buck_moon": "벅 문",
+                    "sturgeon_moon": "스터전 문",
+                    "harvest_moon": "하베스트 문",
+                    "hunters_moon": "헌터스 문",
+                    "beaver_moon": "비버 문",
+                    "cold_moon": "콜드 문",
+                    "blue_moon": "블루 문",
+                    "unknown": "알 수 없음"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "다음 보름달의 대체 이름(일반적)",
+                "state": {
+                    "wolf_moon_alt_names": "율(Yule) 이후의 달, 집에 머무는 달, 고요한 달, 혹독한 달, 중심의 달",
+                    "snow_moon_alt_names": "굶주린 달, 곰의 달, 폭풍의 달, 얼음의 달",
+                    "worm_moon_alt_names": "사순절의 달, 까마귀의 달, 눈껍질의 달, 정결한 달, 설탕의 달, 수액의 달",
+                    "pink_moon_alt_names": "얼음이 깨지는 달, 새싹의 달, 깨어남의 달, 달걀의 달, 부활절의 달",
+                    "flower_moon_alt_names": "심는 달, 우유의 달, 산토끼의 달, 풀의 달, 어머니의 달, 밝은 달",
+                    "strawberry_moon_alt_names": "장미의 달, 더운 달, 미드(벌꿀술)의 달, 꽃의 달, 심는 달",
+                    "buck_moon_alt_names": "천둥의 달, 건초의 달, 약초의 달",
+                    "sturgeon_moon_alt_names": "곡식의 달, 옥수수의 달, 스라소니의 달, 번개의 달",
+                    "harvest_moon_alt_names": "옥수수 보름달, 푸른 옥수수의 달, 옥수수의 달, 와인의 달, 노래의 달, 보리의 달",
+                    "hunters_moon_alt_names": "말린 쌀의 달, 낙엽의 달, 얼어붙는 달, 피의 달, 상귀네 문",
+                    "beaver_moon_alt_names": "서리의 달, 얼어붙는 달, 교역의 달, 눈의 달, 애도의 달, 가장 어두운 심연의 달",
+                    "cold_moon_alt_names": "긴 밤의 달, 율 이전의 달, 참나무의 달, 차가운 보름달",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "다음 하현"
             },

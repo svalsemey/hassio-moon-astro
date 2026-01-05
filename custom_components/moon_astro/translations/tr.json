@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Sıradaki dolunay"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Bir sonraki dolunayın adı",
+                "state": {
+                    "wolf_moon": "Kurt Dolunayı",
+                    "snow_moon": "Kar Dolunayı",
+                    "worm_moon": "Solucan Dolunayı",
+                    "pink_moon": "Pembe Dolunay",
+                    "flower_moon": "Çiçek Dolunayı",
+                    "strawberry_moon": "Çilek Dolunayı",
+                    "buck_moon": "Geyik Dolunayı",
+                    "sturgeon_moon": "Mersin Balığı Dolunayı",
+                    "harvest_moon": "Hasat Dolunayı",
+                    "hunters_moon": "Avcı Dolunayı",
+                    "beaver_moon": "Kunduz Dolunayı",
+                    "cold_moon": "Soğuk Dolunay",
+                    "blue_moon": "Mavi Dolunay",
+                    "unknown": "Bilinmiyor"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Bir sonraki dolunay için alternatif adlar",
+                "state": {
+                    "wolf_moon_alt_names": "Yule Sonrası Ay, Evde Kal Ayı, Sakin Ay, Sert Ay, Merkez Ay",
+                    "snow_moon_alt_names": "Açlık Ayı, Ayı Ayı, Fırtına Ayı, Buz Ayı",
+                    "worm_moon_alt_names": "Oruç Ayı, Karga Ayı, Kabuk Ayı, İffet Ayı, Şeker Ayı, Özsu Ayı",
+                    "pink_moon_alt_names": "Buz Kıran Ay, Tomurcuk Ayı, Uyanış Ayı, Yumurta Ayı, Paskalya Ayı",
+                    "flower_moon_alt_names": "Ekim Ayı, Süt Ayı, Tavşan Ayı, Çimen Ayı, Anneler Ayı, Parlak Ay",
+                    "strawberry_moon_alt_names": "Gül Ayı, Sıcak Ay, Bal Şarabı Ayı, Çiçek Ayı, Ekim Ayı",
+                    "buck_moon_alt_names": "Gök Gürültüsü Ayı, Saman Ayı, Ot Ayı",
+                    "sturgeon_moon_alt_names": "Tahıl Ayı, Mısır Ayı, Vaşak Ayı, Şimşek Ayı",
+                    "harvest_moon_alt_names": "Tam Mısır Ayı, Yeşil Mısır Ayı, Mısır Ayı, Şarap Ayı, Şarkı Ayı, Arpa Ayı",
+                    "hunters_moon_alt_names": "Pirinç Kurutma Ayı, Düşen Yapraklar Ayı, Don Ayı, Kanlı Ay, Kızıl Ay",
+                    "beaver_moon_alt_names": "Kırağı Ayı, Don Ayı, Ticaret Ayı, Kar Ayı, Yas Ayı, En Karanlık Derinlikler Ayı",
+                    "cold_moon_alt_names": "Uzun Geceler Ayı, Yule Öncesi Ay, Meşe Ayı, Tam Soğuk Ay",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Sıradaki son dördün"
             },

@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "下次满月"
             },
+            "sensor_next_full_moon_name": {
+                "name": "下次满月名称",
+                "state": {
+                    "wolf_moon": "狼月",
+                    "snow_moon": "雪月",
+                    "worm_moon": "虫月",
+                    "pink_moon": "粉月",
+                    "flower_moon": "花月",
+                    "strawberry_moon": "草莓月",
+                    "buck_moon": "雄鹿月",
+                    "sturgeon_moon": "鲟鱼月",
+                    "harvest_moon": "丰收月",
+                    "hunters_moon": "猎人月",
+                    "beaver_moon": "海狸月",
+                    "cold_moon": "寒月",
+                    "blue_moon": "蓝月",
+                    "unknown": "未知"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "下次满月别名",
+                "state": {
+                    "wolf_moon_alt_names": "Yule后月, 宅家月, 静月, 严寒月, 中心月",
+                    "snow_moon_alt_names": "饥饿月, 熊月, 风暴月, 冰月",
+                    "worm_moon_alt_names": "四旬期月, 乌鸦月, 结壳月, 贞洁月, 糖月, 树液月",
+                    "pink_moon_alt_names": "破冰月, 萌芽月, 觉醒月, 蛋月, 复活节月",
+                    "flower_moon_alt_names": "播种月, 奶月, 野兔月, 草月, 母亲月, 明亮月",
+                    "strawberry_moon_alt_names": "玫瑰月, 炎热月, 蜂蜜酒月, 花月, 播种月",
+                    "buck_moon_alt_names": "雷月, 干草月, 药草月",
+                    "sturgeon_moon_alt_names": "谷物月, 玉米月, 猞猁月, 闪电月",
+                    "harvest_moon_alt_names": "玉米满月, 青玉米月, 玉米月, 葡萄酒月, 歌曲月, 大麦月",
+                    "hunters_moon_alt_names": "晾稻月, 落叶月, 冻结月, 血月, 绯红月",
+                    "beaver_moon_alt_names": "霜月, 冻结月, 贸易月, 雪月, 哀悼月, 至暗月",
+                    "cold_moon_alt_names": "长夜月, Yule前月, 橡树月, 寒冷满月",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "下次下弦月"
             },

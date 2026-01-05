@@ -30,6 +30,8 @@ from .const import (
     KEY_NEXT_APOGEE,
     KEY_NEXT_FIRST_QUARTER,
     KEY_NEXT_FULL_MOON,
+    KEY_NEXT_FULL_MOON_ALT_NAMES,
+    KEY_NEXT_FULL_MOON_NAME,
     KEY_NEXT_LAST_QUARTER,
     KEY_NEXT_NEW_MOON,
     KEY_NEXT_PERIGEE,
@@ -179,6 +181,20 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         "sensor_next_full_moon",
         None,
         SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_FULL_MOON_NAME,
+        "sensor_next_full_moon_name",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_NEXT_FULL_MOON_ALT_NAMES,
+        "sensor_next_full_moon_alt_names",
+        None,
+        None,
         None,
     ),
     (
@@ -374,7 +390,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
                 return None
             try:
                 dt = datetime.fromisoformat(str(value))
-            except Exception:  # noqa: BLE001
+            except (ValueError, TypeError):
                 return None
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=UTC)
@@ -387,59 +403,91 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         )
         return value
 
-    @property
-    def icon(self) -> str | None:
-        """Return an MDI icon by sensor type."""
+    def _icon_for_phase(self) -> str | None:
+        """Return an icon for the phase sensor, based on the current phase code.
 
-        # Phase sensor: dynamic based on phase, illumination, and waxing/waning
-        if self._key == KEY_PHASE:
-            data = self.coordinator.data or {}
-            phase = (data.get(KEY_PHASE) or "unknown") or "unknown"
+        Returns:
+            An MDI icon string if the entity is the phase sensor, otherwise None.
+        """
+        if self._key != KEY_PHASE:
+            return None
 
-            if phase == "new_moon":
-                return "mdi:moon-new"
-            if phase == "full_moon":
-                return "mdi:moon-full"
-            if phase == "first_quarter":
-                return "mdi:moon-first-quarter"
-            if phase == "last_quarter":
-                return "mdi:moon-last-quarter"
-            if phase == "waning_crescent":
-                return "mdi:moon-waning-crescent"
-            if phase == "waning_gibbous":
-                return "mdi:moon-waning-gibbous"
-            if phase == "waxing_crescent":
-                return "mdi:moon-waxing-crescent"
-            if phase == "waxing_gibbous":
-                return "mdi:moon-waxing-gibbous"
+        data = self.coordinator.data or {}
+        phase = (data.get(KEY_PHASE) or "unknown") or "unknown"
 
-        # Zodiac degree current moon icon (canonical waning crescent)
+        return {
+            "new_moon": "mdi:moon-new",
+            "full_moon": "mdi:moon-full",
+            "first_quarter": "mdi:moon-first-quarter",
+            "last_quarter": "mdi:moon-last-quarter",
+            "waning_crescent": "mdi:moon-waning-crescent",
+            "waning_gibbous": "mdi:moon-waning-gibbous",
+            "waxing_crescent": "mdi:moon-waxing-crescent",
+            "waxing_gibbous": "mdi:moon-waxing-gibbous",
+        }.get(str(phase))
+
+    def _icon_for_specific_keys(self) -> str | None:
+        """Return an icon for keys with a fixed, well-defined icon.
+
+        Returns:
+            An MDI icon string if the key matches, otherwise None.
+        """
         if self._key == KEY_ZODIAC_DEGREE_CURRENT_MOON:
             return "mdi:moon-waning-crescent"
 
-        # Canonical phase-related icons for specific next events
         if self._key in (KEY_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON):
             return "mdi:moon-new"
-        if self._key in (KEY_NEXT_FULL_MOON, KEY_ZODIAC_DEGREE_NEXT_FULL_MOON):
+
+        if self._key in (
+            KEY_NEXT_FULL_MOON,
+            KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+        ):
             return "mdi:moon-full"
+
+        if self._key in (
+            KEY_NEXT_FULL_MOON_NAME,
+            KEY_NEXT_FULL_MOON_ALT_NAMES,
+        ):
+            return "mdi:calendar-badge"
+
         if self._key == KEY_NEXT_FIRST_QUARTER:
             return "mdi:moon-first-quarter"
+
         if self._key == KEY_NEXT_LAST_QUARTER:
             return "mdi:moon-last-quarter"
 
-        # Instant angles and measurements
         if self._key == KEY_AZ:
             return "mdi:angle-obtuse"
+
         if self._key == KEY_EL:
             return "mdi:angle-acute"
+
         if self._key == KEY_ILLUM:
             return "mdi:weather-night"
+
         if self._key == KEY_DISTANCE:
             return "mdi:ruler"
+
         if self._key == KEY_PARALLAX:
             return "mdi:circle-multiple"
 
-        # Ecliptic longitudes
+        if self._key == KEY_NEXT_RISE:
+            return "mdi:arrow-up-circle"
+
+        if self._key == KEY_NEXT_SET:
+            return "mdi:arrow-down-circle"
+
+        if self._key in (KEY_NEXT_APOGEE, KEY_NEXT_PERIGEE):
+            return "mdi:orbit"
+
+        return None
+
+    def _icon_for_ecliptic_coords(self) -> str | None:
+        """Return an icon for ecliptic longitude/latitude sensors.
+
+        Returns:
+            An MDI icon string if the key matches, otherwise None.
+        """
         if self._key in (
             KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
             KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
@@ -448,7 +496,6 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         ):
             return "mdi:longitude"
 
-        # Ecliptic latitudes
         if self._key in (
             KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
             KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
@@ -457,38 +504,52 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         ):
             return "mdi:latitude"
 
-        # Time-based events
-        if self._key == KEY_NEXT_RISE:
-            return "mdi:arrow-up-circle"
-        if self._key == KEY_NEXT_SET:
-            return "mdi:arrow-down-circle"
-        if self._key in (KEY_NEXT_APOGEE, KEY_NEXT_PERIGEE):
-            return "mdi:orbit"
+        return None
 
-        # Zodiac sensors
-        if self._key in (
+    def _icon_for_zodiac_sign(self) -> str | None:
+        """Return an icon for zodiac sign sensors, based on the current sign value.
+
+        Returns:
+            An MDI icon string if the entity is a zodiac sign sensor, otherwise None.
+        """
+        if self._key not in (
             KEY_ZODIAC_SIGN_CURRENT_MOON,
             KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
             KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
         ):
-            data = self.coordinator.data or {}
-            raw = data.get(self._key)
-            sign = str(raw).strip().lower() if raw is not None else ""
+            return None
 
-            zodiac_icons = {
-                "aries": "mdi:zodiac-aries",
-                "taurus": "mdi:zodiac-taurus",
-                "gemini": "mdi:zodiac-gemini",
-                "cancer": "mdi:zodiac-cancer",
-                "leo": "mdi:zodiac-leo",
-                "virgo": "mdi:zodiac-virgo",
-                "libra": "mdi:zodiac-libra",
-                "scorpio": "mdi:zodiac-scorpio",
-                "sagittarius": "mdi:zodiac-sagittarius",
-                "capricorn": "mdi:zodiac-capricorn",
-                "aquarius": "mdi:zodiac-aquarius",
-                "pisces": "mdi:zodiac-pisces",
-            }
-            return zodiac_icons.get(sign, "mdi:zodiac-aquarius")
+        data = self.coordinator.data or {}
+        raw = data.get(self._key)
+        sign = str(raw).strip().lower() if raw is not None else ""
 
-        return None
+        zodiac_icons: dict[str, str] = {
+            "aries": "mdi:zodiac-aries",
+            "taurus": "mdi:zodiac-taurus",
+            "gemini": "mdi:zodiac-gemini",
+            "cancer": "mdi:zodiac-cancer",
+            "leo": "mdi:zodiac-leo",
+            "virgo": "mdi:zodiac-virgo",
+            "libra": "mdi:zodiac-libra",
+            "scorpio": "mdi:zodiac-scorpio",
+            "sagittarius": "mdi:zodiac-sagittarius",
+            "capricorn": "mdi:zodiac-capricorn",
+            "aquarius": "mdi:zodiac-aquarius",
+            "pisces": "mdi:zodiac-pisces",
+        }
+
+        return zodiac_icons.get(sign, "mdi:zodiac-aquarius")
+
+    @property
+    def icon(self) -> str | None:
+        """Return an MDI icon by sensor type.
+
+        Returns:
+            An MDI icon string, or None when no icon is defined.
+        """
+        return (
+            self._icon_for_phase()
+            or self._icon_for_specific_keys()
+            or self._icon_for_ecliptic_coords()
+            or self._icon_for_zodiac_sign()
+        )

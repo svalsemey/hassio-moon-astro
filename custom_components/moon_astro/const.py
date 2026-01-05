@@ -51,6 +51,8 @@ KEY_NEXT_PERIGEE = "next_perigee"
 KEY_NEXT_NEW_MOON = "next_new_moon"
 KEY_NEXT_FIRST_QUARTER = "next_first_quarter"
 KEY_NEXT_FULL_MOON = "next_full_moon"
+KEY_NEXT_FULL_MOON_NAME = "next_full_moon_name"
+KEY_NEXT_FULL_MOON_ALT_NAMES = "next_full_moon_alt_names"
 KEY_NEXT_LAST_QUARTER = "next_last_quarter"
 
 # Additional flags

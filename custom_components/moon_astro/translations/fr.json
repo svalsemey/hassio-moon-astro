@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Prochaine pleine lune"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Nom de la prochaine pleine lune",
+                "state": {
+                    "wolf_moon": "Lune du Loup",
+                    "snow_moon": "Lune de Neige",
+                    "worm_moon": "Lune des Vers",
+                    "pink_moon": "Lune Rose",
+                    "flower_moon": "Lune des Fleurs",
+                    "strawberry_moon": "Lune des Fraises",
+                    "buck_moon": "Lune du Daim",
+                    "sturgeon_moon": "Lune de l’Esturgeon",
+                    "harvest_moon": "Lune des Moissons",
+                    "hunters_moon": "Lune du Chasseur",
+                    "beaver_moon": "Lune du Castor",
+                    "cold_moon": "Lune Froide",
+                    "blue_moon": "Lune Bleue",
+                    "unknown": "Inconnue"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Noms alternatifs de la prochaine pleine lune",
+                "state": {
+                    "wolf_moon_alt_names": "Lune après Yule, Lune du Foyer, Lune Silencieuse, Lune Sévère, Lune Centrale",
+                    "snow_moon_alt_names": "Lune de la Faim, Lune de l’Ours, Lune des Tempêtes, Lune de Glace",
+                    "worm_moon_alt_names": "Lune du Carême, Lune du Corbeau, Lune de la Croûte, Lune Chaste, Lune du Sucre, Lune de la Sève",
+                    "pink_moon_alt_names": "Lune de la Glace qui rompt, Lune des Bourgeons, Lune de l’Éveil, Lune des Œufs, Lune Pascale",
+                    "flower_moon_alt_names": "Lune des Semis, Lune du Lait, Lune du Lièvre, Lune de l’Herbe, Lune des Mères, Lune Brillante",
+                    "strawberry_moon_alt_names": "Lune des Roses, Lune Chaude, Lune de l’Hydromel, Lune des Fleurs, Lune des Semis",
+                    "buck_moon_alt_names": "Lune du Tonnerre, Lune du Foin, Lune des Herbes",
+                    "sturgeon_moon_alt_names": "Lune des Grains, Lune du Maïs, Lune du Lynx, Lune des Éclairs",
+                    "harvest_moon_alt_names": "Pleine Lune du Maïs, Lune du Maïs Vert, Lune du Maïs, Lune du Vin, Lune du Chant, Lune de l’Orge",
+                    "hunters_moon_alt_names": "Lune du Riz Séché, Lune des Feuilles Tombantes, Lune du Gel, Lune de Sang, Lune Sanguine",
+                    "beaver_moon_alt_names": "Lune du Givre, Lune du Gel, Lune du Commerce, Lune de Neige, Lune du Deuil, Lune des Profondeurs les plus sombres",
+                    "cold_moon_alt_names": "Lune des Longues Nuits, Lune avant Yule, Lune du Chêne, Pleine Lune Froide",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Prochain dernier quartier"
             },

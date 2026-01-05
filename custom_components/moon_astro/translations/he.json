@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "ירח מלא הבא"
             },
+            "sensor_next_full_moon_name": {
+                "name": "שם הירח המלא הבא",
+                "state": {
+                    "wolf_moon": "ירח הזאב",
+                    "snow_moon": "ירח השלג",
+                    "worm_moon": "ירח התולעת",
+                    "pink_moon": "הירח הוורוד",
+                    "flower_moon": "ירח הפרחים",
+                    "strawberry_moon": "ירח התות",
+                    "buck_moon": "ירח האייל",
+                    "sturgeon_moon": "ירח החדקן",
+                    "harvest_moon": "ירח הקציר",
+                    "hunters_moon": "ירח הצייד",
+                    "beaver_moon": "ירח הבונה",
+                    "cold_moon": "ירח הקור",
+                    "blue_moon": "הירח הכחול",
+                    "unknown": "לא ידוע"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "שמות חלופיים לירח המלא הבא",
+                "state": {
+                    "wolf_moon_alt_names": "הירח שלאחר יול, ירח “הישאר בבית”, ירח שקט, ירח קשוח, ירח המרכז",
+                    "snow_moon_alt_names": "ירח הרעב, ירח הדוב, ירח הסערה, ירח הקרח",
+                    "worm_moon_alt_names": "ירח התענית, ירח העורב, ירח הקרום, ירח הצניעות, ירח הסוכר, ירח השרף",
+                    "pink_moon_alt_names": "ירח שבירת הקרח, ירח הניצנים, ירח ההתעוררות, ירח הביצים, ירח הפסחא",
+                    "flower_moon_alt_names": "ירח הנטיעה, ירח החלב, ירח הארנבת, ירח העשב, ירח האימהות, ירח בהיר",
+                    "strawberry_moon_alt_names": "ירח הוורד, ירח חם, ירח התמד, ירח הפרחים, ירח הנטיעה",
+                    "buck_moon_alt_names": "ירח הרעם, ירח החציר, ירח עשבי המרפא",
+                    "sturgeon_moon_alt_names": "ירח הדגן, ירח התירס, ירח השונר, ירח הברק",
+                    "harvest_moon_alt_names": "ירח התירס המלא, ירח התירס הירוק, ירח התירס, ירח היין, ירח השיר, ירח השעורה",
+                    "hunters_moon_alt_names": "ירח ייבוש האורז, ירח העלים הנושרים, ירח הקיפאון, ירח הדם, ירח סנגוויני",
+                    "beaver_moon_alt_names": "ירח הכפור, ירח הקיפאון, ירח המסחר, ירח השלג, ירח האבל, ירח המעמקים האפלים ביותר",
+                    "cold_moon_alt_names": "ירח הלילות הארוכים, ירח שלפני יול, ירח האלון, ירח קור מלא",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "רבע אחרון הבא"
             },

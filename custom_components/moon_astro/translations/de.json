@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Nächster Vollmond"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Name des nächsten Vollmonds",
+                "state": {
+                    "wolf_moon": "Wolfsmond",
+                    "snow_moon": "Schneemond",
+                    "worm_moon": "Wurmmond",
+                    "pink_moon": "Rosa Mond",
+                    "flower_moon": "Blumenmond",
+                    "strawberry_moon": "Erdbeermond",
+                    "buck_moon": "Hirschmond",
+                    "sturgeon_moon": "Störmond",
+                    "harvest_moon": "Erntemond",
+                    "hunters_moon": "Jägermond",
+                    "beaver_moon": "Bibermond",
+                    "cold_moon": "Kalter Mond",
+                    "blue_moon": "Blauer Mond",
+                    "unknown": "Unbekannt"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternative Namen des nächsten Vollmonds",
+                "state": {
+                    "wolf_moon_alt_names": "Mond nach Yule, Bleib-zu-Hause-Mond, Stiller Mond, Strenger Mond, Zentraler Mond",
+                    "snow_moon_alt_names": "Hungermond, Bärenmond, Sturmmond, Eismond",
+                    "worm_moon_alt_names": "Fastenmond, Krähenmond, Krustenmond, Keuscher Mond, Zuckermond, Saftmond",
+                    "pink_moon_alt_names": "Eisbrechender Mond, Knospenmond, Erwachender Mond, Eimond, Paschamond",
+                    "flower_moon_alt_names": "Pflanzmond, Milchmond, Hasenmond, Grasmond, Mütter-Mond, Heller Mond",
+                    "strawberry_moon_alt_names": "Rosenmond, Heißer Mond, Metmond, Blumenmond, Pflanzmond",
+                    "buck_moon_alt_names": "Donner-Mond, Heumond, Kräutermond",
+                    "sturgeon_moon_alt_names": "Kornmond, Maismond, Luchsmond, Blitzmond",
+                    "harvest_moon_alt_names": "Voller Maismond, Grüner-Mais-Mond, Maismond, Weinmond, Liedmond, Gerstenmond",
+                    "hunters_moon_alt_names": "Reistrocknungs-Mond, Fallende-Blätter-Mond, Gefriermond, Blutmond, Sanguiner Mond",
+                    "beaver_moon_alt_names": "Reifmond, Gefriermond, Handelsmond, Schneemond, Trauermond, Mond der dunkelsten Tiefen",
+                    "cold_moon_alt_names": "Mond der langen Nächte, Mond vor Yule, Eichenmond, Voller kalter Mond",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Nächstes letztes Viertel"
             },

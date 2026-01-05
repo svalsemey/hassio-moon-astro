@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Következő telihold"
             },
+            "sensor_next_full_moon_name": {
+                "name": "A következő telihold neve",
+                "state": {
+                    "wolf_moon": "Farkas Hold",
+                    "snow_moon": "Hó Hold",
+                    "worm_moon": "Féreg Hold",
+                    "pink_moon": "Rózsaszín Hold",
+                    "flower_moon": "Virág Hold",
+                    "strawberry_moon": "Eper Hold",
+                    "buck_moon": "Bika Hold",
+                    "sturgeon_moon": "Tokhal Hold",
+                    "harvest_moon": "Aratás Hold",
+                    "hunters_moon": "Vadász Hold",
+                    "beaver_moon": "Hód Hold",
+                    "cold_moon": "Hideg Hold",
+                    "blue_moon": "Kék Hold",
+                    "unknown": "Ismeretlen"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "A következő telihold gyakori alternatív nevei",
+                "state": {
+                    "wolf_moon_alt_names": "Yule utáni Hold, Maradj-otthon Hold, Csendes Hold, Szigorú Hold, Középső Hold",
+                    "snow_moon_alt_names": "Éhség Hold, Medve Hold, Vihar Hold, Jég Hold",
+                    "worm_moon_alt_names": "Nagyböjti Hold, Holló Hold, Hókérges Hold, Szemérmes Hold, Cukor Hold, Nedv Hold",
+                    "pink_moon_alt_names": "Jégszakadó Hold, Rügy Hold, Ébredés Hold, Tojás Hold, Húsvéti Hold",
+                    "flower_moon_alt_names": "Ültetés Hold, Tej Hold, Nyúl Hold, Fű Hold, Anyák Holdja, Fényes Hold",
+                    "strawberry_moon_alt_names": "Rózsa Hold, Forró Hold, Mézsör Hold, Virág Hold, Ültetés Hold",
+                    "buck_moon_alt_names": "Mennydörgés Hold, Széna Hold, Fűszernövény Hold",
+                    "sturgeon_moon_alt_names": "Gabona Hold, Kukorica Hold, Hiúz Hold, Villám Hold",
+                    "harvest_moon_alt_names": "Teljes Kukorica Hold, Zöld Kukorica Hold, Kukorica Hold, Bor Hold, Dal Hold, Árpa Hold",
+                    "hunters_moon_alt_names": "Száradó Rizs Hold, Hulló Levelek Hold, Fagy Hold, Vér Hold, Sanguine Hold",
+                    "beaver_moon_alt_names": "Dér Hold, Fagy Hold, Csere/kereskedelem Hold, Hó Hold, Gyász Hold, A legsötétebb mélységek Holdja",
+                    "cold_moon_alt_names": "Hosszú Éjszakák Holdja, Yule előtti Hold, Tölgy Hold, Telihideg Hold",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Következő utolsó negyed"
             },

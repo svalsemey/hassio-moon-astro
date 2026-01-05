@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Næste fuldmåne"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Navn på næste fuldmåne",
+                "state": {
+                    "wolf_moon": "Ulvmåne",
+                    "snow_moon": "Snemåne",
+                    "worm_moon": "Ormemåne",
+                    "pink_moon": "Lyserød måne",
+                    "flower_moon": "Blomstermåne",
+                    "strawberry_moon": "Jordbærmåne",
+                    "buck_moon": "Hjortemåne",
+                    "sturgeon_moon": "Størmåne",
+                    "harvest_moon": "Høstmåne",
+                    "hunters_moon": "Jægerens måne",
+                    "beaver_moon": "Bævermåne",
+                    "cold_moon": "Koldmåne",
+                    "blue_moon": "Blå måne",
+                    "unknown": "Ukendt"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternative navne på næste fuldmåne",
+                "state": {
+                    "wolf_moon_alt_names": "Månen efter Yule, Bliv-hjemme-måne, Stille måne, Streng måne, Centrum-måne",
+                    "snow_moon_alt_names": "Sultmåne, Bjørnemåne, Stormmåne, Ismåne",
+                    "worm_moon_alt_names": "Fastemåne, Kragemåne, Skorpemåne, Kysk måne, Sukker-måne, Saftmåne",
+                    "pink_moon_alt_names": "Isbrydningsmåne, Knopmåne, Opvågningsmåne, Æggemåne, Påskemåne",
+                    "flower_moon_alt_names": "Plantemåne, Mælkemåne, Haremåne, Græsmåne, Mødres måne, Lys måne",
+                    "strawberry_moon_alt_names": "Rosens måne, Varm måne, Mjød-måne, Blomstermåne, Plantemåne",
+                    "buck_moon_alt_names": "Tordenmåne, Hømåne, Urtmåne",
+                    "sturgeon_moon_alt_names": "Kornmåne, Majsmåne, Losmåne, Lynmåne",
+                    "harvest_moon_alt_names": "Fuld majsmåne, Grøn majsmåne, Majsmåne, Vinmåne, Sangmåne, Bygmåne",
+                    "hunters_moon_alt_names": "Tørreris-måne, Faldende blade-måne, Frostmåne, Blodmåne, Sanguin måne",
+                    "beaver_moon_alt_names": "Rim-måne, Frostmåne, Handelsmåne, Snemåne, Sorgmåne, Mørkeste dybder-måne",
+                    "cold_moon_alt_names": "Lange nætters måne, Månen før Yule, Egemåne, Fuld koldmåne",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Næste sidste kvarter"
             },

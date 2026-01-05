@@ -105,6 +105,44 @@
             "sensor_next_full_moon": {
                 "name": "Naslednja polna luna"
             },
+            "sensor_next_full_moon_name": {
+                "name": "Ime naslednje polne lune",
+                "state": {
+                    "wolf_moon": "Volčja luna",
+                    "snow_moon": "Snežna luna",
+                    "worm_moon": "Črvja luna",
+                    "pink_moon": "Rožnata luna",
+                    "flower_moon": "Cvetlična luna",
+                    "strawberry_moon": "Jagodna luna",
+                    "buck_moon": "Jelenja luna",
+                    "sturgeon_moon": "Jesetrova luna",
+                    "harvest_moon": "Žetvena luna",
+                    "hunters_moon": "Lovčeva luna",
+                    "beaver_moon": "Bobrova luna",
+                    "cold_moon": "Hladna luna",
+                    "blue_moon": "Modra luna",
+                    "unknown": "Neznano"
+                }
+            },
+            "sensor_next_full_moon_alt_names": {
+                "name": "Alternativna imena naslednje polne lune",
+                "state": {
+                    "wolf_moon_alt_names": "Luna po Yule, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
+                    "snow_moon_alt_names": "Lačna luna, Medvedja luna, Nevihtna luna, Ledena luna",
+                    "worm_moon_alt_names": "Postna luna, Vranja luna, Skorjasta luna, Čista luna, Sladkorna luna, Luna sokov",
+                    "pink_moon_alt_names": "Luna lomljenja ledu, Brsteča luna, Prebujajoča luna, Jajčna luna, Velikonočna luna",
+                    "flower_moon_alt_names": "Sadjena luna, Mlečna luna, Zajčja luna, Travna luna, Materinska luna, Svetla luna",
+                    "strawberry_moon_alt_names": "Rožna (Rose) luna, Vroča luna, Luna medice, Cvetlična luna, Sadjena luna",
+                    "buck_moon_alt_names": "Gromovna luna, Senena luna, Zeliščna luna",
+                    "sturgeon_moon_alt_names": "Žitna luna, Koruza luna, Risova luna, Luna bliskov",
+                    "harvest_moon_alt_names": "Polna koruzna luna, Luna zelene koruze, Koruzna luna, Vinska luna, Luna pesmi, Ječmenova luna",
+                    "hunters_moon_alt_names": "Luna sušenja riža, Luna padajočega listja, Zmrzovalna luna, Krvava luna, Sanguine luna",
+                    "beaver_moon_alt_names": "Slanasta luna, Zmrzovalna luna, Trgovska luna, Snežna luna, Žalna luna, Luna najtemnejših globin",
+                    "cold_moon_alt_names": "Luna dolgih noči, Luna pred Yule, Hrastova luna, Polna hladna luna",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
             "sensor_next_last_quarter": {
                 "name": "Naslednji zadnji krajec"
             },
