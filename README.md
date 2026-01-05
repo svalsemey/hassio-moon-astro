@@ -20,8 +20,7 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Lunation context:
   - Geocentric ecliptic longitude/latitude at next new/full moon (true-of-date)
   - Zodiac sign and zodiac degree at next new/full moon
-  - Next full moon name (Gregorian calendar)
-  - Next full moon alternative names (Gregorian calendar)
+  - Next full moon name and usual alternative names (Gregorian calendar)
 - Binary sensor:
   - Moon above horizon (on/off)
 
@@ -47,29 +46,9 @@ Options (via Configure on the integration):
 - Scan interval (seconds). Default: 300 (min 30, max 21600)
 - Use Home Assistant time zone. Default: true
 
-## Entities
-
-Sensors (examples of entity names; actual names are localized):
-- Phase
-- Azimuth (°)
-- Elevation (°)
-- Illumination (%)
-- Distance (km)
-- Parallax (°)
-- Ecliptic longitude/latitude (topocentric and geocentric)
-- Next moonrise/moonset (timestamp)
-- Next apogee/perigee (timestamp)
-- Next new moon / first quarter / full moon / last quarter (timestamp)
-- Ecliptic longitude/latitude at next new/full moon
-- Zodiac sign and degree at current moon position and next new/full moon
-- Next full moon name and alternative names (according to Gregorian calendar)
-
-Binary sensors:
-- Moon above horizon
-
 ## Localization
 
-Translations are included for multiple languages (ar, cs, da, de, el, es, fi, fr, he, hi, hu, it, ja, ko, nl, no, pl, pt, ro, ru, sk, sl, sv, tr, uk, zh_CN). Entity names and some state values (for example zodiac signs and full moon names) are localized via Home Assistant’s translation system.
+Translations are included for multiple languages. Entity names and some state values (for example zodiac signs and full moon names) are localized via Home Assistant’s translation system.
 
 If you notice that a translation is incomplete or inaccurate, contributions are very welcome.
 
@@ -102,8 +81,7 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
 ## Known Notes
 
 - Ecliptic-of-date values use IAU 1980 nutation with true obliquity.
-- If you modify translation files, reload the integration to apply changes.
-- Ensure the key name for “ecliptic_latitude_next_new_moon” is consistently spelled across code and translations.
+- If you modify locally translation files, reload the integration to apply changes.
 
 ## Contributing
 
