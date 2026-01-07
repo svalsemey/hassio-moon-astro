@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Nästa sista kvarter"
             },
+
+            "sensor_previous_rise": {
+                "name": "Föregående uppgång"
+            },
+            "sensor_previous_set": {
+                "name": "Föregående nedgång"
+            },
+            "sensor_previous_apogee": {
+                "name": "Föregående apogeum"
+            },
+            "sensor_previous_perigee": {
+                "name": "Föregående perigeum"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Föregående nymåne"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Föregående första kvarter"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Föregående fullmåne"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Namn på föregående fullmåne",
+                "state": {
+                    "wolf_moon": "Vargmåne",
+                    "snow_moon": "Snömåne",
+                    "worm_moon": "Maskmåne",
+                    "pink_moon": "Rosa måne",
+                    "flower_moon": "Blomstermåne",
+                    "strawberry_moon": "Jordgubbsmåne",
+                    "buck_moon": "Hjortmåne",
+                    "sturgeon_moon": "Störmåne",
+                    "harvest_moon": "Skördemåne",
+                    "hunters_moon": "Jägarmåne",
+                    "beaver_moon": "Bävermåne",
+                    "cold_moon": "Köldmåne",
+                    "blue_moon": "Blå måne",
+                    "unknown": "Okänd"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Alternativa namn för föregående fullmåne",
+                "state": {
+                    "wolf_moon_alt_names": "Månen efter Yule, Hemma-måne, Tyst måne, Sträng måne, Centrum-måne",
+                    "snow_moon_alt_names": "Hunger-måne, Björnmåne, Stormmåne, Ismåne",
+                    "worm_moon_alt_names": "Fastemåne, Kråkmåne, Skorpmåne, Kysk måne, Sockermåne, Säftmåne",
+                    "pink_moon_alt_names": "Isbrytningsmåne, Knoppmåne, Uppvaknandets måne, Äggmåne, Påskmåne",
+                    "flower_moon_alt_names": "Planteringsmåne, Mjölkmåne, Haremåne, Gräsmåne, Mödrarnas måne, Ljus måne",
+                    "strawberry_moon_alt_names": "Rosmåne, Het måne, Mjöd-måne, Blomstermåne, Planteringsmåne",
+                    "buck_moon_alt_names": "Åskmåne, Hömåne, Örtmåne",
+                    "sturgeon_moon_alt_names": "Sädmåne, Majsmåne, Lodjursmåne, Blixtmåne",
+                    "harvest_moon_alt_names": "Full majsmåne, Grön majsmåne, Majsmåne, Vinmåne, Sångmåne, Kornmåne",
+                    "hunters_moon_alt_names": "Torkat-ris-måne, Fallande löv-måne, Frysmåne, Blodmåne, Sanguine-måne",
+                    "beaver_moon_alt_names": "Frostmåne, Frysmåne, Handelsmåne, Snömåne, Sorgmåne, Månens mörkaste djup",
+                    "cold_moon_alt_names": "Långa nätter-måne, Månen före Yule, Ekmåne, Full köldmåne",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Föregående sista kvarter"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptisk longitud vid nästa fullmåne"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptisk latitud vid nästa nymåne"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Ekliptisk longitud vid föregående fullmåne"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Ekliptisk latitud vid föregående fullmåne"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Ekliptisk longitud vid föregående nymåne"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Ekliptisk latitud vid föregående nymåne"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Stjärntecken (nuvarande)",
                 "state": {
@@ -209,6 +286,41 @@
                     "pisces": "Fiskarna"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Stjärntecken vid föregående nymåne",
+                "state": {
+                    "aries": "Väduren",
+                    "taurus": "Oxen",
+                    "gemini": "Tvillingarna",
+                    "cancer": "Kräftan",
+                    "leo": "Lejonet",
+                    "virgo": "Jungfrun",
+                    "libra": "Vågen",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbocken",
+                    "aquarius": "Vattumannen",
+                    "pisces": "Fiskarna"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Stjärntecken vid föregående fullmåne",
+                "state": {
+                    "aries": "Väduren",
+                    "taurus": "Oxen",
+                    "gemini": "Tvillingarna",
+                    "cancer": "Kräftan",
+                    "leo": "Lejonet",
+                    "virgo": "Jungfrun",
+                    "libra": "Vågen",
+                    "scorpio": "Skorpionen",
+                    "sagittarius": "Skytten",
+                    "capricorn": "Stenbocken",
+                    "aquarius": "Vattumannen",
+                    "pisces": "Fiskarna"
+                }
+            },
+
             "sensor_zodiac_degree_current_moon": {
                 "name": "Zodiakgrad (nuvarande)"
             },
@@ -217,6 +329,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Zodiakgrad vid nästa fullmåne"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Zodiakgrad vid föregående nymåne"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Zodiakgrad vid föregående fullmåne"
             }
         }
     }

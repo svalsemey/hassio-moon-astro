@@ -37,18 +37,22 @@ from .const import (
     FULL_MOON,
     FULL_MOON_STRICT_PCT,
     KEY_ABOVE_HORIZON,
-    KEY_AZ,
+    KEY_AZIMUTH,
     KEY_DISTANCE,
     KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
     KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
     KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
     KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
     KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
     KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
     KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
     KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
-    KEY_EL,
-    KEY_ILLUM,
+    KEY_ELEVATION,
+    KEY_ILLUMINATION,
     KEY_NEXT_APOGEE,
     KEY_NEXT_FIRST_QUARTER,
     KEY_NEXT_FULL_MOON,
@@ -61,16 +65,32 @@ from .const import (
     KEY_NEXT_SET,
     KEY_PARALLAX,
     KEY_PHASE,
+    KEY_PREVIOUS_APOGEE,
+    KEY_PREVIOUS_FIRST_QUARTER,
+    KEY_PREVIOUS_FULL_MOON,
+    KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
+    KEY_PREVIOUS_FULL_MOON_NAME,
+    KEY_PREVIOUS_LAST_QUARTER,
+    KEY_PREVIOUS_NEW_MOON,
+    KEY_PREVIOUS_PERIGEE,
+    KEY_PREVIOUS_RISE,
+    KEY_PREVIOUS_SET,
     KEY_WAXING,
     KEY_ZODIAC_DEGREE_CURRENT_MOON,
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+    KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+    KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
     KEY_ZODIAC_ICON_CURRENT_MOON,
     KEY_ZODIAC_ICON_NEXT_FULL_MOON,
     KEY_ZODIAC_ICON_NEXT_NEW_MOON,
+    KEY_ZODIAC_ICON_PREVIOUS_FULL_MOON,
+    KEY_ZODIAC_ICON_PREVIOUS_NEW_MOON,
     KEY_ZODIAC_SIGN_CURRENT_MOON,
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
+    KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+    KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
     LAST_QUARTER,
     NEW_MOON_STRICT_PCT,
     QUARTER_TOL_PCT,
@@ -114,11 +134,11 @@ def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
     If timezone cannot be found, UTC is returned.
 
     Args:
-    lat: Latitude in decimal degrees.
-    lon: Longitude in decimal degrees.
+        lat: Latitude in decimal degrees.
+        lon: Longitude in decimal degrees.
 
     Returns:
-    A ZoneInfo instance representing the local timezone or UTC as fallback.
+        A ZoneInfo instance representing the local timezone or UTC as fallback.
     """
     tzname: str | None = None
     tzname = TimezoneFinder().timezone_at(lat=lat, lng=lon)
@@ -133,10 +153,10 @@ def _tz_for_hass(hass: HomeAssistant) -> ZoneInfo:
     """Return ZoneInfo from Home Assistant configuration with UTC fallback.
 
     Args:
-    hass: Home Assistant instance.
+        hass: Home Assistant instance.
 
     Returns:
-    The configured ZoneInfo or UTC if missing/invalid.
+        The configured ZoneInfo or UTC if missing/invalid.
     """
     tzname = hass.config.time_zone
     try:
@@ -149,11 +169,11 @@ def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
     """Convert a UTC datetime to ISO 8601 string in provided timezone.
 
     Args:
-    dt_utc: Input datetime expected to be UTC or naive (assumed UTC).
-    tz: Target timezone; UTC is used if None.
+        dt_utc: Input datetime expected to be UTC or naive (assumed UTC).
+        tz: Target timezone; UTC is used if None.
 
     Returns:
-    The ISO 8601 formatted string or None when input is None.
+        The ISO 8601 formatted string or None when input is None.
     """
     if dt_utc is None:
         return None
@@ -230,8 +250,7 @@ def _moon_phase_name(eph: Ephemeris, t: Time, ts: Timescale | None = None) -> st
         ts: Skyfield Timescale used to compute t+6h (optional).
 
     Returns:
-        A phase name among: new_moon, waxing_crescent, first_quarter, waxing_gibbous,
-        full_moon, waning_gibbous, last_quarter, waning_crescent.
+        A phase name string.
     """
     illum_now = _moon_illumination_percentage(eph, t)
 
@@ -669,9 +688,6 @@ def _ecliptic_lon_lat_deg_of_date(apparent_vector: Apparent) -> tuple[float, flo
     return float(lon), float(lat)
 
 
-# ----------------------------------------------------------------------
-
-
 def _moon_parallax_angle_deg(distance_km: float) -> float:
     """Approximate equatorial horizontal parallax (degrees) from distance.
 
@@ -844,6 +860,85 @@ def _refine_bracket(
     return (t_list[i0].tt, t_list[i2].tt)
 
 
+def _find_geocentric_distance_extremum(
+    eph: Ephemeris,
+    ts: Timescale,
+    t_start: Time,
+    *,
+    is_min: bool,
+    search_backward: bool,
+    days_window: float = 40.0,
+    step_hours: float = 2.0,
+    tol: float = 1e-7,
+    max_iter: int = 200,
+) -> Time | None:
+    """Find a local extremum of the geocentric Earth-Moon distance around a reference time.
+
+    Args:
+        eph: Loaded ephemeris.
+        ts: Skyfield Timescale.
+        t_start: Reference time for the search.
+        is_min: True to search for a minimum (perigee), False for a maximum (apogee).
+        search_backward: True to search in the past window [t_start - days_window, t_start],
+            False to search in the future window [t_start, t_start + days_window].
+        days_window: Search window size in days.
+        step_hours: Coarse sampling step in hours used to locate a bracketing interval.
+        tol: Absolute tolerance on TT Julian date during Brent refinement.
+        max_iter: Maximum number of Brent iterations.
+
+    Returns:
+        A Skyfield Time for the extremum, or None if no suitable bracket is found.
+    """
+    earth, moon = eph["earth"], eph["moon"]
+
+    def geocentric_distance_km(t: Time) -> float:
+        """Return geocentric Earth-Moon distance at time t in kilometers.
+
+        Args:
+            t: Skyfield Time.
+
+        Returns:
+            Geocentric distance in kilometers.
+        """
+        return earth.at(t).observe(moon).distance().km
+
+    def f_tt(tt: float) -> float:
+        """Return geocentric Earth-Moon distance in km as a function of TT Julian date.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Geocentric distance in kilometers.
+        """
+        return geocentric_distance_km(ts.tt_jd(tt))
+
+    # Build a monotonic time grid for coarse sampling.
+    steps = int(days_window * 24.0 / step_hours) + 1
+    t0 = (t_start - days_window) if search_backward else t_start
+
+    t_list: list[Time] = []
+    d_list: list[float] = []
+    for i in range(steps):
+        dt_days = i * (step_hours / 24.0)
+        t_i = t0 + dt_days
+        t_list.append(t_i)
+        d_list.append(geocentric_distance_km(t_i))
+
+    bracket_kind = "min" if is_min else "max"
+    bracket = _refine_bracket(t_list, d_list, kind=bracket_kind)
+    if bracket is None:
+        return None
+
+    tt_a, tt_b = bracket
+    res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
+    t_ext = ts.tt_jd(res.tt)
+
+    if search_backward:
+        return t_ext if t_ext.tt < t_start.tt else None
+    return t_ext if t_ext.tt > t_start.tt else None
+
+
 def _find_next_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
     """Find the next apogee after t_start using distance maximization.
 
@@ -855,35 +950,13 @@ def _find_next_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | No
     Returns:
         Skyfield Time at apogee, or None if not found in the window.
     """
-    earth, moon = eph["earth"], eph["moon"]
-
-    def geocentric_distance_km(t: Time) -> float:
-        """Return geocentric distance Earth-Moon at time t in kilometers."""
-        return earth.at(t).observe(moon).distance().km
-
-    days_window = 40.0
-    step_hours = 2.0
-    steps = int(days_window * 24 / step_hours) + 1
-    t_list: list[Time] = []
-    d_list: list[float] = []
-    for i in range(steps):
-        dt_days = i * (step_hours / 24.0)
-        t_i = t_start + dt_days
-        t_list.append(t_i)
-        d_list.append(geocentric_distance_km(t_i))
-
-    bracket = _refine_bracket(t_list, d_list, kind="max")
-    if bracket is None:
-        return None
-    tt_a, tt_b = bracket
-
-    def f_tt(tt: float) -> float:
-        """Distance in km as a function of TT (days)."""
-        return geocentric_distance_km(ts.tt_jd(tt))
-
-    res = _brent_extremum(f_tt, tt_a, tt_b, is_min=False, tol=1e-7, max_iter=200)
-    t_ext = ts.tt_jd(res.tt)
-    return t_ext if t_ext.tt > t_start.tt else None
+    return _find_geocentric_distance_extremum(
+        eph,
+        ts,
+        t_start,
+        is_min=False,
+        search_backward=False,
+    )
 
 
 def _find_next_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
@@ -897,35 +970,89 @@ def _find_next_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | N
     Returns:
         Skyfield Time at perigee, or None if not found in the window.
     """
-    earth, moon = eph["earth"], eph["moon"]
+    return _find_geocentric_distance_extremum(
+        eph,
+        ts,
+        t_start,
+        is_min=True,
+        search_backward=False,
+    )
 
-    def geocentric_distance_km(t: Time) -> float:
-        """Return geocentric distance Earth-Moon at time t in kilometers."""
-        return earth.at(t).observe(moon).distance().km
 
-    days_window = 40.0
-    step_hours = 2.0
-    steps = int(days_window * 24 / step_hours) + 1
-    t_list: list[Time] = []
-    d_list: list[float] = []
-    for i in range(steps):
-        dt_days = i * (step_hours / 24.0)
-        t_i = t_start + dt_days
-        t_list.append(t_i)
-        d_list.append(geocentric_distance_km(t_i))
+def _previous_rise_set(
+    eph: Ephemeris, lat: float, lon: float, alt_m: float, t_start: Time
+) -> tuple[Time | None, Time | None]:
+    """Compute previous rise and set times for the Moon at observer location.
 
-    bracket = _refine_bracket(t_list, d_list, kind="min")
-    if bracket is None:
-        return None
-    tt_a, tt_b = bracket
+    Args:
+        eph: Loaded ephemeris.
+        lat: Latitude in degrees.
+        lon: Longitude in degrees.
+        alt_m: Elevation in meters.
+        t_start: Reference time for the search.
 
-    def f_tt(tt: float) -> float:
-        """Distance in km as a function of TT (days)."""
-        return geocentric_distance_km(ts.tt_jd(tt))
+    Returns:
+        A tuple (previous_rise, previous_set) as Skyfield Times or None if not found.
+    """
+    observer = wgs84.latlon(
+        latitude_degrees=lat, longitude_degrees=lon, elevation_m=alt_m
+    )
+    f = almanac.risings_and_settings(eph, eph["moon"], observer)
+    t0 = t_start - 7.0
+    t1 = t_start
+    times, events = almanac.find_discrete(t0, t1, f)
 
-    res = _brent_extremum(f_tt, tt_a, tt_b, is_min=True, tol=1e-7, max_iter=200)
-    t_ext = ts.tt_jd(res.tt)
-    return t_ext if t_ext.tt > t_start.tt else None
+    prev_rise: Time | None = None
+    prev_set: Time | None = None
+    for ti, ei in zip(times, events, strict=False):
+        if ti.tt >= t_start.tt:
+            continue
+        if ei:
+            prev_rise = ti
+        else:
+            prev_set = ti
+
+    return prev_rise, prev_set
+
+
+def _find_previous_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+    """Find the previous apogee before t_start using distance maximization.
+
+    Args:
+        eph: Loaded ephemeris.
+        ts: Skyfield Timescale.
+        t_start: Reference time for the search.
+
+    Returns:
+        Skyfield Time at apogee, or None if not found in the window.
+    """
+    return _find_geocentric_distance_extremum(
+        eph,
+        ts,
+        t_start,
+        is_min=False,
+        search_backward=True,
+    )
+
+
+def _find_previous_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+    """Find the previous perigee before t_start using distance minimization.
+
+    Args:
+        eph: Loaded ephemeris.
+        ts: Skyfield Timescale.
+        t_start: Reference time for the search.
+
+    Returns:
+        Skyfield Time at perigee, or None if not found in the window.
+    """
+    return _find_geocentric_distance_extremum(
+        eph,
+        ts,
+        t_start,
+        is_min=True,
+        search_backward=True,
+    )
 
 
 def _find_phase_next(
@@ -949,6 +1076,31 @@ def _find_phase_next(
         if int(pv) == int(phase_value) and ti.tt > t_start.tt:
             return ti
     return None
+
+
+def _find_phase_previous(
+    ts: Timescale, f: Any, t_start: Time, phase_value: int
+) -> Time | None:
+    """Find the previous occurrence of a given moon phase before t_start.
+
+    Args:
+        ts: Skyfield Timescale.
+        f: Almanac function for moon phases.
+        t_start: Start time for the search.
+        phase_value: Target phase identifier.
+
+    Returns:
+        The Skyfield Time of the previous matching phase.
+    """
+    t0 = t_start - 40.0
+    t1 = t_start
+    times, phases = almanac.find_discrete(t0, t1, f)
+
+    prev_match: Time | None = None
+    for ti, pv in zip(times, phases, strict=False):
+        if int(pv) == int(phase_value) and ti.tt < t_start.tt:
+            prev_match = ti
+    return prev_match
 
 
 def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | None:
@@ -991,6 +1143,29 @@ def _full_moon_name_code(month: int) -> str:
         12: "cold_moon",
     }
     return mapping.get(month, "unknown")
+
+
+def _previous_full_moon_name_code(
+    ts: Timescale, eph: Ephemeris, t_start: Time
+) -> str | None:
+    """Compute the previous full moon name code, handling 'blue_moon' when applicable."""
+    try:
+        f = almanac.moon_phases(eph)
+        t_full_1 = _find_phase_previous(ts, f, t_start, FULL_MOON)
+        if t_full_1 is None:
+            return None
+        t_full_0 = _find_phase_previous(ts, f, t_full_1, FULL_MOON)
+
+        if _is_blue_moon(t_full_0, t_full_1):
+            return "blue_moon"
+
+        dt = t_full_1.utc_datetime()
+        if not isinstance(dt, datetime):
+            dt = dt.item() if hasattr(dt, "item") else dt[0]
+
+        return _full_moon_name_code(dt.month)
+    except _RECOVERABLE_SKYFIELD_ERRORS:
+        return None
 
 
 def _is_blue_moon(next_full: Time | None, following_full: Time | None) -> bool:
@@ -1091,13 +1266,17 @@ def _zodiac_sign_from_longitude_deg(lon_deg: float) -> str | None:
 def _degree_within_sign(lon_deg: float) -> float:
     """Return the degree within the current zodiac sign.
 
+    This function is intended to be fed with an unrounded ecliptic longitude to
+    avoid boundary artifacts when the value is close to a sign cusp.
+
     Args:
         lon_deg: Ecliptic longitude in degrees.
 
     Returns:
         Degree within the sign in [0, 30).
     """
-    return float((lon_deg % 360.0) % 30.0)
+    lon_norm = (float(lon_deg) % 360.0 + 360.0) % 360.0
+    return lon_norm - (math.floor(lon_norm / 30.0) * 30.0)
 
 
 def _zodiac_icon(sign: str | None) -> str | None:
@@ -1125,6 +1304,413 @@ def _zodiac_icon(sign: str | None) -> str | None:
         "aquarius": "mdi:zodiac-aquarius",
         "pisces": "mdi:zodiac-pisces",
     }.get(sign)
+
+
+# -----------------------------------------------------------------------------
+# Computation grouping helpers for Moon Astro
+# -----------------------------------------------------------------------------
+
+
+class _Calc:
+    """Private computation namespace.
+
+    This class groups coordinator computation helpers to reduce the number of module-level
+    symbols and to keep call sites compact.
+    """
+
+    @staticmethod
+    def _round_or_none(value: float | None, ndigits: int) -> float | None:
+        """Round a float value or return None.
+
+        Args:
+            value: Input float or None.
+            ndigits: Decimal digits.
+
+        Returns:
+            Rounded float or None.
+        """
+        if value is None:
+            return None
+        return round(float(value), ndigits)
+
+    @staticmethod
+    def current(
+        eph: Ephemeris,
+        ts: Timescale,
+        t: Time,
+        t_future: Time,
+        *,
+        lat: float,
+        lon: float,
+        elev_m: float,
+    ) -> tuple[dict[str, Any], dict[str, float]]:
+        """Compute current topocentric/geocentric coordinates and derived quantities.
+
+        This function returns both:
+        - rounded values intended for sensor states
+        - raw values intended for downstream computations requiring maximal precision
+
+        Args:
+            eph: Loaded ephemeris.
+            ts: Skyfield Timescale.
+            t: Current time.
+            t_future: Future time used to infer waxing/waning.
+            lat: Observer latitude in degrees.
+            lon: Observer longitude in degrees.
+            elev_m: Observer elevation in meters.
+
+        Returns:
+            A tuple:
+              - payload dictionary fragment for current observations (rounded)
+              - raw dictionary containing unrounded values used for internal calculations
+        """
+        topo_vec, az_deg, el_deg, dist_km = _topocentric_vectors(
+            eph, t, lat, lon, elev_m
+        )
+        geo_vec = _geocentric_vector(eph, t)
+
+        ecl_lon_topo, ecl_lat_topo = _ecliptic_lon_lat_deg_of_date(topo_vec)
+        ecl_lon_geo, ecl_lat_geo = _ecliptic_lon_lat_deg_of_date(geo_vec)
+
+        illum_now = _moon_illumination_percentage(eph, t)
+        illum_future = _moon_illumination_percentage(eph, t_future)
+        waxing = illum_future > illum_now + 1e-6
+
+        payload = {
+            KEY_PHASE: _moon_phase_name(eph, t, ts),
+            KEY_AZIMUTH: round(float(az_deg), 4),
+            KEY_ELEVATION: round(float(el_deg), 4),
+            KEY_ILLUMINATION: round(float(illum_now), 3),
+            KEY_DISTANCE: round(float(dist_km), 3),
+            KEY_PARALLAX: round(float(_moon_parallax_angle_deg(dist_km)), 4),
+            KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC: round(float(ecl_lon_topo), 6),
+            KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC: round(float(ecl_lat_topo), 6),
+            KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC: round(float(ecl_lon_geo), 6),
+            KEY_ECLIPTIC_LATITUDE_GEOCENTRIC: round(float(ecl_lat_geo), 6),
+            KEY_ABOVE_HORIZON: float(el_deg) > 0.0,
+            KEY_WAXING: bool(waxing),
+        }
+
+        raw: dict[str, float] = {
+            "ecl_lon_geo": float(ecl_lon_geo),
+        }
+
+        return payload, raw
+
+    @staticmethod
+    def rise_set(
+        eph: Ephemeris,
+        t: Time,
+        tz: ZoneInfo | None,
+        *,
+        lat: float,
+        lon: float,
+        elev_m: float,
+    ) -> dict[str, Any]:
+        """Compute next and previous rise/set times.
+
+        Args:
+            eph: Loaded ephemeris.
+            t: Reference time.
+            tz: Target timezone for formatting.
+            lat: Observer latitude in degrees.
+            lon: Observer longitude in degrees.
+            elev_m: Observer elevation in meters.
+
+        Returns:
+            A payload dictionary fragment for rise and set times.
+        """
+        try:
+            next_rise, next_set = _next_rise_set(eph, lat, lon, elev_m, t)
+        except _RECOVERABLE_SKYFIELD_ERRORS:
+            next_rise, next_set = None, None
+
+        try:
+            prev_rise, prev_set = _previous_rise_set(eph, lat, lon, elev_m, t)
+        except _RECOVERABLE_SKYFIELD_ERRORS:
+            prev_rise, prev_set = None, None
+
+        return {
+            KEY_NEXT_RISE: _safe_time_iso(next_rise, tz),
+            KEY_NEXT_SET: _safe_time_iso(next_set, tz),
+            KEY_PREVIOUS_RISE: _safe_time_iso(prev_rise, tz),
+            KEY_PREVIOUS_SET: _safe_time_iso(prev_set, tz),
+        }
+
+    @staticmethod
+    def apsis(
+        eph: Ephemeris, ts: Timescale, t: Time, tz: ZoneInfo | None
+    ) -> dict[str, Any]:
+        """Compute next and previous apogee/perigee times.
+
+        Args:
+            eph: Loaded ephemeris.
+            ts: Skyfield Timescale.
+            t: Reference time.
+            tz: Target timezone for formatting.
+
+        Returns:
+            A payload dictionary fragment for apogee/perigee times.
+        """
+        try:
+            next_apogee = _find_next_apogee(eph, ts, t)
+        except _RECOVERABLE_NUMERIC_ERRORS:
+            next_apogee = None
+
+        try:
+            next_perigee = _find_next_perigee(eph, ts, t)
+        except _RECOVERABLE_NUMERIC_ERRORS:
+            next_perigee = None
+
+        try:
+            prev_apogee = _find_previous_apogee(eph, ts, t)
+        except _RECOVERABLE_NUMERIC_ERRORS:
+            prev_apogee = None
+
+        try:
+            prev_perigee = _find_previous_perigee(eph, ts, t)
+        except _RECOVERABLE_NUMERIC_ERRORS:
+            prev_perigee = None
+
+        return {
+            KEY_NEXT_APOGEE: _safe_time_iso(next_apogee, tz),
+            KEY_NEXT_PERIGEE: _safe_time_iso(next_perigee, tz),
+            KEY_PREVIOUS_APOGEE: _safe_time_iso(prev_apogee, tz),
+            KEY_PREVIOUS_PERIGEE: _safe_time_iso(prev_perigee, tz),
+        }
+
+    @staticmethod
+    def phases_and_names(
+        eph: Ephemeris,
+        ts: Timescale,
+        t: Time,
+        tz: ZoneInfo | None,
+    ) -> tuple[dict[str, Any], dict[str, Time | None]]:
+        """Compute phase event timestamps and full moon name codes.
+
+        Args:
+            eph: Loaded ephemeris.
+            ts: Skyfield Timescale.
+            t: Reference time.
+            tz: Target timezone for formatting.
+
+        Returns:
+            A tuple:
+              - payload dictionary fragment for phase-related keys
+              - raw event times dictionary used downstream (ecliptic/zodiac)
+        """
+
+        def phase_events() -> dict[str, Time | None]:
+            """Compute next and previous main lunar phase event times.
+
+            Args:
+                None.
+
+            Returns:
+                A dictionary containing raw Skyfield Time objects for events.
+            """
+            try:
+                f = almanac.moon_phases(eph)
+                return {
+                    "next_new": _find_phase_next(ts, f, t, DARK_MOON),
+                    "next_first": _find_phase_next(ts, f, t, FIRST_QUARTER),
+                    "next_full": _find_phase_next(ts, f, t, FULL_MOON),
+                    "next_last": _find_phase_next(ts, f, t, LAST_QUARTER),
+                    "prev_new": _find_phase_previous(ts, f, t, DARK_MOON),
+                    "prev_first": _find_phase_previous(ts, f, t, FIRST_QUARTER),
+                    "prev_full": _find_phase_previous(ts, f, t, FULL_MOON),
+                    "prev_last": _find_phase_previous(ts, f, t, LAST_QUARTER),
+                }
+            except _RECOVERABLE_SKYFIELD_ERRORS:
+                return {
+                    "next_new": None,
+                    "next_first": None,
+                    "next_full": None,
+                    "next_last": None,
+                    "prev_new": None,
+                    "prev_first": None,
+                    "prev_full": None,
+                    "prev_last": None,
+                }
+
+        events = phase_events()
+
+        try:
+            next_full_name = _next_full_moon_name_code(ts, eph, t)
+        except _RECOVERABLE_SKYFIELD_ERRORS:
+            next_full_name = None
+
+        try:
+            prev_full_name = _previous_full_moon_name_code(ts, eph, t)
+        except _RECOVERABLE_SKYFIELD_ERRORS:
+            prev_full_name = None
+
+        payload = {
+            KEY_NEXT_NEW_MOON: _safe_time_iso(events["next_new"], tz),
+            KEY_NEXT_FIRST_QUARTER: _safe_time_iso(events["next_first"], tz),
+            KEY_NEXT_FULL_MOON: _safe_time_iso(events["next_full"], tz),
+            KEY_NEXT_LAST_QUARTER: _safe_time_iso(events["next_last"], tz),
+            KEY_PREVIOUS_NEW_MOON: _safe_time_iso(events["prev_new"], tz),
+            KEY_PREVIOUS_FIRST_QUARTER: _safe_time_iso(events["prev_first"], tz),
+            KEY_PREVIOUS_FULL_MOON: _safe_time_iso(events["prev_full"], tz),
+            KEY_PREVIOUS_LAST_QUARTER: _safe_time_iso(events["prev_last"], tz),
+            KEY_NEXT_FULL_MOON_NAME: next_full_name,
+            KEY_NEXT_FULL_MOON_ALT_NAMES: _full_moon_alt_names_state_code(
+                next_full_name
+            ),
+            KEY_PREVIOUS_FULL_MOON_NAME: prev_full_name,
+            KEY_PREVIOUS_FULL_MOON_ALT_NAMES: _full_moon_alt_names_state_code(
+                prev_full_name
+            ),
+        }
+        return payload, events
+
+    @staticmethod
+    def lunation_ecliptics(
+        eph: Ephemeris,
+        events: dict[str, Time | None],
+    ) -> tuple[dict[str, Any], dict[str, float | None]]:
+        """Compute lunation ecliptic coordinates for next/previous new and full moons.
+
+        This function returns both:
+        - rounded values for sensor states
+        - raw longitudes for downstream computations (e.g., zodiac)
+
+        Args:
+            eph: Loaded ephemeris.
+            events: Raw event times dictionary.
+
+        Returns:
+            A tuple:
+              - payload dictionary fragment containing lunation ecliptic keys (rounded)
+              - raw longitude mapping used for zodiac computation (unrounded)
+        """
+
+        def lunation_ecliptic(
+            t_event: Time | None,
+        ) -> tuple[float | None, float | None]:
+            """Compute geocentric ecliptic lon/lat for a given event time.
+
+            Args:
+                t_event: Event time (or None).
+
+            Returns:
+                A tuple (lon_deg, lat_deg) or (None, None).
+            """
+            if t_event is None:
+                return None, None
+            try:
+                v = _geocentric_vector(eph, t_event)
+                return _ecliptic_lon_lat_deg_of_date(v)
+            except _RECOVERABLE_NUMERIC_ERRORS as exc:
+                _LOGGER.debug("Failed lunation ecliptic computation: %r", exc)
+                return None, None
+
+        lon_next_new, lat_next_new = lunation_ecliptic(events.get("next_new"))
+        lon_next_full, lat_next_full = lunation_ecliptic(events.get("next_full"))
+        lon_prev_new, lat_prev_new = lunation_ecliptic(events.get("prev_new"))
+        lon_prev_full, lat_prev_full = lunation_ecliptic(events.get("prev_full"))
+
+        payload = {
+            KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON: _Calc._round_or_none(lon_next_new, 6),
+            KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON: _Calc._round_or_none(lat_next_new, 6),
+            KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON: _Calc._round_or_none(
+                lon_next_full, 6
+            ),
+            KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON: _Calc._round_or_none(
+                lat_next_full, 6
+            ),
+            KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON: _Calc._round_or_none(
+                lon_prev_new, 6
+            ),
+            KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON: _Calc._round_or_none(
+                lat_prev_new, 6
+            ),
+            KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON: _Calc._round_or_none(
+                lon_prev_full, 6
+            ),
+            KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON: _Calc._round_or_none(
+                lat_prev_full, 6
+            ),
+        }
+
+        raw_lons: dict[str, float | None] = {
+            "next_new": lon_next_new,
+            "next_full": lon_next_full,
+            "prev_new": lon_prev_new,
+            "prev_full": lon_prev_full,
+        }
+
+        return payload, raw_lons
+
+    @staticmethod
+    def zodiac(
+        current_lon_geo: float,
+        *,
+        lon_next_new: float | None,
+        lon_next_full: float | None,
+        lon_prev_new: float | None,
+        lon_prev_full: float | None,
+    ) -> dict[str, Any]:
+        """Compute zodiac sign/degree/icon keys for current and lunation longitudes.
+
+        Args:
+            current_lon_geo: Current geocentric ecliptic longitude of the Moon in degrees.
+            lon_next_new: Ecliptic longitude at next new moon in degrees (or None).
+            lon_next_full: Ecliptic longitude at next full moon in degrees (or None).
+            lon_prev_new: Ecliptic longitude at previous new moon in degrees (or None).
+            lon_prev_full: Ecliptic longitude at previous full moon in degrees (or None).
+
+        Returns:
+            A payload dictionary fragment containing only zodiac keys.
+        """
+
+        def zodiac_from_lon(
+            lon_deg: float | None,
+        ) -> tuple[str | None, float | None, str | None]:
+            """Return zodiac sign, degree in sign and icon from longitude.
+
+            Args:
+                lon_deg: Ecliptic longitude in degrees.
+
+            Returns:
+                A tuple (sign, degree_in_sign, icon) where each item may be None.
+            """
+            if lon_deg is None:
+                return None, None, None
+            try:
+                lon_raw = float(lon_deg)
+                sign = _zodiac_sign_from_longitude_deg(lon_raw)
+                degree_raw = _degree_within_sign(lon_raw)
+                degree = round(degree_raw, 4)
+                return sign, degree, _zodiac_icon(sign)
+            except (ValueError, ArithmeticError) as exc:
+                _LOGGER.debug("Failed zodiac computation: %r", exc)
+                return None, None, None
+
+        sign_cur, deg_cur, icon_cur = zodiac_from_lon(current_lon_geo)
+        sign_nn, deg_nn, icon_nn = zodiac_from_lon(lon_next_new)
+        sign_nf, deg_nf, icon_nf = zodiac_from_lon(lon_next_full)
+        sign_pn, deg_pn, icon_pn = zodiac_from_lon(lon_prev_new)
+        sign_pf, deg_pf, icon_pf = zodiac_from_lon(lon_prev_full)
+
+        return {
+            KEY_ZODIAC_SIGN_CURRENT_MOON: sign_cur,
+            KEY_ZODIAC_DEGREE_CURRENT_MOON: deg_cur,
+            KEY_ZODIAC_ICON_CURRENT_MOON: icon_cur,
+            KEY_ZODIAC_SIGN_NEXT_NEW_MOON: sign_nn,
+            KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: deg_nn,
+            KEY_ZODIAC_ICON_NEXT_NEW_MOON: icon_nn,
+            KEY_ZODIAC_SIGN_NEXT_FULL_MOON: sign_nf,
+            KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: deg_nf,
+            KEY_ZODIAC_ICON_NEXT_FULL_MOON: icon_nf,
+            KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON: sign_pn,
+            KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON: deg_pn,
+            KEY_ZODIAC_ICON_PREVIOUS_NEW_MOON: icon_pn,
+            KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON: sign_pf,
+            KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON: deg_pf,
+            KEY_ZODIAC_ICON_PREVIOUS_FULL_MOON: icon_pf,
+        }
 
 
 class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
@@ -1206,6 +1792,87 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return await self._hass.async_add_executor_job(_load)
 
+    async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
+        """Ensure ephemeris and timescale are loaded and return them.
+
+        Returns:
+            A tuple (ephemeris, timescale).
+        """
+        if self._eph is None or self._ts is None:
+            self._eph, self._ts = await self._async_load_ephemeris()
+
+        assert self._eph is not None, "Ephemeris must be loaded"
+        assert self._ts is not None, "Timescale must be loaded"
+        return self._eph, self._ts
+
+    async def _async_compute_payload(
+        self, eph: Ephemeris, ts: Timescale
+    ) -> dict[str, Any]:
+        """Compute the coordinator payload using an executor thread.
+
+        Args:
+            eph: Loaded ephemeris.
+            ts: Loaded timescale.
+
+        Returns:
+            A dictionary with all computed keys ready to be exposed by entities.
+        """
+        now_utc = datetime.now(UTC)
+        t = ts.from_datetime(now_utc)
+        t_future = ts.from_datetime(now_utc + timedelta(hours=6))
+
+        def _calc() -> dict[str, Any]:
+            """Heavy computation executed in the executor thread.
+
+            Returns:
+                A dictionary with all computed keys ready to be exposed by entities.
+            """
+            payload: dict[str, Any] = {}
+
+            current_payload, current_raw = _Calc.current(
+                eph,
+                ts,
+                t,
+                t_future,
+                lat=self._lat,
+                lon=self._lon,
+                elev_m=self._elev,
+            )
+            payload.update(current_payload)
+
+            payload.update(
+                _Calc.rise_set(
+                    eph,
+                    t,
+                    self._tz,
+                    lat=self._lat,
+                    lon=self._lon,
+                    elev_m=self._elev,
+                )
+            )
+
+            phase_payload, events = _Calc.phases_and_names(eph, ts, t, self._tz)
+            payload.update(phase_payload)
+
+            payload.update(_Calc.apsis(eph, ts, t, self._tz))
+
+            ecl_payload, ecl_raw_lons = _Calc.lunation_ecliptics(eph, events)
+            payload.update(ecl_payload)
+
+            payload.update(
+                _Calc.zodiac(
+                    current_raw["ecl_lon_geo"],
+                    lon_next_new=ecl_raw_lons["next_new"],
+                    lon_next_full=ecl_raw_lons["next_full"],
+                    lon_prev_new=ecl_raw_lons["prev_new"],
+                    lon_prev_full=ecl_raw_lons["prev_full"],
+                )
+            )
+
+            return payload
+
+        return await self._hass.async_add_executor_job(_calc)
+
     async def _async_update_data(self) -> dict[str, Any]:
         """Compute current lunar data and upcoming events for sensors.
 
@@ -1216,190 +1883,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             UpdateFailed: If an unexpected error occurs during calculations.
         """
         try:
-            if self._eph is None or self._ts is None:
-                self._eph, self._ts = await self._async_load_ephemeris()
-
-            # Use local variables to satisfy type checkers after conditional load
-            eph = self._eph
-            ts = self._ts
-
-            # At this point, eph and ts are guaranteed non-None by the conditional above
-            assert eph is not None, "Ephemeris must be loaded"
-            assert ts is not None, "Timescale must be loaded"
-
-            now_utc = datetime.now(UTC)
-            t = ts.from_datetime(now_utc)
-            t_future = ts.from_datetime(now_utc + timedelta(hours=6))
-
-            def _calc() -> dict[str, Any]:
-                """Heavy computation executed in the executor thread."""
-                topo_vec, az_deg, el_deg, dist_km = _topocentric_vectors(
-                    eph, t, self._lat, self._lon, self._elev
-                )
-                geo_vec = _geocentric_vector(eph, t)
-
-                ecl_lon_topo, ecl_lat_topo = _ecliptic_lon_lat_deg_of_date(topo_vec)
-                ecl_lon_geo, ecl_lat_geo = _ecliptic_lon_lat_deg_of_date(geo_vec)
-
-                illum_now = _moon_illumination_percentage(eph, t)
-                parallax_deg = _moon_parallax_angle_deg(dist_km)
-
-                phase = _moon_phase_name(eph, t, ts)
-
-                illum_future = _moon_illumination_percentage(eph, t_future)
-                waxing = illum_future > illum_now + 1e-6
-
-                try:
-                    t_rise, t_set = _next_rise_set(
-                        eph, self._lat, self._lon, self._elev, t
-                    )
-                except _RECOVERABLE_SKYFIELD_ERRORS:
-                    t_rise, t_set = None, None
-
-                try:
-                    f = almanac.moon_phases(eph)
-                    t_new = _find_phase_next(ts, f, t, DARK_MOON)
-                    t_first = _find_phase_next(ts, f, t, FIRST_QUARTER)
-                    t_full = _find_phase_next(ts, f, t, FULL_MOON)
-                    t_last = _find_phase_next(ts, f, t, LAST_QUARTER)
-                except _RECOVERABLE_SKYFIELD_ERRORS:
-                    t_new = t_first = t_full = t_last = None
-
-                try:
-                    full_moon_name_code = _next_full_moon_name_code(ts, eph, t)
-                except (ValueError, RuntimeError):
-                    full_moon_name_code = None
-
-                try:
-                    t_apogee = _find_next_apogee(eph, ts, t)
-                except _RECOVERABLE_NUMERIC_ERRORS:
-                    t_apogee = None
-                try:
-                    t_perigee = _find_next_perigee(eph, ts, t)
-                except _RECOVERABLE_NUMERIC_ERRORS:
-                    t_perigee = None
-
-                # Compute ecliptic lon/lat at the lunation instants (geocentric, true-of-date)
-                lon_new: float | None = None
-                lat_new: float | None = None
-                lon_full: float | None = None
-                lat_full: float | None = None
-                try:
-                    if t_new is not None:
-                        v_new = _geocentric_vector(eph, t_new)
-                        lon_new, lat_new = _ecliptic_lon_lat_deg_of_date(v_new)
-                except _RECOVERABLE_NUMERIC_ERRORS as exc:
-                    _LOGGER.debug("Failed ecliptic lon/lat at new moon: %r", exc)
-                    lon_new = lat_new = None
-                try:
-                    if t_full is not None:
-                        v_full = _geocentric_vector(eph, t_full)
-                        lon_full, lat_full = _ecliptic_lon_lat_deg_of_date(v_full)
-                except _RECOVERABLE_NUMERIC_ERRORS as exc:
-                    _LOGGER.debug("Failed ecliptic lon/lat at full moon: %r", exc)
-                    lon_full = lat_full = None
-
-                zodiac_current: str | None = None
-                zodiac_new: str | None = None
-                zodiac_full: str | None = None
-                zodiac_degree_current: float | None = None
-                zodiac_degree_new: float | None = None
-                zodiac_degree_full: float | None = None
-                try:
-                    zodiac_current = _zodiac_sign_from_longitude_deg(ecl_lon_geo)
-                    zodiac_degree_current = round(_degree_within_sign(ecl_lon_geo), 4)
-                except (ValueError, ArithmeticError) as exc:
-                    _LOGGER.debug("Failed current zodiac computation: %r", exc)
-                    zodiac_current = None
-                    zodiac_degree_current = None
-                try:
-                    if lon_new is not None:
-                        zodiac_new = _zodiac_sign_from_longitude_deg(lon_new)
-                        zodiac_degree_new = round(_degree_within_sign(lon_new), 4)
-                        _LOGGER.debug(
-                            "Next new moon t=%s lon_moon_geo=%.6f° lat_moon_geo=%.6f° sign=%s deg_in_sign=%s",
-                            _safe_time_iso(t_new, ZoneInfo("UTC")),
-                            lon_new,
-                            lat_new,
-                            zodiac_new,
-                            zodiac_degree_new,
-                        )
-                except (ValueError, ArithmeticError) as exc:
-                    _LOGGER.debug("Failed zodiac_new computation: %r", exc)
-                    zodiac_new = None
-                    zodiac_degree_new = None
-                try:
-                    if lon_full is not None:
-                        zodiac_full = _zodiac_sign_from_longitude_deg(lon_full)
-                        zodiac_degree_full = round(_degree_within_sign(lon_full), 4)
-                        _LOGGER.debug(
-                            "Next full moon t=%s lon_moon_geo=%.6f° lat_moon_geo=%.6f° sign=%s deg_in_sign=%s",
-                            _safe_time_iso(t_full, ZoneInfo("UTC")),
-                            lon_full,
-                            lat_full,
-                            zodiac_full,
-                            zodiac_degree_full,
-                        )
-                except (ValueError, ArithmeticError) as exc:
-                    _LOGGER.debug("Failed zodiac_full computation: %r", exc)
-                    zodiac_full = None
-                    zodiac_degree_full = None
-
-                zodiac_icon_current = _zodiac_icon(zodiac_current)
-                zodiac_icon_new = _zodiac_icon(zodiac_new)
-                zodiac_icon_full = _zodiac_icon(zodiac_full)
-
-                above = el_deg > 0.0
-
-                return {
-                    KEY_PHASE: phase,
-                    KEY_AZ: round(az_deg, 4),
-                    KEY_EL: round(el_deg, 4),
-                    KEY_ILLUM: round(illum_now, 3),
-                    KEY_DISTANCE: round(dist_km, 3),
-                    KEY_PARALLAX: round(parallax_deg, 4),
-                    KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC: round(ecl_lon_topo, 6),
-                    KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC: round(ecl_lat_topo, 6),
-                    KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC: round(ecl_lon_geo, 6),
-                    KEY_ECLIPTIC_LATITUDE_GEOCENTRIC: round(ecl_lat_geo, 6),
-                    # The following four keys depend on optional event times; may be None/NaN
-                    KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON: None
-                    if lon_full is None
-                    else round(lon_full, 6),
-                    KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON: None
-                    if lat_full is None
-                    else round(lat_full, 6),
-                    KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON: None
-                    if lon_new is None
-                    else round(lon_new, 6),
-                    KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON: None
-                    if lat_new is None
-                    else round(lat_new, 6),
-                    KEY_NEXT_RISE: _safe_time_iso(t_rise, self._tz),
-                    KEY_NEXT_SET: _safe_time_iso(t_set, self._tz),
-                    KEY_NEXT_APOGEE: _safe_time_iso(t_apogee, self._tz),
-                    KEY_NEXT_PERIGEE: _safe_time_iso(t_perigee, self._tz),
-                    KEY_NEXT_NEW_MOON: _safe_time_iso(t_new, self._tz),
-                    KEY_NEXT_FIRST_QUARTER: _safe_time_iso(t_first, self._tz),
-                    KEY_NEXT_FULL_MOON: _safe_time_iso(t_full, self._tz),
-                    KEY_NEXT_FULL_MOON_NAME: full_moon_name_code,
-                    KEY_NEXT_FULL_MOON_ALT_NAMES: _full_moon_alt_names_state_code(
-                        full_moon_name_code
-                    ),
-                    KEY_NEXT_LAST_QUARTER: _safe_time_iso(t_last, self._tz),
-                    KEY_ZODIAC_SIGN_CURRENT_MOON: zodiac_current,
-                    KEY_ZODIAC_SIGN_NEXT_NEW_MOON: zodiac_new,
-                    KEY_ZODIAC_SIGN_NEXT_FULL_MOON: zodiac_full,
-                    KEY_ZODIAC_DEGREE_CURRENT_MOON: zodiac_degree_current,
-                    KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: zodiac_degree_new,
-                    KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: zodiac_degree_full,
-                    KEY_ZODIAC_ICON_CURRENT_MOON: zodiac_icon_current,
-                    KEY_ZODIAC_ICON_NEXT_NEW_MOON: zodiac_icon_new,
-                    KEY_ZODIAC_ICON_NEXT_FULL_MOON: zodiac_icon_full,
-                    KEY_ABOVE_HORIZON: above,
-                    KEY_WAXING: waxing,
-                }
-
-            return await self._hass.async_add_executor_job(_calc)
+            eph, ts = await self._async_ensure_ephemeris_loaded()
+            return await self._async_compute_payload(eph, ts)
         except _RECOVERABLE_UPDATE_ERRORS as err:
             raise UpdateFailed(str(err)) from err

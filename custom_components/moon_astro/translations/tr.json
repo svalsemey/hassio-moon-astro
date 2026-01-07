@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Sıradaki son dördün"
             },
+
+            "sensor_previous_rise": {
+                "name": "Önceki doğuş"
+            },
+            "sensor_previous_set": {
+                "name": "Önceki batış"
+            },
+            "sensor_previous_apogee": {
+                "name": "Önceki apogee"
+            },
+            "sensor_previous_perigee": {
+                "name": "Önceki perigee"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Önceki yeni ay"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Önceki ilk dördün"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Önceki dolunay"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Önceki dolunayın adı",
+                "state": {
+                    "wolf_moon": "Kurt Dolunayı",
+                    "snow_moon": "Kar Dolunayı",
+                    "worm_moon": "Solucan Dolunayı",
+                    "pink_moon": "Pembe Dolunay",
+                    "flower_moon": "Çiçek Dolunayı",
+                    "strawberry_moon": "Çilek Dolunayı",
+                    "buck_moon": "Geyik Dolunayı",
+                    "sturgeon_moon": "Mersin Balığı Dolunayı",
+                    "harvest_moon": "Hasat Dolunayı",
+                    "hunters_moon": "Avcı Dolunayı",
+                    "beaver_moon": "Kunduz Dolunayı",
+                    "cold_moon": "Soğuk Dolunay",
+                    "blue_moon": "Mavi Dolunay",
+                    "unknown": "Bilinmiyor"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Önceki dolunay için alternatif adlar",
+                "state": {
+                    "wolf_moon_alt_names": "Yule Sonrası Ay, Evde Kal Ayı, Sakin Ay, Sert Ay, Merkez Ay",
+                    "snow_moon_alt_names": "Açlık Ayı, Ayı Ayı, Fırtına Ayı, Buz Ayı",
+                    "worm_moon_alt_names": "Oruç Ayı, Karga Ayı, Kabuk Ayı, İffet Ayı, Şeker Ayı, Özsu Ayı",
+                    "pink_moon_alt_names": "Buz Kıran Ay, Tomurcuk Ayı, Uyanış Ayı, Yumurta Ayı, Paskalya Ayı",
+                    "flower_moon_alt_names": "Ekim Ayı, Süt Ayı, Tavşan Ayı, Çimen Ayı, Anneler Ayı, Parlak Ay",
+                    "strawberry_moon_alt_names": "Gül Ayı, Sıcak Ay, Bal Şarabı Ayı, Çiçek Ayı, Ekim Ayı",
+                    "buck_moon_alt_names": "Gök Gürültüsü Ayı, Saman Ayı, Ot Ayı",
+                    "sturgeon_moon_alt_names": "Tahıl Ayı, Mısır Ayı, Vaşak Ayı, Şimşek Ayı",
+                    "harvest_moon_alt_names": "Tam Mısır Ayı, Yeşil Mısır Ayı, Mısır Ayı, Şarap Ayı, Şarkı Ayı, Arpa Ayı",
+                    "hunters_moon_alt_names": "Pirinç Kurutma Ayı, Düşen Yapraklar Ayı, Don Ayı, Kanlı Ay, Kızıl Ay",
+                    "beaver_moon_alt_names": "Kırağı Ayı, Don Ayı, Ticaret Ayı, Kar Ayı, Yas Ayı, En Karanlık Derinlikler Ayı",
+                    "cold_moon_alt_names": "Uzun Geceler Ayı, Yule Öncesi Ay, Meşe Ayı, Tam Soğuk Ay",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Önceki son dördün"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Sıradaki dolunayda ekliptik boylam"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Sıradaki yeni ayda ekliptik enlem"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Önceki dolunayda ekliptik boylam"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Önceki dolunayda ekliptik enlem"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Önceki yeni ayda ekliptik boylam"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Önceki yeni ayda ekliptik enlem"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Burç (mevcut)",
                 "state": {
@@ -209,6 +286,41 @@
                     "pisces": "Balık"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Önceki yeni ayda burç",
+                "state": {
+                    "aries": "Koç",
+                    "taurus": "Boğa",
+                    "gemini": "İkizler",
+                    "cancer": "Yengeç",
+                    "leo": "Aslan",
+                    "virgo": "Başak",
+                    "libra": "Terazi",
+                    "scorpio": "Akrep",
+                    "sagittarius": "Yay",
+                    "capricorn": "Oğlak",
+                    "aquarius": "Kova",
+                    "pisces": "Balık"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Önceki dolunayda burç",
+                "state": {
+                    "aries": "Koç",
+                    "taurus": "Boğa",
+                    "gemini": "İkizler",
+                    "cancer": "Yengeç",
+                    "leo": "Aslan",
+                    "virgo": "Başak",
+                    "libra": "Terazi",
+                    "scorpio": "Akrep",
+                    "sagittarius": "Yay",
+                    "capricorn": "Oğlak",
+                    "aquarius": "Kova",
+                    "pisces": "Balık"
+                }
+            },
+
             "sensor_zodiac_degree_current_moon": {
                 "name": "Burç derecesi (mevcut)"
             },
@@ -217,6 +329,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Sıradaki dolunayda burç derecesi"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Önceki yeni ayda burç derecesi"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Önceki dolunayda burç derecesi"
             }
         }
     }

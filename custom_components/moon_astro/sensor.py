@@ -1,4 +1,8 @@
-"""Sensor entities for Moon Astro."""
+"""Sensor entities for Moon Astro.
+
+This module defines SensorEntity instances backed by the integration coordinator.
+Each sensor reads a single computed value from the coordinator data dictionary.
+"""
 
 from __future__ import annotations
 
@@ -15,18 +19,22 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
-    KEY_AZ,
+    KEY_AZIMUTH,
     KEY_DISTANCE,
     KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
     KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
     KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
     KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
     KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
     KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
     KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
     KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
-    KEY_EL,
-    KEY_ILLUM,
+    KEY_ELEVATION,
+    KEY_ILLUMINATION,
     KEY_NEXT_APOGEE,
     KEY_NEXT_FIRST_QUARTER,
     KEY_NEXT_FULL_MOON,
@@ -39,18 +47,32 @@ from .const import (
     KEY_NEXT_SET,
     KEY_PARALLAX,
     KEY_PHASE,
+    KEY_PREVIOUS_APOGEE,
+    KEY_PREVIOUS_FIRST_QUARTER,
+    KEY_PREVIOUS_FULL_MOON,
+    KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
+    KEY_PREVIOUS_FULL_MOON_NAME,
+    KEY_PREVIOUS_LAST_QUARTER,
+    KEY_PREVIOUS_NEW_MOON,
+    KEY_PREVIOUS_PERIGEE,
+    KEY_PREVIOUS_RISE,
+    KEY_PREVIOUS_SET,
     KEY_ZODIAC_DEGREE_CURRENT_MOON,
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+    KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+    KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
     KEY_ZODIAC_SIGN_CURRENT_MOON,
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
-    PRECISION_AZ,
+    KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+    KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
+    PRECISION_AZIMUTH,
     PRECISION_DISTANCE,
     PRECISION_ECL_GEO,
     PRECISION_ECL_TOPO,
-    PRECISION_EL,
-    PRECISION_ILLUM,
+    PRECISION_ELEVATION,
+    PRECISION_ILLUMINATION,
     PRECISION_PARALLAX,
     PRECISION_ZODIAC_DEGREE,
 )
@@ -69,25 +91,25 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
     ),
     (
-        KEY_AZ,
+        KEY_AZIMUTH,
         "sensor_azimuth",
         "°",
         None,
-        PRECISION_AZ,
+        PRECISION_AZIMUTH,
     ),
     (
-        KEY_EL,
+        KEY_ELEVATION,
         "sensor_elevation",
         "°",
         None,
-        PRECISION_EL,
+        PRECISION_ELEVATION,
     ),
     (
-        KEY_ILLUM,
+        KEY_ILLUMINATION,
         "sensor_illumination",
         "%",
         None,
-        PRECISION_ILLUM,
+        PRECISION_ILLUMINATION,
     ),
     (
         KEY_DISTANCE,
@@ -133,7 +155,7 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
         PRECISION_ECL_GEO,
     ),
-    # Time sensors
+    # Time sensors (next)
     (
         KEY_NEXT_RISE,
         "sensor_next_rise",
@@ -163,13 +185,6 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
     ),
     (
-        KEY_NEXT_NEW_MOON,
-        "sensor_next_new_moon",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
-    ),
-    (
         KEY_NEXT_FIRST_QUARTER,
         "sensor_next_first_quarter",
         None,
@@ -184,6 +199,92 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
     ),
     (
+        KEY_NEXT_LAST_QUARTER,
+        "sensor_next_last_quarter",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_NEXT_NEW_MOON,
+        "sensor_next_new_moon",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    # Time sensors (previous)
+    (
+        KEY_PREVIOUS_RISE,
+        "sensor_previous_rise",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_SET,
+        "sensor_previous_set",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_APOGEE,
+        "sensor_previous_apogee",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_PERIGEE,
+        "sensor_previous_perigee",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_FIRST_QUARTER,
+        "sensor_previous_first_quarter",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_FULL_MOON,
+        "sensor_previous_full_moon",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_LAST_QUARTER,
+        "sensor_previous_last_quarter",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_NEW_MOON,
+        "sensor_previous_new_moon",
+        None,
+        SensorDeviceClass.TIMESTAMP,
+        None,
+    ),
+    # Full moon names
+    (
+        KEY_PREVIOUS_FULL_MOON_NAME,
+        "sensor_previous_full_moon_name",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
+        "sensor_previous_full_moon_alt_names",
+        None,
+        None,
+        None,
+    ),
+    (
         KEY_NEXT_FULL_MOON_NAME,
         "sensor_next_full_moon_name",
         None,
@@ -195,13 +296,6 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         "sensor_next_full_moon_alt_names",
         None,
         None,
-        None,
-    ),
-    (
-        KEY_NEXT_LAST_QUARTER,
-        "sensor_next_last_quarter",
-        None,
-        SensorDeviceClass.TIMESTAMP,
         None,
     ),
     # Ecliptic coordinates at next lunations (geocentric, true-of-date)
@@ -233,10 +327,46 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
         PRECISION_ECL_GEO,
     ),
+    # Ecliptic coordinates at previous lunations (geocentric, true-of-date)
+    (
+        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+        "sensor_ecliptic_longitude_previous_full_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+        "sensor_ecliptic_latitude_previous_full_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
+        "sensor_ecliptic_longitude_previous_new_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
+    (
+        KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
+        "sensor_ecliptic_latitude_previous_new_moon",
+        "°",
+        None,
+        PRECISION_ECL_GEO,
+    ),
     # Zodiac sign sensors (string states)
     (
         KEY_ZODIAC_SIGN_CURRENT_MOON,
         "sensor_zodiac_sign_current_moon",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+        "sensor_zodiac_sign_next_full_moon",
         None,
         None,
         None,
@@ -249,8 +379,15 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         None,
     ),
     (
-        KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
-        "sensor_zodiac_sign_next_full_moon",
+        KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+        "sensor_zodiac_sign_previous_full_moon",
+        None,
+        None,
+        None,
+    ),
+    (
+        KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
+        "sensor_zodiac_sign_previous_new_moon",
         None,
         None,
         None,
@@ -264,6 +401,13 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         PRECISION_ZODIAC_DEGREE,
     ),
     (
+        KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+        "sensor_zodiac_degree_next_full_moon",
+        "°",
+        None,
+        PRECISION_ZODIAC_DEGREE,
+    ),
+    (
         KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
         "sensor_zodiac_degree_next_new_moon",
         "°",
@@ -271,8 +415,15 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
         PRECISION_ZODIAC_DEGREE,
     ),
     (
-        KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
-        "sensor_zodiac_degree_next_full_moon",
+        KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
+        "sensor_zodiac_degree_previous_new_moon",
+        "°",
+        None,
+        PRECISION_ZODIAC_DEGREE,
+    ),
+    (
+        KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+        "sensor_zodiac_degree_previous_full_moon",
         "°",
         None,
         PRECISION_ZODIAC_DEGREE,
@@ -282,9 +433,9 @@ SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]]
 # Stable, non-localized slugs for initial entity_id creation
 SUGGESTED_SLUGS: dict[str, str] = {
     KEY_PHASE: "phase",
-    KEY_AZ: "azimuth",
-    KEY_EL: "elevation",
-    KEY_ILLUM: "illumination",
+    KEY_AZIMUTH: "azimuth",
+    KEY_ELEVATION: "elevation",
+    KEY_ILLUMINATION: "illumination",
     KEY_DISTANCE: "distance",
     KEY_PARALLAX: "parallax",
     KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC: "ecliptic_longitude_topocentric",
@@ -295,27 +446,56 @@ SUGGESTED_SLUGS: dict[str, str] = {
     KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON: "ecliptic_latitude_next_full_moon",
     KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON: "ecliptic_longitude_next_new_moon",
     KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON: "ecliptic_latitude_next_new_moon",
-    KEY_NEXT_RISE: "next_rise",
-    KEY_NEXT_SET: "next_set",
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON: "ecliptic_longitude_previous_full_moon",
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON: "ecliptic_latitude_previous_full_moon",
+    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON: "ecliptic_longitude_previous_new_moon",
+    KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON: "ecliptic_latitude_previous_new_moon",
     KEY_NEXT_APOGEE: "next_apogee",
-    KEY_NEXT_PERIGEE: "next_perigee",
-    KEY_NEXT_NEW_MOON: "next_new_moon",
     KEY_NEXT_FIRST_QUARTER: "next_first_quarter",
     KEY_NEXT_FULL_MOON: "next_full_moon",
+    KEY_NEXT_FULL_MOON_NAME: "next_full_moon_name",
+    KEY_NEXT_FULL_MOON_ALT_NAMES: "next_full_moon_alt_names",
     KEY_NEXT_LAST_QUARTER: "next_last_quarter",
+    KEY_NEXT_NEW_MOON: "next_new_moon",
+    KEY_NEXT_PERIGEE: "next_perigee",
+    KEY_NEXT_RISE: "next_rise",
+    KEY_NEXT_SET: "next_set",
+    KEY_PREVIOUS_APOGEE: "previous_apogee",
+    KEY_PREVIOUS_FIRST_QUARTER: "previous_first_quarter",
+    KEY_PREVIOUS_FULL_MOON: "previous_full_moon",
+    KEY_PREVIOUS_FULL_MOON_NAME: "previous_full_moon_name",
+    KEY_PREVIOUS_FULL_MOON_ALT_NAMES: "previous_full_moon_alt_names",
+    KEY_PREVIOUS_LAST_QUARTER: "previous_last_quarter",
+    KEY_PREVIOUS_NEW_MOON: "previous_new_moon",
+    KEY_PREVIOUS_PERIGEE: "previous_perigee",
+    KEY_PREVIOUS_RISE: "previous_rise",
+    KEY_PREVIOUS_SET: "previous_set",
     KEY_ZODIAC_SIGN_CURRENT_MOON: "zodiac_sign_current_moon",
-    KEY_ZODIAC_SIGN_NEXT_NEW_MOON: "zodiac_sign_next_new_moon",
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON: "zodiac_sign_next_full_moon",
+    KEY_ZODIAC_SIGN_NEXT_NEW_MOON: "zodiac_sign_next_new_moon",
+    KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON: "zodiac_sign_previous_full_moon",
+    KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON: "zodiac_sign_previous_new_moon",
     KEY_ZODIAC_DEGREE_CURRENT_MOON: "zodiac_degree_current_moon",
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: "zodiac_degree_next_new_moon",
     KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: "zodiac_degree_next_full_moon",
+    KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON: "zodiac_degree_previous_full_moon",
+    KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON: "zodiac_degree_previous_new_moon",
 }
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up sensor entities from a config entry."""
+    """Set up sensor entities from a config entry.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry for the integration.
+        async_add_entities: Callback to add entities.
+
+    Returns:
+        None.
+    """
     coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
     device_info = DeviceInfo(
         identifiers={(DOMAIN, entry.entry_id)},
@@ -361,7 +541,22 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         device_info: DeviceInfo,
         suggested_object_id: str,
     ) -> None:
-        """Initialize the sensor."""
+        """Initialize the sensor.
+
+        Args:
+            coordinator: Integration data coordinator.
+            entry_id: Config entry identifier.
+            key: Coordinator dictionary key.
+            name_key: Translation key used by the frontend.
+            unit: Unit of measurement if applicable.
+            device_class: Sensor device class if applicable.
+            suggested_display_precision: Suggested display precision for UI rendering.
+            device_info: Home Assistant device information.
+            suggested_object_id: Stable suggested entity_id suffix.
+
+        Returns:
+            None.
+        """
         super().__init__(coordinator)
         self._key = key
         self._attr_unique_id = f"moon_astro_{entry_id}_{key}"
@@ -370,21 +565,27 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         self._attr_device_class = device_class
         self._attr_device_info = device_info
         self._attr_suggested_display_precision = suggested_display_precision
-        # Stable ASCII object_id slug
         self._attr_suggested_object_id = suggested_object_id
 
     @property
     def translation_key(self) -> str | None:
-        """Expose explicit translation_key so frontend can translate state values."""
+        """Expose explicit translation_key so frontend can translate state values.
+
+        Returns:
+            The translation key for this entity, or None.
+        """
         return self._attr_translation_key
 
     @property
     def native_value(self) -> Any:
-        """Return the state of the sensor."""
+        """Return the state of the sensor.
+
+        Returns:
+            The current sensor value in its native type.
+        """
         data = self.coordinator.data or {}
         value = data.get(self._key)
 
-        # Convert ISO string (local or aware) -> aware UTC datetime for timestamp sensors
         if self.device_class == SensorDeviceClass.TIMESTAMP:
             if value is None:
                 return None
@@ -432,37 +633,40 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         Returns:
             An MDI icon string if the key matches, otherwise None.
         """
-        if self._key == KEY_ZODIAC_DEGREE_CURRENT_MOON:
-            return "mdi:moon-waning-crescent"
-
-        if self._key in (KEY_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON):
+        if self._key in (KEY_NEXT_NEW_MOON, KEY_PREVIOUS_NEW_MOON):
             return "mdi:moon-new"
 
-        if self._key in (
-            KEY_NEXT_FULL_MOON,
-            KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
-        ):
+        if self._key in (KEY_NEXT_FULL_MOON, KEY_PREVIOUS_FULL_MOON):
             return "mdi:moon-full"
+
+        if self._key in (
+            KEY_ELEVATION,
+            KEY_ZODIAC_DEGREE_CURRENT_MOON,
+            KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+            KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+            KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+            KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
+        ):
+            return "mdi:angle-acute"
+
+        if self._key == KEY_AZIMUTH:
+            return "mdi:angle-obtuse"
 
         if self._key in (
             KEY_NEXT_FULL_MOON_NAME,
             KEY_NEXT_FULL_MOON_ALT_NAMES,
+            KEY_PREVIOUS_FULL_MOON_NAME,
+            KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
         ):
             return "mdi:calendar-badge"
 
-        if self._key == KEY_NEXT_FIRST_QUARTER:
+        if self._key in (KEY_NEXT_FIRST_QUARTER, KEY_PREVIOUS_FIRST_QUARTER):
             return "mdi:moon-first-quarter"
 
-        if self._key == KEY_NEXT_LAST_QUARTER:
+        if self._key in (KEY_NEXT_LAST_QUARTER, KEY_PREVIOUS_LAST_QUARTER):
             return "mdi:moon-last-quarter"
 
-        if self._key == KEY_AZ:
-            return "mdi:angle-obtuse"
-
-        if self._key == KEY_EL:
-            return "mdi:angle-acute"
-
-        if self._key == KEY_ILLUM:
+        if self._key == KEY_ILLUMINATION:
             return "mdi:weather-night"
 
         if self._key == KEY_DISTANCE:
@@ -477,7 +681,12 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         if self._key == KEY_NEXT_SET:
             return "mdi:arrow-down-circle"
 
-        if self._key in (KEY_NEXT_APOGEE, KEY_NEXT_PERIGEE):
+        if self._key in (
+            KEY_NEXT_APOGEE,
+            KEY_NEXT_PERIGEE,
+            KEY_PREVIOUS_APOGEE,
+            KEY_PREVIOUS_PERIGEE,
+        ):
             return "mdi:orbit"
 
         return None
@@ -493,6 +702,8 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
             KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
             KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+            KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+            KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
         ):
             return "mdi:longitude"
 
@@ -501,6 +712,8 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
             KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
             KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
             KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+            KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+            KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
         ):
             return "mdi:latitude"
 
@@ -514,8 +727,10 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         """
         if self._key not in (
             KEY_ZODIAC_SIGN_CURRENT_MOON,
-            KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
             KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+            KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
+            KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+            KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
         ):
             return None
 

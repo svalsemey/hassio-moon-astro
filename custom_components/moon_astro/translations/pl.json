@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Następna ostatnia kwadra"
             },
+
+            "sensor_previous_rise": {
+                "name": "Poprzedni wschód"
+            },
+            "sensor_previous_set": {
+                "name": "Poprzedni zachód"
+            },
+            "sensor_previous_apogee": {
+                "name": "Poprzednie apogeum"
+            },
+            "sensor_previous_perigee": {
+                "name": "Poprzednie perygeum"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Poprzedni nów"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Poprzednia pierwsza kwadra"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Poprzednia pełnia"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Nazwa poprzedniej pełni",
+                "state": {
+                    "wolf_moon": "Wilcza Pełnia",
+                    "snow_moon": "Śnieżna Pełnia",
+                    "worm_moon": "Robacza Pełnia",
+                    "pink_moon": "Różowa Pełnia",
+                    "flower_moon": "Kwietna Pełnia",
+                    "strawberry_moon": "Truskawkowa Pełnia",
+                    "buck_moon": "Jeleniowa Pełnia",
+                    "sturgeon_moon": "Jesiotrowa Pełnia",
+                    "harvest_moon": "Żniwna Pełnia",
+                    "hunters_moon": "Myśliwska Pełnia",
+                    "beaver_moon": "Bobrowa Pełnia",
+                    "cold_moon": "Zimna Pełnia",
+                    "blue_moon": "Niebieska Pełnia",
+                    "unknown": "Nieznana"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Alternatywne nazwy poprzedniej pełni",
+                "state": {
+                    "wolf_moon_alt_names": "Księżyc po Yule, Księżyc Zostań w Domu, Cichy Księżyc, Surowy Księżyc, Środkowy Księżyc",
+                    "snow_moon_alt_names": "Głodny Księżyc, Niedźwiedzi Księżyc, Burzowy Księżyc, Lodowy Księżyc",
+                    "worm_moon_alt_names": "Wielkopostny Księżyc, Kruczy Księżyc, Księżyc Skorupy Śnieżnej, Czysty Księżyc, Cukrowy Księżyc, Księżyc Soku Klonowego",
+                    "pink_moon_alt_names": "Księżyc Pękającego Lodu, Księżyc Pąków, Księżyc Przebudzenia, Księżyc Jaj, Księżyc Paschalny",
+                    "flower_moon_alt_names": "Księżyc Sadzenia, Mleczny Księżyc, Zajęczy Księżyc, Trawiasty Księżyc, Księżyc Matek, Jasny Księżyc",
+                    "strawberry_moon_alt_names": "Różany Księżyc, Gorący Księżyc, Księżyc Miodu Pitnego, Kwiatowy Księżyc, Księżyc Sadzenia",
+                    "buck_moon_alt_names": "Księżyc Grzmotów, Księżyc Siana, Księżyc Ziół",
+                    "sturgeon_moon_alt_names": "Księżyc Ziarna, Księżyc Kukurydzy, Księżyc Rysia, Księżyc Błyskawic",
+                    "harvest_moon_alt_names": "Pełnia Kukurydzy, Pełnia Zielonej Kukurydzy, Pełnia Kukurydzy, Księżyc Wina, Księżyc Pieśni, Księżyc Jęczmienia",
+                    "hunters_moon_alt_names": "Księżyc Suszenia Ryżu, Księżyc Spadających Liści, Księżyc Mrozu, Krwawy Księżyc, Sanguiniczny Księżyc",
+                    "beaver_moon_alt_names": "Księżyc Szronu, Księżyc Mrozu, Księżyc Handlu, Śnieżny Księżyc, Księżyc Żałoby, Księżyc Najciemniejszych Głębin",
+                    "cold_moon_alt_names": "Księżyc Długich Nocy, Księżyc Przed Yule, Dębowy Księżyc, Pełnia Zimna",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Poprzednia ostatnia kwadra"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Długość ekliptyczna przy następnej pełni"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Szerokość ekliptyczna przy następnym nowiu"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Długość ekliptyczna przy poprzedniej pełni"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Szerokość ekliptyczna przy poprzedniej pełni"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Długość ekliptyczna przy poprzednim nowiu"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Szerokość ekliptyczna przy poprzednim nowiu"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Znak zodiaku (aktualny)",
                 "state": {
@@ -209,6 +286,41 @@
                     "pisces": "Ryby"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Znak zodiaku przy poprzednim nowiu",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Byk",
+                    "gemini": "Bliźnięta",
+                    "cancer": "Rak",
+                    "leo": "Lew",
+                    "virgo": "Panna",
+                    "libra": "Waga",
+                    "scorpio": "Skorpion",
+                    "sagittarius": "Strzelec",
+                    "capricorn": "Koziorożec",
+                    "aquarius": "Wodnik",
+                    "pisces": "Ryby"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Znak zodiaku przy poprzedniej pełni",
+                "state": {
+                    "aries": "Baran",
+                    "taurus": "Byk",
+                    "gemini": "Bliźnięta",
+                    "cancer": "Rak",
+                    "leo": "Lew",
+                    "virgo": "Panna",
+                    "libra": "Waga",
+                    "scorpio": "Skorpion",
+                    "sagittarius": "Strzelec",
+                    "capricorn": "Koziorożec",
+                    "aquarius": "Wodnik",
+                    "pisces": "Ryby"
+                }
+            },
+
             "sensor_zodiac_degree_current_moon": {
                 "name": "Stopień zodiaku (aktualny)"
             },
@@ -217,6 +329,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Stopień zodiaku przy następnej pełni"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Stopień zodiaku przy poprzednim nowiu"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Stopień zodiaku przy poprzedniej pełni"
             }
         }
     }

@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Seuraava viimeinen neljännes"
             },
+
+            "sensor_previous_rise": {
+                "name": "Edellinen nousu"
+            },
+            "sensor_previous_set": {
+                "name": "Edellinen lasku"
+            },
+            "sensor_previous_apogee": {
+                "name": "Edellinen apogeum"
+            },
+            "sensor_previous_perigee": {
+                "name": "Edellinen perigeum"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Edellinen uusikuu"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Edellinen ensimmäinen neljännes"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Edellinen täysikuu"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Edellisen täydenkuun nimi",
+                "state": {
+                    "wolf_moon": "Susikuu",
+                    "snow_moon": "Lumikuu",
+                    "worm_moon": "Matokuu",
+                    "pink_moon": "Vaaleanpunainen kuu",
+                    "flower_moon": "Kukkakuu",
+                    "strawberry_moon": "Mansikkakuu",
+                    "buck_moon": "Hirvikuu",
+                    "sturgeon_moon": "Sampikuu",
+                    "harvest_moon": "Satokuu",
+                    "hunters_moon": "Metsästäjän kuu",
+                    "beaver_moon": "Majavakuu",
+                    "cold_moon": "Kylmä kuu",
+                    "blue_moon": "Sininen kuu",
+                    "unknown": "Tuntematon"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Edellisen täydenkuun vaihtoehtoiset nimet",
+                "state": {
+                    "wolf_moon_alt_names": "Yulen jälkeinen kuu, Kotikuun aika, Hiljainen kuu, Ankaran kuu, Keskuskuu",
+                    "snow_moon_alt_names": "Nälkäkuu, Karhukuu, Myrskykuu, Jääkuu",
+                    "worm_moon_alt_names": "Paastokuu, Variskuu, Kuorikuu, Sokerikuu, Mahlan kuu",
+                    "pink_moon_alt_names": "Jäänmurtumisen kuu, Silmujen kuu, Heräämisen kuu, Munakuu, Pääsiäiskuu",
+                    "flower_moon_alt_names": "Istutuksen kuu, Maitokuu, Jäniskuu, Ruohokuu, Äitien kuu, Kirkas kuu",
+                    "strawberry_moon_alt_names": "Ruusukuu, Kuuma kuu, Simakuu, Kukkakuu, Istutuksen kuu",
+                    "buck_moon_alt_names": "Ukkoskuu, Heinakuu, Yrttikuu",
+                    "sturgeon_moon_alt_names": "Viljakuu, Maissikuu, Ilveskuu, Salamakuu",
+                    "harvest_moon_alt_names": "Maissitäysikuu, Vihreän maissin kuu, Maissikuu, Viinikuu, Laulukuu, Ohrakuu",
+                    "hunters_moon_alt_names": "Riisin kuivauskuu, Lehtien putoamisen kuu, Jäätymisen kuu, Verikuu, Sanguine-kuu",
+                    "beaver_moon_alt_names": "Huurrekuu, Jäätymisen kuu, Kauppakuu, Lumikuu, Surukuu, Syvimmän pimeyden kuu",
+                    "cold_moon_alt_names": "Pitkien öiden kuu, Yulea edeltävä kuu, Tammikuu, Täysi kylmä kuu",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Edellinen viimeinen neljännes"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptinen pituus (seuraava täysikuu)"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptinen leveys (seuraava uusikuu)"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Ekliptinen pituus (edellinen täysikuu)"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Ekliptinen leveys (edellinen täysikuu)"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Ekliptinen pituus (edellinen uusikuu)"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Ekliptinen leveys (edellinen uusikuu)"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Horoskooppimerkki (nykyinen)",
                 "state": {
@@ -209,11 +286,54 @@
                     "pisces": "Kalat"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Horoskooppimerkki (edellinen uusikuu)",
+                "state": {
+                    "aries": "Oinas",
+                    "taurus": "Härkä",
+                    "gemini": "Kaksoset",
+                    "cancer": "Rapu",
+                    "leo": "Leijona",
+                    "virgo": "Neitsyt",
+                    "libra": "Vaaka",
+                    "scorpio": "Skorpioni",
+                    "sagittarius": "Jousimies",
+                    "capricorn": "Kauris",
+                    "aquarius": "Vesimies",
+                    "pisces": "Kalat"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Horoskooppimerkki (edellinen täysikuu)",
+                "state": {
+                    "aries": "Oinas",
+                    "taurus": "Härkä",
+                    "gemini": "Kaksoset",
+                    "cancer": "Rapu",
+                    "leo": "Leijona",
+                    "virgo": "Neitsyt",
+                    "libra": "Vaaka",
+                    "scorpio": "Skorpioni",
+                    "sagittarius": "Jousimies",
+                    "capricorn": "Kauris",
+                    "aquarius": "Vesimies",
+                    "pisces": "Kalat"
+                }
+            },
+            "sensor_zodiac_degree_current_moon": {
+                "name": "Zodiakin aste (nykyinen)"
+            },
             "sensor_zodiac_degree_next_new_moon": {
                 "name": "Zodiakin aste (seuraava uusikuu)"
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Zodiakin aste (seuraava täysikuu)"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Zodiakin aste (edellinen uusikuu)"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Zodiakin aste (edellinen täysikuu)"
             }
         }
     }

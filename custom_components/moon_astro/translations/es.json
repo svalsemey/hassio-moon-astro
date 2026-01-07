@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Próximo último cuarto"
             },
+
+            "sensor_previous_rise": {
+                "name": "Orto anterior"
+            },
+            "sensor_previous_set": {
+                "name": "Ocaso anterior"
+            },
+            "sensor_previous_apogee": {
+                "name": "Apogeo anterior"
+            },
+            "sensor_previous_perigee": {
+                "name": "Perigeo anterior"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Luna nueva anterior"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Primer cuarto anterior"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Luna llena anterior"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Nombre de la luna llena anterior",
+                "state": {
+                    "wolf_moon": "Luna del Lobo",
+                    "snow_moon": "Luna de Nieve",
+                    "worm_moon": "Luna del Gusano",
+                    "pink_moon": "Luna Rosa",
+                    "flower_moon": "Luna de las Flores",
+                    "strawberry_moon": "Luna de Fresa",
+                    "buck_moon": "Luna del Ciervo",
+                    "sturgeon_moon": "Luna del Esturión",
+                    "harvest_moon": "Luna de la Cosecha",
+                    "hunters_moon": "Luna del Cazador",
+                    "beaver_moon": "Luna del Castor",
+                    "cold_moon": "Luna Fría",
+                    "blue_moon": "Luna Azul",
+                    "unknown": "Desconocido"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Nombres alternativos de la luna llena anterior",
+                "state": {
+                    "wolf_moon_alt_names": "Luna después de Yule, Luna de quedarse en casa, Luna silenciosa, Luna severa, Luna central",
+                    "snow_moon_alt_names": "Luna hambrienta, Luna del oso, Luna de tormenta, Luna de hielo",
+                    "worm_moon_alt_names": "Luna de Cuaresma, Luna del cuervo, Luna de costra, Luna casta, Luna de azúcar, Luna de savia",
+                    "pink_moon_alt_names": "Luna de romper el hielo, Luna de brotes, Luna del despertar, Luna del huevo, Luna pascual",
+                    "flower_moon_alt_names": "Luna de siembra, Luna de leche, Luna de liebre, Luna de hierba, Luna de las madres, Luna brillante",
+                    "strawberry_moon_alt_names": "Luna de la rosa, Luna caliente, Luna de hidromiel, Luna de las flores, Luna de siembra",
+                    "buck_moon_alt_names": "Luna del trueno, Luna del heno, Luna de hierbas",
+                    "sturgeon_moon_alt_names": "Luna del grano, Luna del maíz, Luna del lince, Luna del relámpago",
+                    "harvest_moon_alt_names": "Luna llena del maíz, Luna del maíz verde, Luna del maíz, Luna del vino, Luna de la canción, Luna de la cebada",
+                    "hunters_moon_alt_names": "Luna del arroz secándose, Luna de hojas que caen, Luna de congelación, Luna de sangre, Luna sanguina",
+                    "beaver_moon_alt_names": "Luna de escarcha, Luna de congelación, Luna del comercio, Luna de nieve, Luna de luto, Luna de las profundidades más oscuras",
+                    "cold_moon_alt_names": "Luna de las noches largas, Luna antes de Yule, Luna del roble, Luna fría llena",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Último cuarto anterior"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Longitud eclíptica en la próxima luna llena"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Latitud eclíptica en la próxima luna nueva"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Longitud eclíptica en la luna llena anterior"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Latitud eclíptica en la luna llena anterior"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Longitud eclíptica en la luna nueva anterior"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Latitud eclíptica en la luna nueva anterior"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Signo del zodiaco (actual)",
                 "state": {
@@ -209,6 +286,40 @@
                     "pisces": "Piscis"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Signo del zodiaco en la luna nueva anterior",
+                "state": {
+                    "aries": "Aries",
+                    "taurus": "Tauro",
+                    "gemini": "Géminis",
+                    "cancer": "Cáncer",
+                    "leo": "Leo",
+                    "virgo": "Virgo",
+                    "libra": "Libra",
+                    "scorpio": "Escorpio",
+                    "sagittarius": "Sagitario",
+                    "capricorn": "Capricornio",
+                    "aquarius": "Acuario",
+                    "pisces": "Piscis"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Signo del zodiaco en la luna llena anterior",
+                "state": {
+                    "aries": "Aries",
+                    "taurus": "Tauro",
+                    "gemini": "Géminis",
+                    "cancer": "Cáncer",
+                    "leo": "Leo",
+                    "virgo": "Virgo",
+                    "libra": "Libra",
+                    "scorpio": "Escorpio",
+                    "sagittarius": "Sagitario",
+                    "capricorn": "Capricornio",
+                    "aquarius": "Acuario",
+                    "pisces": "Piscis"
+                }
+            },
             "sensor_zodiac_degree_current_moon": {
                 "name": "Grado zodiacal (actual)"
             },
@@ -217,6 +328,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Grado zodiacal en la próxima luna llena"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Grado zodiacal en la luna nueva anterior"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Grado zodiacal en la luna llena anterior"
             }
         }
     }

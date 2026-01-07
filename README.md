@@ -1,6 +1,6 @@
 # Moon Astro
 
-High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, next lunation timestamps, apogee/perigee, and zodiac information.
+High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, lunation timestamps (next and previous), apogee/perigee, and zodiac information.
 
 - Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
 - Topocentric elevation/azimuth from your configured location
@@ -13,16 +13,34 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
   - Phase, Azimuth, Elevation, Illumination (%), Distance (km), Parallax (°)
   - Ecliptic longitude/latitude (topocentric and geocentric)
   - Zodiac sign and zodiac degree (current moon position)
+
 - Next events:
   - Moonrise, Moonset
   - Apogee, Perigee
   - New Moon, First Quarter, Full Moon, Last Quarter
-- Lunation context:
-  - Geocentric ecliptic longitude/latitude at next new/full moon (true-of-date)
-  - Zodiac sign and zodiac degree at next new/full moon
   - Next full moon name and usual alternative names (Gregorian calendar)
+
+- Previous events:
+  - Previous Moonrise, Previous Moonset
+  - Previous Apogee, Previous Perigee
+  - Previous New Moon, Previous First Quarter, Previous Full Moon, Previous Last Quarter
+  - Previous full moon name and usual alternative names (Gregorian calendar)
+
+- Lunation context:
+  - Geocentric ecliptic longitude/latitude at:
+    - next new moon and next full moon (true-of-date)
+    - previous new moon and previous full moon (true-of-date)
+  - Zodiac sign and zodiac degree from geocentric coordinates at:
+    - current moon position
+    - next new moon / next full moon
+    - previous new moon / previous full moon
+
 - Binary sensor:
   - Moon above horizon (on/off)
+
+## Precision notes (raw values)
+
+Some intermediate computations use non-rounded (“raw”) values internally to avoid boundary artifacts, especially when values are close to zodiac sign cusps (0°, 30°, 60°…). The values exposed as sensor states remain rounded for readability, but zodiac sign/degree calculations can rely on raw longitudes for higher precision.
 
 ## Installation
 

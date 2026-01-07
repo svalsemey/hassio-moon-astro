@@ -146,6 +146,70 @@
             "sensor_next_last_quarter": {
                 "name": "Volgend laatste kwartier"
             },
+
+            "sensor_previous_rise": {
+                "name": "Vorige opkomst"
+            },
+            "sensor_previous_set": {
+                "name": "Vorige ondergang"
+            },
+            "sensor_previous_apogee": {
+                "name": "Vorig apogeum"
+            },
+            "sensor_previous_perigee": {
+                "name": "Vorig perigeum"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Vorige nieuwe maan"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Vorig eerste kwartier"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Vorige volle maan"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Naam van de vorige volle maan",
+                "state": {
+                    "wolf_moon": "Wolfsmaan",
+                    "snow_moon": "Sneeuwmaan",
+                    "worm_moon": "Wormenmaan",
+                    "pink_moon": "Roze Maan",
+                    "flower_moon": "Bloemenmaan",
+                    "strawberry_moon": "Aardbeienmaan",
+                    "buck_moon": "Bokkenmaan",
+                    "sturgeon_moon": "Steurmaan",
+                    "harvest_moon": "Oogstmaan",
+                    "hunters_moon": "Jagersmaan",
+                    "beaver_moon": "Bevermaan",
+                    "cold_moon": "Koude Maan",
+                    "blue_moon": "Blauwe Maan",
+                    "unknown": "Onbekend"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Alternatieve namen van de vorige volle maan",
+                "state": {
+                    "wolf_moon_alt_names": "Maan na Yule, Blijf-thuismaan, Stille Maan, Strenge Maan, Middelpuntmaan",
+                    "snow_moon_alt_names": "Hongersmaan, Berenmaan, Stormmaan, IJsmaan",
+                    "worm_moon_alt_names": "Vastentijdmaan, Kraaienmaan, Sneeuwkorstmaan, Kuise Maan, Suikermaan, Sapmaan",
+                    "pink_moon_alt_names": "Breekijsmaan, Knoppenmaan, Ontwakingsmaan, Eimaan, Paasmaan",
+                    "flower_moon_alt_names": "Plantmaan, Melkmaan, Hazenmaan, Grasmaan, Moedersmaan, Heldere Maan",
+                    "strawberry_moon_alt_names": "Rozenmaan, Hete Maan, Mede-maan, Bloemenmaan, Plantmaan",
+                    "buck_moon_alt_names": "Dondermaan, Hooimaan, Kruidenmaan",
+                    "sturgeon_moon_alt_names": "Graanmaan, Maïsmaan, Lynxmaan, Bliksemmaan",
+                    "harvest_moon_alt_names": "Volle Maïsmaan, Groene Maïsmaan, Maïsmaan, Wijnmaan, Zangmaan, Gerstmaan",
+                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Sanguine Maan",
+                    "beaver_moon_alt_names": "Rijpmaan, Vriesmaan, Handelsmaan, Sneeuwmaan, Rouwmaan, Donkerste-dieptenmaan",
+                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Vorig laatste kwartier"
+            },
+
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Ecliptische lengte bij de volgende volle maan"
             },
@@ -158,6 +222,19 @@
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ecliptische breedte bij de volgende nieuwe maan"
             },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Ecliptische lengte bij de vorige volle maan"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Ecliptische breedte bij de vorige volle maan"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Ecliptische lengte bij de vorige nieuwe maan"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Ecliptische breedte bij de vorige nieuwe maan"
+            },
+
             "sensor_zodiac_sign_current_moon": {
                 "name": "Dierenriemteken (huidig)",
                 "state": {
@@ -209,6 +286,41 @@
                     "pisces": "Vissen"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Dierenriemteken bij de vorige nieuwe maan",
+                "state": {
+                    "aries": "Ram",
+                    "taurus": "Stier",
+                    "gemini": "Tweelingen",
+                    "cancer": "Kreeft",
+                    "leo": "Leeuw",
+                    "virgo": "Maagd",
+                    "libra": "Weegschaal",
+                    "scorpio": "Schorpioen",
+                    "sagittarius": "Boogschutter",
+                    "capricorn": "Steenbok",
+                    "aquarius": "Waterman",
+                    "pisces": "Vissen"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Dierenriemteken bij de vorige volle maan",
+                "state": {
+                    "aries": "Ram",
+                    "taurus": "Stier",
+                    "gemini": "Tweelingen",
+                    "cancer": "Kreeft",
+                    "leo": "Leeuw",
+                    "virgo": "Maagd",
+                    "libra": "Weegschaal",
+                    "scorpio": "Schorpioen",
+                    "sagittarius": "Boogschutter",
+                    "capricorn": "Steenbok",
+                    "aquarius": "Waterman",
+                    "pisces": "Vissen"
+                }
+            },
+
             "sensor_zodiac_degree_current_moon": {
                 "name": "Dierenriemgraad (huidig)"
             },
@@ -217,6 +329,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Dierenriemgraad bij de volgende volle maan"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Dierenriemgraad bij de vorige nieuwe maan"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Dierenriemgraad bij de vorige volle maan"
             }
         }
     }

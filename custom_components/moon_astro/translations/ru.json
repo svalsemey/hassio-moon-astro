@@ -144,7 +144,69 @@
                 }
             },
             "sensor_next_last_quarter": {
-                "name": "Следняя последняя четверть"
+                "name": "Следующая последняя четверть"
+            },
+            "sensor_previous_rise": {
+                "name": "Предыдущий восход"
+            },
+            "sensor_previous_set": {
+                "name": "Предыдущий заход"
+            },
+            "sensor_previous_apogee": {
+                "name": "Предыдущий апогей"
+            },
+            "sensor_previous_perigee": {
+                "name": "Предыдущий перигей"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Предыдущее новолуние"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Предыдущая первая четверть"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Предыдущее полнолуние"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Название предыдущего полнолуния",
+                "state": {
+                    "wolf_moon": "Волчья луна",
+                    "snow_moon": "Снежная луна",
+                    "worm_moon": "Луна червей",
+                    "pink_moon": "Розовая луна",
+                    "flower_moon": "Цветочная луна",
+                    "strawberry_moon": "Клубничная луна",
+                    "buck_moon": "Оленья луна",
+                    "sturgeon_moon": "Осетровая луна",
+                    "harvest_moon": "Луна урожая",
+                    "hunters_moon": "Луна охотника",
+                    "beaver_moon": "Бобровая луна",
+                    "cold_moon": "Холодная луна",
+                    "blue_moon": "Голубая луна",
+                    "unknown": "Неизвестно"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Альтернативные названия предыдущего полнолуния",
+                "state": {
+                    "wolf_moon_alt_names": "Луна после Йоля, Домашняя луна, Тихая луна, Суровая луна, Центральная луна",
+                    "snow_moon_alt_names": "Голодная луна, Медвежья луна, Штормовая луна, Ледяная луна",
+                    "worm_moon_alt_names": "Луна Великого поста, Воронья луна, Луна корки, Целомудренная луна, Сахарная луна, Луна сока",
+                    "pink_moon_alt_names": "Луна ломающегося льда, Луна почек, Луна пробуждения, Яичная луна, Пасхальная луна",
+                    "flower_moon_alt_names": "Луна посадок, Молочная луна, Заячья луна, Травяная луна, Луна матерей, Яркая луна",
+                    "strawberry_moon_alt_names": "Розовая (Rose) луна, Жаркая луна, Луна медовухи, Цветочная луна, Луна посадок",
+                    "buck_moon_alt_names": "Громовая луна, Сенная луна, Луна трав",
+                    "sturgeon_moon_alt_names": "Луна зерна, Кукурузная луна, Рысья луна, Луна молний",
+                    "harvest_moon_alt_names": "Полная кукурузная луна, Луна зелёной кукурузы, Кукурузная луна, Винная луна, Луна песни, Ячменная луна",
+                    "hunters_moon_alt_names": "Луна сушки риса, Луна падающих листьев, Морозная луна, Кровавая луна, Сангвиническая луна",
+                    "beaver_moon_alt_names": "Луна инея, Морозная луна, Торговая луна, Снежная луна, Луна скорби, Луна самых тёмных глубин",
+                    "cold_moon_alt_names": "Луна длинных ночей, Луна перед Йолем, Дубовая луна, Полная холодная луна",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Предыдущая последняя четверть"
             },
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Эклиптическая долгота в следующее полнолуние"
@@ -157,6 +219,18 @@
             },
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Эклиптическая широта в следующее новолуние"
+            },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Эклиптическая долгота в предыдущее полнолуние"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Эклиптическая широта в предыдущее полнолуние"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Эклиптическая долгота в предыдущее новолуние"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Эклиптическая широта в предыдущее новолуние"
             },
             "sensor_zodiac_sign_current_moon": {
                 "name": "Знак зодиака (текущий)",
@@ -209,6 +283,40 @@
                     "pisces": "Рыбы"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Знак зодиака при предыдущем новолунии",
+                "state": {
+                    "aries": "Овен",
+                    "taurus": "Телец",
+                    "gemini": "Близнецы",
+                    "cancer": "Рак",
+                    "leo": "Лев",
+                    "virgo": "Дева",
+                    "libra": "Весы",
+                    "scorpio": "Скорпион",
+                    "sagittarius": "Стрелец",
+                    "capricorn": "Козерог",
+                    "aquarius": "Водолей",
+                    "pisces": "Рыбы"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Знак зодиака при предыдущем полнолунии",
+                "state": {
+                    "aries": "Овен",
+                    "taurus": "Телец",
+                    "gemini": "Близнецы",
+                    "cancer": "Рак",
+                    "leo": "Лев",
+                    "virgo": "Дева",
+                    "libra": "Весы",
+                    "scorpio": "Скорпион",
+                    "sagittarius": "Стрелец",
+                    "capricorn": "Козерог",
+                    "aquarius": "Водолей",
+                    "pisces": "Рыбы"
+                }
+            },
             "sensor_zodiac_degree_current_moon": {
                 "name": "Градус зодиака (текущий)"
             },
@@ -217,6 +325,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Градус зодиака при следующем полнолунии"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Градус зодиака при предыдущем новолунии"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Градус зодиака при предыдущем полнолунии"
             }
         }
     }

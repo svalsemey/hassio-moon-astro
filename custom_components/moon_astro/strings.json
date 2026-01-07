@@ -42,7 +42,7 @@
                 }
             }
         },
-        "sensor": {
+       "sensor": {
             "sensor_phase": {
                 "name": "Phase",
                 "state": {
@@ -146,6 +146,68 @@
             "sensor_next_last_quarter": {
                 "name": "Next last quarter"
             },
+            "sensor_previous_rise": {
+                "name": "Previous rise"
+            },
+            "sensor_previous_set": {
+                "name": "Previous set"
+            },
+            "sensor_previous_apogee": {
+                "name": "Previous apogee"
+            },
+            "sensor_previous_perigee": {
+                "name": "Previous perigee"
+            },
+            "sensor_previous_new_moon": {
+                "name": "Previous new moon"
+            },
+            "sensor_previous_first_quarter": {
+                "name": "Previous first quarter"
+            },
+            "sensor_previous_full_moon": {
+                "name": "Previous full moon"
+            },
+            "sensor_previous_full_moon_name": {
+                "name": "Previous full moon name",
+                "state": {
+                    "wolf_moon": "Wolf Moon",
+                    "snow_moon": "Snow Moon",
+                    "worm_moon": "Worm Moon",
+                    "pink_moon": "Pink Moon",
+                    "flower_moon": "Flower Moon",
+                    "strawberry_moon": "Strawberry Moon",
+                    "buck_moon": "Buck Moon",
+                    "sturgeon_moon": "Sturgeon Moon",
+                    "harvest_moon": "Harvest Moon",
+                    "hunters_moon": "Hunter's Moon",
+                    "beaver_moon": "Beaver Moon",
+                    "cold_moon": "Cold Moon",
+                    "blue_moon": "Blue Moon",
+                    "unknown": "Unknown"
+                }
+            },
+            "sensor_previous_full_moon_alt_names": {
+                "name": "Previous full moon alternative names",
+                "state": {
+                    "wolf_moon_alt_names": "Moon After Yule, Stay Home Moon, Quiet Moon, Severe Moon, Center Moon",
+                    "snow_moon_alt_names": "Hungry Moon, Bear Moon, Storm Moon, Ice Moon",
+                    "worm_moon_alt_names": "Lenten Moon, Crow Moon, Crust Moon, Chaste Moon, Sugar Moon, Sap Moon",
+                    "pink_moon_alt_names": "Breaking Ice Moon, Budding Moon, Awakening Moon, Egg Moon, Paschal Moon",
+                    "flower_moon_alt_names": "Planting Moon, Milk Moon, Hare Moon, Grass Moon, Mothers’ Moon, Bright Moon",
+                    "strawberry_moon_alt_names": "Rose Moon, Hot Moon, Mead Moon, Flower Moon, Planting Moon",
+                    "buck_moon_alt_names": "Thunder Moon, Hay Moon, Wyrt Moon",
+                    "sturgeon_moon_alt_names": "Grain Moon, Corn Moon, Lynx Moon, Lightning Moon",
+                    "harvest_moon_alt_names": "Full Corn Moon, Green Corn Moon, Corn Moon, Wine Moon, Song Moon, Barley Moon",
+                    "hunters_moon_alt_names": "Drying Rice Moon, Falling Leaves Moon, Freezing Moon, Blood Moon, Sanguine Moon",
+                    "beaver_moon_alt_names": "Frost Moon, Freezing Moon, Trading Moon, Snow Moon, Mourning Moon, Darkest Depths Moon",
+                    "cold_moon_alt_names": "Long Nights Moon, Moon Before Yule, Oak Moon, Full Cold Moon",
+                    "blue_moon_alt_names": "",
+                    "unknown": ""
+                }
+            },
+            "sensor_previous_last_quarter": {
+                "name": "Previous last quarter"
+            },
             "sensor_ecliptic_longitude_next_full_moon": {
                 "name": "Ecliptic longitude at next full moon"
             },
@@ -157,6 +219,18 @@
             },
             "sensor_ecliptic_latitude_next_new_moon": {
                 "name": "Ecliptic latitude at next new moon"
+            },
+            "sensor_ecliptic_longitude_previous_full_moon": {
+                "name": "Ecliptic longitude at previous full moon"
+            },
+            "sensor_ecliptic_latitude_previous_full_moon": {
+                "name": "Ecliptic latitude at previous full moon"
+            },
+            "sensor_ecliptic_longitude_previous_new_moon": {
+                "name": "Ecliptic longitude at previous new moon"
+            },
+            "sensor_ecliptic_latitude_previous_new_moon": {
+                "name": "Ecliptic latitude at previous new moon"
             },
             "sensor_zodiac_sign_current_moon": {
                 "name": "Zodiac sign (current)",
@@ -209,6 +283,40 @@
                     "pisces": "Pisces"
                 }
             },
+            "sensor_zodiac_sign_previous_new_moon": {
+                "name": "Zodiac sign at previous new moon",
+                "state": {
+                    "aries": "Aries",
+                    "taurus": "Taurus",
+                    "gemini": "Gemini",
+                    "cancer": "Cancer",
+                    "leo": "Leo",
+                    "virgo": "Virgo",
+                    "libra": "Libra",
+                    "scorpio": "Scorpio",
+                    "sagittarius": "Sagittarius",
+                    "capricorn": "Capricorn",
+                    "aquarius": "Aquarius",
+                    "pisces": "Pisces"
+                }
+            },
+            "sensor_zodiac_sign_previous_full_moon": {
+                "name": "Zodiac sign at previous full moon",
+                "state": {
+                    "aries": "Aries",
+                    "taurus": "Taurus",
+                    "gemini": "Gemini",
+                    "cancer": "Cancer",
+                    "leo": "Leo",
+                    "virgo": "Virgo",
+                    "libra": "Libra",
+                    "scorpio": "Scorpio",
+                    "sagittarius": "Sagittarius",
+                    "capricorn": "Capricorn",
+                    "aquarius": "Aquarius",
+                    "pisces": "Pisces"
+                }
+            },
             "sensor_zodiac_degree_current_moon": {
                 "name": "Zodiac degree (current)"
             },
@@ -217,6 +325,12 @@
             },
             "sensor_zodiac_degree_next_full_moon": {
                 "name": "Zodiac degree at next full moon"
+            },
+            "sensor_zodiac_degree_previous_new_moon": {
+                "name": "Zodiac degree at previous new moon"
+            },
+            "sensor_zodiac_degree_previous_full_moon": {
+                "name": "Zodiac degree at previous full moon"
             }
         }
     }
