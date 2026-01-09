@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "ムーンアストロはすでに設定されています",
-            "missing_data": "設定データが不足しています"
+            "missing_data": "設定データが不足しています",
+            "reconfigure_successful": "設定が更新されました"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "ポーリング間隔とタイムゾーンの挙動を更新します。",
                 "data": {
                     "scan_interval": "スキャン間隔（秒）",
-                    "use_ha_time_zone": "Home Assistant のタイムゾーンを使用する"
+                    "use_ha_timezone": "Home Assistant のタイムゾーンを使用する"
                 }
             }
         }

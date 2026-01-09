@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Луна Астро уже настроена",
-            "missing_data": "Отсутствуют данные конфигурации"
+            "missing_data": "Отсутствуют данные конфигурации",
+            "reconfigure_successful": "Конфигурация обновлена"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Обновите интервал опроса и поведение часового пояса.",
                 "data": {
                     "scan_interval": "Интервал сканирования (секунды)",
-                    "use_ha_time_zone": "Использовать часовой пояс Home Assistant"
+                    "use_ha_timezone": "Использовать часовой пояс Home Assistant"
                 }
             }
         }

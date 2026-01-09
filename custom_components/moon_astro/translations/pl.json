@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Księżyc Astro jest już skonfigurowany",
-            "missing_data": "Brak danych konfiguracyjnych"
+            "missing_data": "Brak danych konfiguracyjnych",
+            "reconfigure_successful": "Konfiguracja została zaktualizowana"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Zaktualizuj interwał odpytywania i zachowanie strefy czasowej.",
                 "data": {
                     "scan_interval": "Interwał skanowania (sekundy)",
-                    "use_ha_time_zone": "Użyj strefy czasowej Home Assistant"
+                    "use_ha_timezone": "Użyj strefy czasowej Home Assistant"
                 }
             }
         }

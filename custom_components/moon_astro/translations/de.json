@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Mond Astro ist bereits konfiguriert",
-            "missing_data": "Konfigurationsdaten fehlen"
+            "missing_data": "Konfigurationsdaten fehlen",
+            "reconfigure_successful": "Konfiguration aktualisiert"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Aktualisierungsintervall und Zeitzonenbehandlung anpassen",
                 "data": {
                     "scan_interval": "Abfrageintervall (Sekunden)",
-                    "use_ha_time_zone": "Zeitzone von Home Assistant verwenden"
+                    "use_ha_timezone": "Zeitzone von Home Assistant verwenden"
                 }
             }
         }

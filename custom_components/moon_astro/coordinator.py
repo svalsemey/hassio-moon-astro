@@ -1145,93 +1145,137 @@ def _full_moon_name_code(month: int) -> str:
     return mapping.get(month, "unknown")
 
 
+def _time_to_local_datetime(t_obj: Time, tz: ZoneInfo) -> datetime:
+    """Convert a Skyfield Time to a timezone-aware datetime in a given timezone.
+
+    Args:
+        t_obj: Skyfield Time instance.
+        tz: Target timezone.
+
+    Returns:
+        A timezone-aware datetime in the requested timezone.
+    """
+    dt_utc_raw = t_obj.utc_datetime()
+
+    # Skyfield may return a scalar datetime or an array-like container.
+    if isinstance(dt_utc_raw, datetime):
+        dt_utc = dt_utc_raw
+    else:
+        dt_utc = dt_utc_raw.item() if hasattr(dt_utc_raw, "item") else dt_utc_raw[0]
+
+    if dt_utc.tzinfo is None:
+        dt_utc = dt_utc.replace(tzinfo=UTC)
+
+    return dt_utc.astimezone(tz)
+
+
+def _is_second_full_moon_in_same_month_local(
+    first_full: Time | None,
+    second_full: Time | None,
+    tz: ZoneInfo,
+) -> bool:
+    """Return True if second_full is the second full moon within the same local calendar month.
+
+    Args:
+        first_full: The first full moon candidate (chronologically before second_full).
+        second_full: The second full moon candidate.
+        tz: Timezone used to define the calendar month boundary.
+
+    Returns:
+        True if both full moons occur in the same local (year, month) and are ordered in time.
+    """
+    if first_full is None or second_full is None:
+        return False
+
+    # Ensure strict ordering and guard against accidental equality.
+    if not (first_full.tt < second_full.tt):
+        return False
+
+    dt1 = _time_to_local_datetime(first_full, tz)
+    dt2 = _time_to_local_datetime(second_full, tz)
+
+    # Blue moon only when both events fall within the same local calendar month.
+    return (dt1.year, dt1.month) == (dt2.year, dt2.month)
+
+
 def _previous_full_moon_name_code(
-    ts: Timescale, eph: Ephemeris, t_start: Time
+    ts: Timescale,
+    eph: Ephemeris,
+    t_start: Time,
+    tz: ZoneInfo,
 ) -> str | None:
-    """Compute the previous full moon name code, handling 'blue_moon' when applicable."""
+    """Compute the previous full moon name code using local timezone for blue moon detection.
+
+    This function returns:
+    - "blue_moon" when the most recent full moon is the second full moon in the same local month
+    - otherwise the canonical monthly name code based on the local month of that full moon
+
+    Args:
+        ts: Skyfield Timescale.
+        eph: Loaded ephemeris.
+        t_start: Reference time.
+        tz: Timezone used to define the calendar month boundary.
+
+    Returns:
+        Full moon name code, "blue_moon" when applicable, or None.
+    """
     try:
         f = almanac.moon_phases(eph)
-        t_full_1 = _find_phase_previous(ts, f, t_start, FULL_MOON)
-        if t_full_1 is None:
-            return None
-        t_full_0 = _find_phase_previous(ts, f, t_full_1, FULL_MOON)
 
-        if _is_blue_moon(t_full_0, t_full_1):
+        # Most recent full moon strictly before t_start.
+        t_full_2 = _find_phase_previous(ts, f, t_start, FULL_MOON)
+        if t_full_2 is None:
+            return None
+
+        # Step back a small amount to avoid re-selecting the same event due to rounding.
+        # 1 second in TT days.
+        t_before_full_2 = ts.tt_jd(t_full_2.tt - (1.0 / 86400.0))
+
+        # Full moon before t_full_2 (candidate for first in local month).
+        t_full_1 = _find_phase_previous(ts, f, t_before_full_2, FULL_MOON)
+
+        if _is_second_full_moon_in_same_month_local(t_full_1, t_full_2, tz):
             return "blue_moon"
 
-        dt = t_full_1.utc_datetime()
-        if not isinstance(dt, datetime):
-            dt = dt.item() if hasattr(dt, "item") else dt[0]
-
-        return _full_moon_name_code(dt.month)
+        dt_local = _time_to_local_datetime(t_full_2, tz)
+        return _full_moon_name_code(dt_local.month)
     except _RECOVERABLE_SKYFIELD_ERRORS:
         return None
 
 
-def _is_blue_moon(next_full: Time | None, following_full: Time | None) -> bool:
-    """Return True if next_full is a blue moon (second full moon in the same month).
-
-    Strategy:
-        A "blue moon" (common definition) is the second full moon occurring within
-        the same calendar month.
-
-        We detect it by checking whether the following full moon exists and occurs
-        in the same month/year as the next full moon.
-
-    Args:
-        next_full: The next full moon time.
-        following_full: The full moon after next_full.
-
-    Returns:
-        True if next_full is a blue moon, False otherwise.
-    """
-    if next_full is None or following_full is None:
-        return False
-
-    dt1 = next_full.utc_datetime()
-    dt2 = following_full.utc_datetime()
-
-    # Handle ndarray edge-cases defensively
-    if not isinstance(dt1, datetime):
-        dt1 = dt1.item() if hasattr(dt1, "item") else dt1[0]
-    if not isinstance(dt2, datetime):
-        dt2 = dt2.item() if hasattr(dt2, "item") else dt2[0]
-
-    return (dt1.year, dt1.month) == (dt2.year, dt2.month)
-
-
 def _next_full_moon_name_code(
-    ts: Timescale, eph: Ephemeris, t_start: Time
+    ts: Timescale,
+    eph: Ephemeris,
+    t_start: Time,
+    tz: ZoneInfo,
 ) -> str | None:
-    """Compute the next full moon name code, handling 'blue_moon' when applicable.
+    """Compute the next full moon name code using local timezone for "blue moon" detection.
 
     Args:
         ts: Skyfield Timescale.
         eph: Loaded ephemeris.
         t_start: Start time for the search.
+        tz: Timezone used to define the calendar month boundary.
 
     Returns:
-        A string code among:
-        - 'blue_moon' when next full moon is the second full moon of the month
-        - otherwise a month-based full moon name code (e.g. 'wolf_moon')
-        - None if next full moon cannot be computed
+        Full moon name code, 'blue_moon' when applicable, or None.
     """
     try:
         f = almanac.moon_phases(eph)
+
+        # Next full moon strictly after t_start
         t_full_1 = _find_phase_next(ts, f, t_start, FULL_MOON)
         if t_full_1 is None:
             return None
 
-        # Look for the next full moon after the next full moon
-        t_full_2 = _find_phase_next(ts, f, t_full_1, FULL_MOON)
-        if _is_blue_moon(t_full_1, t_full_2):
+        # Previous full moon relative to t_full_1 (needed to decide if t_full_1 is the second in month)
+        t_full_0 = _find_phase_previous(ts, f, t_full_1, FULL_MOON)
+
+        if _is_second_full_moon_in_same_month_local(t_full_0, t_full_1, tz):
             return "blue_moon"
 
-        dt = t_full_1.utc_datetime()
-        if not isinstance(dt, datetime):
-            dt = dt.item() if hasattr(dt, "item") else dt[0]
-
-        return _full_moon_name_code(dt.month)
+        dt_local = _time_to_local_datetime(t_full_1, tz)
+        return _full_moon_name_code(dt_local.month)
     except _RECOVERABLE_SKYFIELD_ERRORS:
         return None
 
@@ -1536,12 +1580,16 @@ class _Calc:
         events = phase_events()
 
         try:
-            next_full_name = _next_full_moon_name_code(ts, eph, t)
+            next_full_name = _next_full_moon_name_code(
+                ts, eph, t, tz or ZoneInfo("UTC")
+            )
         except _RECOVERABLE_SKYFIELD_ERRORS:
             next_full_name = None
 
         try:
-            prev_full_name = _previous_full_moon_name_code(ts, eph, t)
+            prev_full_name = _previous_full_moon_name_code(
+                ts, eph, t, tz or ZoneInfo("UTC")
+            )
         except _RECOVERABLE_SKYFIELD_ERRORS:
             prev_full_name = None
 

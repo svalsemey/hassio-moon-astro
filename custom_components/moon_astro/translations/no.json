@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Måne Astro er allerede konfigurert",
-            "missing_data": "Konfigurasjonsdata mangler"
+            "missing_data": "Konfigurasjonsdata mangler",
+            "reconfigure_successful": "Konfigurasjonen er oppdatert"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Oppdater intervall for spørring og oppførsel for tidssone.",
                 "data": {
                     "scan_interval": "Skanningsintervall (sekunder)",
-                    "use_ha_time_zone": "Bruk Home Assistants tidssone"
+                    "use_ha_timezone": "Bruk Home Assistants tidssone"
                 }
             }
         }

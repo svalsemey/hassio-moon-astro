@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Maan Astro is al geconfigureerd",
-            "missing_data": "Configuratiegegevens ontbreken"
+            "missing_data": "Configuratiegegevens ontbreken",
+            "reconfigure_successful": "Configuratie bijgewerkt"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Werk het poll-interval en het tijdzonegedrag bij.",
                 "data": {
                     "scan_interval": "Scaninterval (seconden)",
-                    "use_ha_time_zone": "Tijdzone van Home Assistant gebruiken"
+                    "use_ha_timezone": "Tijdzone van Home Assistant gebruiken"
                 }
             }
         }

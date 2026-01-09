@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Måne Astro er allerede konfigureret",
-            "missing_data": "Konfigurationsdata mangler"
+            "missing_data": "Konfigurationsdata mangler",
+            "reconfigure_successful": "Konfigurationen er opdateret"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Juster opdateringsinterval og håndtering af tidszone",
                 "data": {
                     "scan_interval": "Opdateringsinterval (sekunder)",
-                    "use_ha_time_zone": "Brug Home Assistants tidszone"
+                    "use_ha_timezone": "Brug Home Assistants tidszone"
                 }
             }
         }

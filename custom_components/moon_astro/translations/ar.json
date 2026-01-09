@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "قمر أسترو مُكوَّن بالفعل",
-            "missing_data": "بيانات التكوين مفقودة"
+            "missing_data": "بيانات التكوين مفقودة",
+            "reconfigure_successful": "تم تحديث الإعدادات"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "اضبط فترة التحديث وآلية التعامل مع المنطقة الزمنية",
                 "data": {
                     "scan_interval": "فاصل التحديث (بالثواني)",
-                    "use_ha_time_zone": "استخدام المنطقة الزمنية لـ Home Assistant"
+                    "use_ha_timezone": "استخدام المنطقة الزمنية لـ Home Assistant"
                 }
             }
         }

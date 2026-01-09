@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Måne Astro är redan konfigurerad",
-            "missing_data": "Konfigurationsdata saknas"
+            "missing_data": "Konfigurationsdata saknas",
+            "reconfigure_successful": "Konfigurationen har uppdaterats"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Uppdatera avsökningsintervall och tidszonbeteende.",
                 "data": {
                     "scan_interval": "Skanningsintervall (sekunder)",
-                    "use_ha_time_zone": "Använd Home Assistants tidszon"
+                    "use_ha_timezone": "Använd Home Assistants tidszon"
                 }
             }
         }

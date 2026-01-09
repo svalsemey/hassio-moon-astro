@@ -6,6 +6,7 @@ This module implements the configuration and options flows.
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Any
 
 import voluptuous as vol
@@ -24,6 +25,29 @@ from .const import (
 )
 from .utils import cleanup_cache_dir, ensure_valid_ephemeris
 
+_LOGGER = logging.getLogger(__name__)
+
+_EPHEMERIS_LOCK = "ephemeris_lock"
+
+
+def _get_ephemeris_lock(hass) -> asyncio.Lock:
+    """Return a global lock used to prevent concurrent ephemeris downloads.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        A shared asyncio.Lock instance.
+    """
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    lock = domain_data.get(_EPHEMERIS_LOCK)
+    if isinstance(lock, asyncio.Lock):
+        return lock
+
+    lock = asyncio.Lock()
+    domain_data[_EPHEMERIS_LOCK] = lock
+    return lock
+
 
 class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Moon Astro."""
@@ -36,21 +60,57 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._download_task: asyncio.Task[bool] | None = None
         self._download_success: bool = False
 
+    def _is_reconfigure_flow(self) -> bool:
+        """Return True when the current flow is a reconfiguration flow.
+
+        Returns:
+            True if the flow targets an existing entry, False otherwise.
+        """
+        if self.context.get("source") == config_entries.SOURCE_RECONFIGURE:
+            return True
+        return self.context.get("entry_id") is not None
+
+    def _get_target_entry(self) -> config_entries.ConfigEntry | None:
+        """Return the config entry targeted by the current flow.
+
+        Returns:
+            The targeted ConfigEntry or None if it cannot be resolved.
+        """
+        entry_id = self.context.get("entry_id")
+        if entry_id:
+            return self.hass.config_entries.async_get_entry(entry_id)
+
+        entries = self.hass.config_entries.async_entries(DOMAIN)
+        if len(entries) == 1:
+            return entries[0]
+
+        return None
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Handle the initial step for GPS coordinates and altitude.
+        """Handle the main step for GPS coordinates and altitude.
 
         Args:
             user_input: User-provided coordinates and altitude.
 
         Returns:
-            A ConfigFlowResult showing the form or proceeding to the download step.
+            A ConfigFlowResult showing the form or proceeding to the next step.
         """
         errors: dict[str, str] = {}
 
         if user_input is not None:
             self._user_input = user_input
+
+            if self._is_reconfigure_flow():
+                entry = self._get_target_entry()
+                if entry is None:
+                    return self.async_abort(reason="missing_data")
+
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input
+                )
+
             self._download_success = False
             self._download_task = None
             return await self.async_step_download()
@@ -123,11 +183,19 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def _async_ensure_ephemeris(self) -> bool:
         """Ensure a valid ephemeris exists, cleaning up on failure or cancellation.
 
+        A global lock is used to avoid concurrent downloads across config flows
+        and startup setup.
+
         Returns:
             True if a valid ephemeris is available, False otherwise.
         """
+        lock = _get_ephemeris_lock(self.hass)
+
         try:
-            return await ensure_valid_ephemeris(self.hass)
+            _LOGGER.info("Config flow ephemeris: waiting for download lock")
+            async with lock:
+                _LOGGER.info("Config flow ephemeris: acquired download lock")
+                return await ensure_valid_ephemeris(self.hass)
         except asyncio.CancelledError:
             await cleanup_cache_dir(self.hass, remove_empty_dir=True)
             raise
@@ -138,7 +206,7 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_finalize(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Finalize the configuration entry creation.
+        """Finalize the initial configuration.
 
         Args:
             user_input: Optional input (not used by this step).
@@ -154,7 +222,6 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
-
         return self.async_create_entry(title="Moon Astro", data=self._user_input)
 
     async def async_step_import(
@@ -173,15 +240,18 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Handle reconfiguration.
+        """Start a reconfiguration flow.
 
         Args:
             user_input: Optional reconfiguration data.
 
         Returns:
-            A ConfigFlowResult from the user step.
+            A ConfigFlowResult showing the form.
         """
-        return await self.async_step_user(user_input)
+        entry = self._get_target_entry()
+        if entry is not None:
+            self._user_input = dict(entry.data)
+        return await self.async_step_user()
 
     @staticmethod
     @callback

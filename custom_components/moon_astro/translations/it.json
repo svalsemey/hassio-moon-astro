@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Luna Astro è già configurato",
-            "missing_data": "Dati di configurazione mancanti"
+            "missing_data": "Dati di configurazione mancanti",
+            "reconfigure_successful": "Configurazione aggiornata"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Aggiorna l'intervallo di polling e il comportamento del fuso orario.",
                 "data": {
                     "scan_interval": "Intervallo di scansione (secondi)",
-                    "use_ha_time_zone": "Usa il fuso orario di Home Assistant"
+                    "use_ha_timezone": "Usa il fuso orario di Home Assistant"
                 }
             }
         }

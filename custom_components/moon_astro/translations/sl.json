@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Lunin Astro je že konfiguriran",
-            "missing_data": "Manjkajo konfiguracijski podatki"
+            "missing_data": "Manjkajo konfiguracijski podatki",
+            "reconfigure_successful": "Konfiguracija je posodobljena"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Posodobite interval poizvedovanja in obnašanje časovnega pasu.",
                 "data": {
                     "scan_interval": "Interval skeniranja (sekunde)",
-                    "use_ha_time_zone": "Uporabi časovni pas Home Assistant"
+                    "use_ha_timezone": "Uporabi časovni pas Home Assistant"
                 }
             }
         }

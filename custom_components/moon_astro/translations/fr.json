@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Lune Astro est déjà configuré",
-            "missing_data": "Données de configuration manquantes"
+            "missing_data": "Données de configuration manquantes",
+            "reconfigure_successful": "Configuration mise à jour"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Mettre à jour l’intervalle d’interrogation et le comportement du fuseau horaire.",
                 "data": {
                     "scan_interval": "Intervalle d’analyse (secondes)",
-                    "use_ha_time_zone": "Utiliser le fuseau horaire de Home Assistant"
+                    "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant"
                 }
             }
         }
@@ -147,7 +148,7 @@
                 "name": "Prochain dernier quartier"
             },
             "sensor_previous_rise": {
-                "name": "Coucher précédent"
+                "name": "Lever précédent"
             },
             "sensor_previous_set": {
                 "name": "Coucher précédent"

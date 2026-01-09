@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "A Hold Asztro már be van állítva",
-            "missing_data": "Hiányoznak a konfigurációs adatok"
+            "missing_data": "Hiányoznak a konfigurációs adatok",
+            "reconfigure_successful": "A konfiguráció frissítve"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "A lekérdezési időköz és az időzóna viselkedésének frissítése.",
                 "data": {
                     "scan_interval": "Letapogatási időköz (másodperc)",
-                    "use_ha_time_zone": "A Home Assistant időzónájának használata"
+                    "use_ha_timezone": "A Home Assistant időzónájának használata"
                 }
             }
         }

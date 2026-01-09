@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "月亮阿斯特罗已配置",
-            "missing_data": "缺少配置数据"
+            "missing_data": "缺少配置数据",
+            "reconfigure_successful": "配置已更新"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "调整更新间隔与时区处理方式",
                 "data": {
                     "scan_interval": "扫描间隔（秒）",
-                    "use_ha_time_zone": "使用 Home Assistant 的时区"
+                    "use_ha_timezone": "使用 Home Assistant 的时区"
                 }
             }
         }
@@ -145,6 +146,18 @@
             },
             "sensor_next_last_quarter": {
                 "name": "下次下弦月"
+            },
+            "sensor_previous_rise": {
+                "name": "上次月出"
+            },
+            "sensor_previous_set": {
+                "name": "上次月落"
+            },
+            "sensor_previous_apogee": {
+                "name": "上次远地点"
+            },
+            "sensor_previous_perigee": {
+                "name": "上次近地点"
             },
             "sensor_previous_new_moon": {
                 "name": "上次新月"

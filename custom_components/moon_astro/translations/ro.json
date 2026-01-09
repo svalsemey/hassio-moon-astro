@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Lună Astro este deja configurat",
-            "missing_data": "Lipsesc datele de configurare"
+            "missing_data": "Lipsesc datele de configurare",
+            "reconfigure_successful": "Configurația a fost actualizată"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Actualizează intervalul de interogare și comportamentul fusului orar.",
                 "data": {
                     "scan_interval": "Interval de scanare (secunde)",
-                    "use_ha_time_zone": "Folosește fusul orar al Home Assistant"
+                    "use_ha_timezone": "Folosește fusul orar al Home Assistant"
                 }
             }
         }

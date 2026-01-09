@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Το Σελήνη Άστρο έχει ήδη ρυθμιστεί",
-            "missing_data": "Λείπουν δεδομένα ρύθμισης"
+            "missing_data": "Λείπουν δεδομένα ρύθμισης",
+            "reconfigure_successful": "Η διαμόρφωση ενημερώθηκε"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Ενημερώστε το διάστημα δειγματοληψίας και τη συμπεριφορά ζώνης ώρας.",
                 "data": {
                     "scan_interval": "Διάστημα σάρωσης (δευτερόλεπτα)",
-                    "use_ha_time_zone": "Χρήση της ζώνης ώρας του Home Assistant"
+                    "use_ha_timezone": "Χρήση της ζώνης ώρας του Home Assistant"
                 }
             }
         }

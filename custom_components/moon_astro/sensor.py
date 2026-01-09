@@ -675,10 +675,10 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         if self._key == KEY_PARALLAX:
             return "mdi:circle-multiple"
 
-        if self._key == KEY_NEXT_RISE:
+        if self._key in (KEY_NEXT_RISE, KEY_PREVIOUS_RISE):
             return "mdi:arrow-up-circle"
 
-        if self._key == KEY_NEXT_SET:
+        if self._key in (KEY_NEXT_SET, KEY_PREVIOUS_SET):
             return "mdi:arrow-down-circle"
 
         if self._key in (

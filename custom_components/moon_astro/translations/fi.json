@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Kuu Astro on jo määritetty",
-            "missing_data": "Määritystiedot puuttuvat"
+            "missing_data": "Määritystiedot puuttuvat",
+            "reconfigure_successful": "Asetukset päivitetty"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Säädä päivitysväliä ja aikavyöhykkeen käsittelyä.",
                 "data": {
                     "scan_interval": "Päivitysväli (s)",
-                    "use_ha_time_zone": "Käytä Home Assistantin aikavyöhykettä"
+                    "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä"
                 }
             }
         }

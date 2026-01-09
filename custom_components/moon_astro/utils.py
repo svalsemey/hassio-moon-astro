@@ -8,11 +8,14 @@ blocking the event loop.
 from __future__ import annotations
 
 from contextlib import suppress
+import logging
 from pathlib import Path
 
 from homeassistant.core import HomeAssistant
 
 from .const import CACHE_DIR_NAME, DE440_FILE
+
+_LOGGER = logging.getLogger(__name__)
 
 try:
     from skyfield.api import Loader
@@ -21,6 +24,30 @@ try:
     SKYFIELD_AVAILABLE = True
 except ImportError:  # pragma: no cover
     SKYFIELD_AVAILABLE = False
+
+
+def get_cache_dir(hass: HomeAssistant) -> Path:
+    """Return the cache directory used to store Skyfield resources.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        Path to the cache directory.
+    """
+    return Path(hass.config.path(CACHE_DIR_NAME))
+
+
+def get_ephemeris_path(hass: HomeAssistant) -> Path:
+    """Return the expected full path of the ephemeris file.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        Path to the ephemeris file.
+    """
+    return get_cache_dir(hass) / DE440_FILE
 
 
 async def cleanup_cache_dir(
@@ -42,7 +69,7 @@ async def cleanup_cache_dir(
 
     def _blocking_cleanup() -> None:
         """Execute cleanup in executor to avoid blocking the event loop."""
-        cache_dir = Path(hass.config.path(CACHE_DIR_NAME))
+        cache_dir = get_cache_dir(hass)
         if not cache_dir.exists():
             return
 
@@ -58,27 +85,29 @@ async def cleanup_cache_dir(
 
         if remove_empty_dir:
             with suppress(OSError):
-                remaining_files = list(cache_dir.iterdir())
-                if not remaining_files:
+                if not any(cache_dir.iterdir()):
                     cache_dir.rmdir()
 
     await hass.async_add_executor_job(_blocking_cleanup)
 
 
-async def validate_ephemeris_file(hass: HomeAssistant) -> bool:
+async def validate_ephemeris_file(
+    hass: HomeAssistant,
+    *,
+    remove_on_invalid: bool = False,
+) -> bool:
     """Validate the integrity of the ephemeris file.
 
-    The validation is intentionally strict:
-    - checks file existence
-    - checks a conservative minimum size threshold
-    - attempts to load the file with Skyfield
-    - checks that essential bodies are present
-
-    If the file is found invalid, it is removed so a later download can start
-    from a clean state.
+    The validation checks:
+    - file existence
+    - conservative minimum size threshold
+    - ability to load it with Skyfield
+    - expected kernel type
+    - presence of essential bodies
 
     Args:
         hass: Home Assistant instance.
+        remove_on_invalid: If True, delete the ephemeris file when invalid.
 
     Returns:
         True if file is valid and usable, False if invalid or missing.
@@ -89,19 +118,18 @@ async def validate_ephemeris_file(hass: HomeAssistant) -> bool:
         if not SKYFIELD_AVAILABLE:
             return False
 
-        cache_dir = Path(hass.config.path(CACHE_DIR_NAME))
+        cache_dir = get_cache_dir(hass)
         ephemeris_path = cache_dir / DE440_FILE
 
         if not ephemeris_path.exists():
             return False
 
-        # de440.bsp is large; use a conservative minimum threshold.
         min_expected_size = 100 * 1024 * 1024
         try:
-            file_size = ephemeris_path.stat().st_size
-            if file_size < min_expected_size:
-                with suppress(OSError):
-                    ephemeris_path.unlink()
+            if ephemeris_path.stat().st_size < min_expected_size:
+                if remove_on_invalid:
+                    with suppress(OSError):
+                        ephemeris_path.unlink()
                 return False
         except OSError:
             return False
@@ -110,19 +138,21 @@ async def validate_ephemeris_file(hass: HomeAssistant) -> bool:
             loader = Loader(str(cache_dir))
             eph = loader(DE440_FILE)
         except (OSError, AttributeError, RuntimeError):
-            with suppress(OSError):
-                ephemeris_path.unlink()
+            if remove_on_invalid:
+                with suppress(OSError):
+                    ephemeris_path.unlink()
             return False
 
         if not isinstance(eph, SpiceKernel):
-            with suppress(OSError):
-                ephemeris_path.unlink()
+            if remove_on_invalid:
+                with suppress(OSError):
+                    ephemeris_path.unlink()
             return False
 
-        # Ensure essential bodies exist: solar system barycenter, Earth, Moon.
         if 0 not in eph or 3 not in eph or 301 not in eph:
-            with suppress(OSError):
-                ephemeris_path.unlink()
+            if remove_on_invalid:
+                with suppress(OSError):
+                    ephemeris_path.unlink()
             return False
 
         return True
@@ -133,13 +163,6 @@ async def validate_ephemeris_file(hass: HomeAssistant) -> bool:
 async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
     """Ensure a valid ephemeris file exists, downloading only if necessary.
 
-    This function is designed to be idempotent:
-    - If a valid file already exists, it returns True without downloading.
-    - If the file is missing or invalid, it tries to download it and then validates it.
-
-    A best-effort cleanup of temporary download artifacts is done before checking
-    the local file, to avoid leaving stale partial downloads around.
-
     Args:
         hass: Home Assistant instance.
 
@@ -149,33 +172,52 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
     if not SKYFIELD_AVAILABLE:
         return False
 
-    # Remove stale temporary download files first to keep the directory consistent.
     await cleanup_cache_dir(hass)
 
-    # Fast path: if the file is already present and valid, do not download.
-    if await validate_ephemeris_file(hass):
+    if await validate_ephemeris_file(hass, remove_on_invalid=False):
         return True
 
     def _blocking_download() -> bool:
         """Download ephemeris file in executor.
 
         Returns:
-            True if the download attempt did not raise, False otherwise.
+            True if the download attempt did not raise and the expected file exists.
         """
-        cache_dir = Path(hass.config.path(CACHE_DIR_NAME))
+        cache_dir = get_cache_dir(hass)
         cache_dir.mkdir(parents=True, exist_ok=True)
+        ephemeris_path = cache_dir / DE440_FILE
 
         try:
             loader = Loader(str(cache_dir))
             loader(DE440_FILE)
-        except (OSError, RuntimeError, ValueError):
+        except (OSError, RuntimeError, ValueError) as exc:
+            _LOGGER.info("Ephemeris download failed: %r", exc)
             return False
 
+        # Ensure the file exists where the integration expects it.
+        if not ephemeris_path.exists():
+            # Some environments may redirect cache paths; log to diagnose quickly.
+            try:
+                actual = None
+                if hasattr(loader, "path_to"):
+                    actual = loader.path_to(DE440_FILE)
+                _LOGGER.info(
+                    "Ephemeris download completed but file not found at expected path: expected=%s actual=%s",
+                    str(ephemeris_path),
+                    str(actual) if actual is not None else "unknown",
+                )
+            except Exception as exc:  # pragma: no cover
+                _LOGGER.info(
+                    "Ephemeris download completed but file not found at expected path: expected=%s (error=%r)",
+                    str(ephemeris_path),
+                    exc,
+                )
+            return False
+
+        _LOGGER.info("Ephemeris file ready in cache: %s", str(ephemeris_path))
         return True
 
-    download_ok = await hass.async_add_executor_job(_blocking_download)
-    if not download_ok:
+    if not await hass.async_add_executor_job(_blocking_download):
         return False
 
-    # Final authoritative validation (also deletes corrupted files).
-    return await validate_ephemeris_file(hass)
+    return await validate_ephemeris_file(hass, remove_on_invalid=False)

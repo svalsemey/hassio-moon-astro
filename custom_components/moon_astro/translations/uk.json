@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Місяць Астро вже налаштовано",
-            "missing_data": "Відсутні дані конфігурації"
+            "missing_data": "Відсутні дані конфігурації",
+            "reconfigure_successful": "Конфігурацію оновлено"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Оновіть інтервал опитування та поведінку часової зони.",
                 "data": {
                     "scan_interval": "Інтервал сканування (секунди)",
-                    "use_ha_time_zone": "Використовувати часову зону Home Assistant"
+                    "use_ha_timezone": "Використовувати часову зону Home Assistant"
                 }
             }
         }

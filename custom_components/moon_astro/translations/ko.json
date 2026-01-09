@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "문 아스트로는 이미 구성되어 있습니다",
-            "missing_data": "구성 데이터가 누락되었습니다"
+            "missing_data": "구성 데이터가 누락되었습니다",
+            "reconfigure_successful": "구성이 업데이트되었습니다"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "폴링 간격과 시간대 동작을 업데이트합니다.",
                 "data": {
                     "scan_interval": "스캔 간격(초)",
-                    "use_ha_time_zone": "Home Assistant의 시간대 사용"
+                    "use_ha_timezone": "Home Assistant의 시간대 사용"
                 }
             }
         }

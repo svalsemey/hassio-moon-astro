@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "ירח אסטרו כבר מוגדר",
-            "missing_data": "נתוני תצורה חסרים"
+            "missing_data": "נתוני תצורה חסרים",
+            "reconfigure_successful": "ההגדרות עודכנו"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "עדכון מרווח הדגימה והתנהגות אזור הזמן.",
                 "data": {
                     "scan_interval": "מרווח סריקה (שניות)",
-                    "use_ha_time_zone": "השתמש באזור הזמן של Home Assistant"
+                    "use_ha_timezone": "השתמש באזור הזמן של Home Assistant"
                 }
             }
         }

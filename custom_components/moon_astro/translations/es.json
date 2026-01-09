@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Luna Astro ya está configurado",
-            "missing_data": "Faltan datos de configuración"
+            "missing_data": "Faltan datos de configuración",
+            "reconfigure_successful": "Configuración actualizada"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Ajusta el intervalo de actualización y el manejo de la zona horaria",
                 "data": {
                     "scan_interval": "Intervalo de actualización (segundos)",
-                    "use_ha_time_zone": "Usar la zona horaria de Home Assistant"
+                    "use_ha_timezone": "Usar la zona horaria de Home Assistant"
                 }
             }
         }

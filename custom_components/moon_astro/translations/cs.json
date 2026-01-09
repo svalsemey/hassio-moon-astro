@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Měsíc Astro je již nastaven",
-            "missing_data": "Chybí konfigurační data"
+            "missing_data": "Chybí konfigurační data",
+            "reconfigure_successful": "Konfigurace byla aktualizována"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Upravte interval aktualizace a zpracování časového pásma",
                 "data": {
                     "scan_interval": "Interval aktualizace (sekundy)",
-                    "use_ha_time_zone": "Použít časové pásmo Home Assistant"
+                    "use_ha_timezone": "Použít časové pásmo Home Assistant"
                 }
             }
         }

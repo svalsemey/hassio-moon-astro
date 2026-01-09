@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Lua Astro já está configurado",
-            "missing_data": "Dados de configuração ausentes"
+            "missing_data": "Dados de configuração ausentes",
+            "reconfigure_successful": "Configuração atualizada"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Atualize o intervalo de pesquisa e o comportamento do fuso horário.",
                 "data": {
                     "scan_interval": "Intervalo de varredura (segundos)",
-                    "use_ha_time_zone": "Usar o fuso horário do Home Assistant"
+                    "use_ha_timezone": "Usar o fuso horário do Home Assistant"
                 }
             }
         }

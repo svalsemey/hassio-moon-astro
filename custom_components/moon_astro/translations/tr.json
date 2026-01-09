@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Ay Astro zaten yapılandırılmış",
-            "missing_data": "Yapılandırma verileri eksik"
+            "missing_data": "Yapılandırma verileri eksik",
+            "reconfigure_successful": "Yapılandırma güncellendi"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Yoklama aralığını ve saat dilimi davranışını güncelleyin.",
                 "data": {
                     "scan_interval": "Tarama aralığı (saniye)",
-                    "use_ha_time_zone": "Home Assistant saat dilimini kullan"
+                    "use_ha_timezone": "Home Assistant saat dilimini kullan"
                 }
             }
         }

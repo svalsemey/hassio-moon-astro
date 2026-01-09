@@ -17,7 +17,8 @@
         },
         "abort": {
             "already_configured": "Moon Astro is already configured",
-            "missing_data": "Configuration data missing"
+            "missing_data": "Configuration data missing",
+            "reconfigure_successful": "Configuration updated"
         }
     },
     "options": {
@@ -27,7 +28,7 @@
                 "description": "Adjust update interval and time zone handling",
                 "data": {
                     "scan_interval": "Scan interval (seconds)",
-                    "use_ha_time_zone": "Use Home Assistant time zone"
+                    "use_ha_timezone": "Use Home Assistant time zone"
                 }
             }
         }
