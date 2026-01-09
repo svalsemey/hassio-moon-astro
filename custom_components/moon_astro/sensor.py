@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 import logging
+import math
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
@@ -483,6 +484,61 @@ SUGGESTED_SLUGS: dict[str, str] = {
 }
 
 
+def _parse_timestamp_to_utc(value: Any) -> datetime | None:
+    """Parse an ISO timestamp into a timezone-aware UTC datetime.
+
+    Args:
+        value: Raw value returned by the coordinator (expected ISO string or datetime).
+
+    Returns:
+        A timezone-aware datetime in UTC, or None if parsing fails.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, datetime):
+        dt = value
+    else:
+        try:
+            dt = datetime.fromisoformat(str(value))
+        except (ValueError, TypeError):
+            return None
+
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
+def _values_equal(old: Any, new: Any, *, tol: float | None = None) -> bool:
+    """Return True if old and new values should be considered equal for state writing.
+
+    This function supports:
+    - exact comparisons for non-numeric types
+    - tolerant comparisons for floats when a tolerance is provided
+
+    Args:
+        old: Previous value as stored by the entity.
+        new: New computed value.
+        tol: Absolute tolerance used for float comparisons. If None, floats are compared
+            using strict equality.
+
+    Returns:
+        True if values are equivalent, False otherwise.
+    """
+    if old is None and new is None:
+        return True
+    if old is None or new is None:
+        return False
+
+    if tol is not None and isinstance(old, float) and isinstance(new, float):
+        # NaN should never be treated as equal to anything to avoid masking issues.
+        if math.isnan(old) or math.isnan(new):
+            return False
+        return abs(old - new) <= tol
+
+    return old == new
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -525,7 +581,11 @@ async def async_setup_entry(
 
 
 class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
-    """Generic sensor bound to a coordinator value."""
+    """Generic sensor bound to a coordinator value.
+
+    This entity avoids unnecessary state writes by only writing when the computed value
+    changes compared to the last written value.
+    """
 
     _attr_has_entity_name = True
 
@@ -567,6 +627,8 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         self._attr_suggested_display_precision = suggested_display_precision
         self._attr_suggested_object_id = suggested_object_id
 
+        self._last_written_native_value: Any = object()
+
     @property
     def translation_key(self) -> str | None:
         """Expose explicit translation_key so frontend can translate state values.
@@ -576,33 +638,78 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         """
         return self._attr_translation_key
 
-    @property
-    def native_value(self) -> Any:
-        """Return the state of the sensor.
+    def _float_write_tolerance(self) -> float | None:
+        """Return the absolute tolerance used to decide whether to write a new float state.
+
+        The goal is to avoid recorder/history spam caused by tiny numeric jitter while
+        keeping full precision in the coordinator for downstream computations.
+
+        Strategy:
+        - If a suggested display precision is known, use half of the last displayed unit.
+
+        Example:
+            - precision=2 -> tol=0.005
+            - precision=0 -> tol=0.5
+        - If no precision is configured, do not apply a tolerance.
 
         Returns:
-            The current sensor value in its native type.
+            Absolute tolerance for float comparisons, or None when no tolerance applies.
+        """
+        prec = self._attr_suggested_display_precision
+        if prec is None:
+            return None
+
+        try:
+            p = int(prec)
+        except (TypeError, ValueError):
+            return None
+
+        # half of the unit step at the displayed precision
+        # p=2 => 10^-2 / 2 => 0.005
+        return 0.5 * (10.0 ** (-p))
+
+    def _compute_native_value(self) -> Any:
+        """Compute the current native value without triggering a state write.
+
+        Returns:
+            The computed native value, already normalized for the entity device class.
         """
         data = self.coordinator.data or {}
         value = data.get(self._key)
 
         if self.device_class == SensorDeviceClass.TIMESTAMP:
-            if value is None:
-                return None
-            try:
-                dt = datetime.fromisoformat(str(value))
-            except (ValueError, TypeError):
-                return None
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=UTC)
-            else:
-                dt = dt.astimezone(UTC)
-            return dt
+            return _parse_timestamp_to_utc(value)
 
-        _LOGGER.debug(
-            "Sensor %s (%s) raw value: %r", self._key, self._attr_translation_key, value
-        )
         return value
+
+    @property
+    def native_value(self) -> Any:
+        """Return the current state of the sensor.
+
+        Returns:
+            The current sensor value in its native type.
+        """
+        return self._compute_native_value()
+
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator.
+
+        This method avoids updating the entity state if the computed value is unchanged,
+        using a tolerant comparison for floats based on the entity display precision.
+        """
+        new_value = self._compute_native_value()
+
+        tol: float | None = None
+        if isinstance(new_value, float) and isinstance(
+            self._last_written_native_value, float
+        ):
+            tol = self._float_write_tolerance()
+
+        if _values_equal(self._last_written_native_value, new_value, tol=tol):
+            return
+
+        self._last_written_native_value = new_value
+        self.async_write_ha_state()
 
     def _icon_for_phase(self) -> str | None:
         """Return an icon for the phase sensor, based on the current phase code.

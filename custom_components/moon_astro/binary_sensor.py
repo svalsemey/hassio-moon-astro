@@ -15,7 +15,7 @@ from .coordinator import MoonAstroCoordinator
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
-):
+) -> None:
     """Set up binary sensor entities.
 
     Args:
@@ -42,7 +42,11 @@ async def async_setup_entry(
 class MoonAboveHorizonBinary(
     CoordinatorEntity[MoonAstroCoordinator], BinarySensorEntity
 ):
-    """Binary sensor indicating whether the Moon is above the horizon."""
+    """Binary sensor indicating whether the Moon is above the horizon.
+
+    This entity avoids unnecessary state writes by only writing when the computed value
+    changes compared to the last written value.
+    """
 
     def __init__(
         self, coordinator: MoonAstroCoordinator, entry_id: str, device_info: DeviceInfo
@@ -65,6 +69,19 @@ class MoonAboveHorizonBinary(
         # Stable slug for entity_id creation
         self._attr_suggested_object_id = "above_horizon"
 
+        self._last_written_is_on: bool | None = object()  # type: ignore[assignment]
+
+    def _compute_is_on(self) -> bool | None:
+        """Compute the current binary value without triggering a state write.
+
+        Returns:
+            True if above the horizon, False if below, or None if unknown.
+        """
+        data = self.coordinator.data
+        if data is None:
+            return None
+        return bool(data.get(KEY_ABOVE_HORIZON, False))
+
     @property
     def is_on(self) -> bool | None:
         """Return the current binary state.
@@ -73,10 +90,18 @@ class MoonAboveHorizonBinary(
             True if the Moon is above the horizon, False if below, or None if no
             data is available yet.
         """
-        data = self.coordinator.data
-        if data is None:
-            return None
-        return bool(data.get(KEY_ABOVE_HORIZON, False))
+        return self._compute_is_on()
+
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator.
+
+        This method avoids updating the entity state if the computed value is unchanged.
+        """
+        new_state = self._compute_is_on()
+        if self._last_written_is_on == new_state:
+            return
+        self._last_written_is_on = new_state
+        self.async_write_ha_state()
 
     @property
     def icon(self) -> str:

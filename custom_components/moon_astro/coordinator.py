@@ -165,33 +165,93 @@ def _tz_for_hass(hass: HomeAssistant) -> ZoneInfo:
         return ZoneInfo("UTC")
 
 
+def _round_datetime_to_nearest_minute(dt: datetime) -> datetime:
+    """Round a timezone-aware datetime to the nearest minute.
+
+    The rounding rule is:
+    - seconds >= 30 rounds up to the next minute
+    - seconds < 30 rounds down to the current minute
+
+    Microseconds are taken into account as part of the seconds fraction.
+
+    Args:
+        dt: Timezone-aware datetime.
+
+    Returns:
+        A timezone-aware datetime rounded to the nearest minute.
+    """
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=UTC)
+
+    # Compute total seconds within the minute, including microseconds.
+    seconds_in_minute = dt.second + (dt.microsecond / 1_000_000.0)
+
+    # Strip sub-minute part.
+    base = dt.replace(second=0, microsecond=0)
+
+    if seconds_in_minute >= 30.0:
+        return base + timedelta(minutes=1)
+
+    return base
+
+
+def _round_utc_datetime_to_nearest_minute(dt_utc: datetime) -> datetime:
+    """Round a datetime (assumed UTC) to the nearest minute.
+
+    Args:
+        dt_utc: Datetime expected to represent a UTC instant. Naive datetimes are
+            treated as UTC.
+
+    Returns:
+        A timezone-aware UTC datetime rounded to the nearest minute.
+    """
+    if dt_utc.tzinfo is None:
+        dt_utc = dt_utc.replace(tzinfo=UTC)
+    dt_utc = dt_utc.astimezone(UTC)
+    return _round_datetime_to_nearest_minute(dt_utc).astimezone(UTC)
+
+
 def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
-    """Convert a UTC datetime to ISO 8601 string in provided timezone.
+    """Convert a UTC datetime to an ISO 8601 string in the provided timezone.
+
+    This conversion rounds the instant to the nearest minute to maximize stability
+    of timestamp sensors without relying on any cache mechanism.
 
     Args:
         dt_utc: Input datetime expected to be UTC or naive (assumed UTC).
         tz: Target timezone; UTC is used if None.
 
     Returns:
-        The ISO 8601 formatted string or None when input is None.
+        The ISO 8601 formatted string rounded to the nearest minute, or None when
+        input is None.
     """
     if dt_utc is None:
         return None
+
     tz = tz or ZoneInfo("UTC")
+
     if dt_utc.tzinfo is None:
         dt_utc = dt_utc.replace(tzinfo=UTC)
-    return dt_utc.astimezone(tz).isoformat()
+
+    # Round in UTC to keep behavior deterministic, then convert to target timezone.
+    dt_utc_rounded = _round_utc_datetime_to_nearest_minute(dt_utc)
+    dt_local = dt_utc_rounded.astimezone(tz)
+
+    return dt_local.isoformat()
 
 
 def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
-    """Convert a Skyfield Time to localized ISO 8601 safely.
+    """Convert a Skyfield Time to a localized ISO 8601 string safely.
+
+    The conversion rounds the resulting datetime to the nearest minute through
+    the shared datetime formatting helper.
 
     Args:
         t_obj: Skyfield Time or None.
         tz: Target timezone; UTC is used if None.
 
     Returns:
-        Localized ISO 8601 string or None.
+        Localized ISO 8601 string rounded to the nearest minute, or None.
     """
     if t_obj is None:
         return None
@@ -211,7 +271,10 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
             # Fallback: try to convert to datetime
             dt_utc = datetime.fromisoformat(str(dt_utc_raw))
 
-    return _to_local_iso(dt_utc.replace(tzinfo=UTC), tz)
+    if dt_utc.tzinfo is None:
+        dt_utc = dt_utc.replace(tzinfo=UTC)
+
+    return _to_local_iso(dt_utc.astimezone(UTC), tz)
 
 
 def _moon_illumination_percentage(eph: Ephemeris, t: Time) -> float:
@@ -833,10 +896,22 @@ def _brent_extremum(
     return _BrentResult(tt=x, fval=(fx if is_min else -fx), iterations=max_iter)
 
 
-def _refine_bracket(
-    t_list: list[Time], y_list: list[float], kind: str = "max"
-) -> tuple[float, float] | None:
-    """Select a [a,b] bracket in tt for a local extremum based on slope changes.
+def _refine_brackets(
+    t_list: list[Time],
+    y_list: list[float],
+    kind: str = "max",
+) -> list[tuple[float, float, int]]:
+    """Return a list of candidate [a,b] TT brackets for local extrema.
+
+    This function detects multiple extrema candidates in the sampled series and returns
+    an ordered list of brackets. Each bracket is associated with a representative index
+    in the sample grid, which can later be used to choose the nearest extremum depending
+    on the forward/backward search direction.
+
+    The detection is tolerant to:
+    - small numeric jitter in sampled values
+    - locally flat extrema (plateaus)
+    - multiple extrema in the sampled window
 
     Args:
         t_list: Monotonic list of Time samples.
@@ -844,20 +919,96 @@ def _refine_bracket(
         kind: Either "max" or "min".
 
     Returns:
-        A tuple (tt_a, tt_b) in TT days for refinement, or None if not found.
+        A list of tuples (tt_a, tt_b, idx_center) sorted by idx_center ascending.
+        The list may be empty if no suitable bracket is found.
     """
-    y = np.array(y_list)
+    if len(t_list) < 3 or len(y_list) < 3:
+        return []
+
+    y = np.asarray(y_list, dtype=float)
     slopes = np.diff(y)
-    if kind == "max":
-        idxs = np.where((slopes[:-1] > 0) & (slopes[1:] < 0))[0] + 1
-    else:
-        idxs = np.where((slopes[:-1] < 0) & (slopes[1:] > 0))[0] + 1
-    if len(idxs) == 0:
+
+    # Scale-aware epsilon to avoid jitter-driven sign flips.
+    y_scale = float(np.nanmax(np.abs(y))) if np.isfinite(y).any() else 0.0
+    eps = max(1e-12, y_scale * 1e-12)
+
+    # Ternary slope sign: -1, 0, +1.
+    sgn = np.zeros_like(slopes, dtype=int)
+    sgn[slopes > eps] = 1
+    sgn[slopes < -eps] = -1
+
+    want_left = 1 if kind == "max" else -1
+    want_right = -1 if kind == "max" else 1
+
+    n = len(y)
+    candidates: list[int] = []
+
+    for i in range(1, n - 1):
+        # Resolve effective left sign (skip flat slopes to the left).
+        k = i - 1
+        while k >= 0 and sgn[k] == 0:
+            k -= 1
+        left_eff = sgn[k] if k >= 0 else 0
+
+        # Resolve effective right sign (skip flat slopes to the right).
+        j = i
+        while j < len(sgn) and sgn[j] == 0:
+            j += 1
+        right_eff = sgn[j] if j < len(sgn) else 0
+
+        if left_eff == want_left and right_eff == want_right:
+            candidates.append(i)
+
+    if not candidates:
+        return []
+
+    # Build a stable bracket for each candidate.
+    brackets: list[tuple[float, float, int]] = []
+    for idx in candidates:
+        left = idx
+        while left > 0 and sgn[left - 1] == 0:
+            left -= 1
+
+        right = idx
+        while right < len(sgn) and sgn[right] == 0:
+            right += 1
+
+        i0 = max(0, left - 1)
+        i1 = min(n - 1, right + 1)
+
+        if i1 <= i0:
+            continue
+
+        brackets.append((t_list[i0].tt, t_list[i1].tt, idx))
+
+    # Ensure chronological order by index.
+    brackets.sort(key=lambda item: item[2])
+    return brackets
+
+
+def _refine_bracket(
+    t_list: list[Time],
+    y_list: list[float],
+    kind: str = "max",
+) -> tuple[float, float] | None:
+    """Select a single [a,b] bracket in TT days for an extremum.
+
+    This function keeps backward compatibility for call sites that expect a single bracket.
+    It returns the first detected bracket in chronological order.
+
+    Args:
+        t_list: Monotonic list of Time samples.
+        y_list: Corresponding function values.
+        kind: Either "max" or "min".
+
+    Returns:
+        A tuple (tt_a, tt_b) in TT days for refinement, or None.
+    """
+    brackets = _refine_brackets(t_list, y_list, kind=kind)
+    if not brackets:
         return None
-    idx = int(idxs[0])
-    i0 = max(0, idx - 1)
-    i2 = min(len(t_list) - 1, idx + 1)
-    return (t_list[i0].tt, t_list[i2].tt)
+    tt_a, tt_b, _idx = brackets[0]
+    return (tt_a, tt_b)
 
 
 def _find_geocentric_distance_extremum(
@@ -926,11 +1077,34 @@ def _find_geocentric_distance_extremum(
         d_list.append(geocentric_distance_km(t_i))
 
     bracket_kind = "min" if is_min else "max"
-    bracket = _refine_bracket(t_list, d_list, kind=bracket_kind)
-    if bracket is None:
+    brackets = _refine_brackets(t_list, d_list, kind=bracket_kind)
+    if not brackets:
         return None
 
-    tt_a, tt_b = bracket
+    # Choose the nearest candidate bracket depending on search direction.
+    # - Forward: first bracket whose center time is strictly after t_start
+    # - Backward: last bracket whose center time is strictly before t_start
+    t0_tt = t_start.tt
+
+    chosen: tuple[float, float, int] | None = None
+    if search_backward:
+        for tt_a, tt_b, idx_center in brackets:
+            tt_center = t_list[idx_center].tt
+            if tt_center < t0_tt:
+                chosen = (tt_a, tt_b, idx_center)
+            else:
+                break
+    else:
+        for tt_a, tt_b, idx_center in brackets:
+            tt_center = t_list[idx_center].tt
+            if tt_center > t0_tt:
+                chosen = (tt_a, tt_b, idx_center)
+                break
+
+    if chosen is None:
+        return None
+
+    tt_a, tt_b, _idx_center = chosen
     res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
     t_ext = ts.tt_jd(res.tt)
 
@@ -1114,6 +1288,8 @@ def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | No
     """
     if not full_moon_name_code:
         return None
+    if full_moon_name_code == "blue_moon":
+        return ""
     if full_moon_name_code == "unknown":
         return "unknown"
     return f"{full_moon_name_code}_alt_names"
@@ -1865,7 +2041,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Returns:
             A dictionary with all computed keys ready to be exposed by entities.
         """
-        now_utc = datetime.now(UTC)
+        now_utc = _round_utc_datetime_to_nearest_minute(datetime.now(UTC))
         t = ts.from_datetime(now_utc)
         t_future = ts.from_datetime(now_utc + timedelta(hours=6))
 
