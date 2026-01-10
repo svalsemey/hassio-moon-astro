@@ -170,12 +170,6 @@ def _tz_for_hass(hass: HomeAssistant) -> ZoneInfo:
 def _round_datetime_to_nearest_minute(dt: datetime) -> datetime:
     """Round a timezone-aware datetime to the nearest minute.
 
-    The rounding rule is:
-    - seconds >= 30 rounds up to the next minute
-    - seconds < 30 rounds down to the current minute
-
-    Microseconds are taken into account as part of the seconds fraction.
-
     Args:
         dt: Timezone-aware datetime.
 
@@ -185,10 +179,7 @@ def _round_datetime_to_nearest_minute(dt: datetime) -> datetime:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=UTC)
 
-    # Compute total seconds within the minute, including microseconds.
     seconds_in_minute = dt.second + (dt.microsecond / 1_000_000.0)
-
-    # Strip sub-minute part.
     base = dt.replace(second=0, microsecond=0)
 
     if seconds_in_minute >= 30.0:
@@ -201,8 +192,7 @@ def _round_utc_datetime_to_nearest_minute(dt_utc: datetime) -> datetime:
     """Round a datetime (assumed UTC) to the nearest minute.
 
     Args:
-        dt_utc: Datetime expected to represent a UTC instant. Naive datetimes are
-            treated as UTC.
+        dt_utc: Datetime expected to represent a UTC instant.
 
     Returns:
         A timezone-aware UTC datetime rounded to the nearest minute.
@@ -258,19 +248,14 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
     if t_obj is None:
         return None
 
-    # Extract the datetime; .utc_datetime() can return ndarray for array Times
     dt_utc_raw = t_obj.utc_datetime()
 
-    # Handle both scalar datetime and ndarray from Skyfield
     if isinstance(dt_utc_raw, datetime):
-        # Already a scalar datetime
         dt_utc = dt_utc_raw
     else:
-        # Assume it's a numpy array-like object; extract the first element
         try:
             dt_utc = dt_utc_raw.item() if hasattr(dt_utc_raw, "item") else dt_utc_raw[0]
         except (IndexError, TypeError, AttributeError):
-            # Fallback: try to convert to datetime
             dt_utc = datetime.fromisoformat(str(dt_utc_raw))
 
     if dt_utc.tzinfo is None:
@@ -991,6 +976,122 @@ def _refine_brackets(
     return brackets
 
 
+def _local_rescan_refine_bracket(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    tt_a: float,
+    tt_b: float,
+    *,
+    is_min: bool,
+) -> tuple[float, float] | None:
+    """Perform a local rescan inside a coarse bracket and return a tighter bracket.
+
+    The rescan uses a fixed step of 1 hour to keep CPU usage bounded, then rebuilds
+    candidate brackets from the resampled series and keeps the bracket that contains
+    the strongest local extremum.
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Function evaluated on TT Julian dates.
+        tt_a: Left bound (TT Julian date).
+        tt_b: Right bound (TT Julian date).
+        is_min: True for perigee, False for apogee.
+
+    Returns:
+        A tighter (tt_left, tt_right) bracket, or None if it cannot be constructed.
+    """
+    if not (tt_b > tt_a):
+        return None
+
+    step_days = 1.0 / 24.0  # 1 hour
+    n_steps = int((tt_b - tt_a) / step_days) + 1
+    if n_steps < 3:
+        return None
+
+    t_list: list[Time] = []
+    y_list: list[float] = []
+    for i in range(n_steps):
+        tt_i = tt_a + (i * step_days)
+        t_list.append(ts.tt_jd(tt_i))
+        y_list.append(float(f_tt(tt_i)))
+
+    kind = "min" if is_min else "max"
+    brackets = _refine_brackets(t_list, y_list, kind=kind, expand=1)
+    if not brackets:
+        return None
+
+    best: tuple[float, float, float] | None = None
+    for cand_a, cand_b, idx_center in brackets:
+        y_center = float(y_list[idx_center])
+        score = y_center if is_min else -y_center
+        if best is None or score < best[0]:
+            best = (score, cand_a, cand_b)
+
+    if best is None:
+        return None
+
+    _score, best_a, best_b = best
+    if not (best_b > best_a):
+        return None
+    return best_a, best_b
+
+
+def _minute_validation_extremum(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    tt_center: float,
+    *,
+    is_min: bool,
+) -> Time:
+    """Snap the extremum to the most extreme minute among {t-1m, t, t+1m}.
+
+    The input is a continuous-time solution (typically from Brent). The output is a
+    Skyfield Time exactly on a minute boundary (TT), chosen by evaluating the function
+    on the 3 neighboring minute instants.
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Function evaluated on TT Julian dates.
+        tt_center: Candidate solution (TT Julian date).
+        is_min: True for perigee, False for apogee.
+
+    Returns:
+        A Skyfield Time located on the selected minute.
+    """
+    # Convert to UTC datetime, round to minute in UTC, and convert back to TT.
+    t_center = ts.tt_jd(tt_center)
+    dt_utc_raw = t_center.utc_datetime()
+    if not isinstance(dt_utc_raw, datetime):
+        dt_utc_raw = dt_utc_raw.item() if hasattr(dt_utc_raw, "item") else dt_utc_raw[0]
+    if dt_utc_raw.tzinfo is None:
+        dt_utc_raw = dt_utc_raw.replace(tzinfo=UTC)
+
+    dt_utc_min = _round_utc_datetime_to_nearest_minute(dt_utc_raw.astimezone(UTC))
+    t_min = ts.from_datetime(dt_utc_min)
+
+    minute_days = 1.0 / 1440.0
+    candidates = [
+        t_min.tt - minute_days,
+        t_min.tt,
+        t_min.tt + minute_days,
+    ]
+
+    best_tt = candidates[1]
+    best_val = float(f_tt(best_tt))
+
+    for tt_i in candidates:
+        val = float(f_tt(tt_i))
+        if is_min:
+            if val < best_val:
+                best_val = val
+                best_tt = tt_i
+        elif val > best_val:
+            best_val = val
+            best_tt = tt_i
+
+    return ts.tt_jd(best_tt)
+
+
 def _find_geocentric_distance_extremum(
     eph: Ephemeris,
     ts: Timescale,
@@ -1092,8 +1193,34 @@ def _find_geocentric_distance_extremum(
         return None
 
     tt_a, tt_b, _idx_center = chosen
+
+    # Enable additional stability refinements only in high precision mode.
+    # The integration uses step_hours=1 and bracket_expand=2 for this mode.
+    # Determining high precision mode here from step_hours and bracket_expand
+    # avoids transmitting Home Assistant configuration settings down to this level.
+    use_high_precision_refine = (step_hours <= 1.0) and (bracket_expand >= 2)
+
+    if use_high_precision_refine:
+        refined = _local_rescan_refine_bracket(
+            ts,
+            f_tt,
+            tt_a,
+            tt_b,
+            is_min=is_min,
+        )
+        if refined is not None:
+            tt_a, tt_b = refined
+
     res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
     t_ext = ts.tt_jd(res.tt)
+
+    if use_high_precision_refine:
+        t_ext = _minute_validation_extremum(
+            ts,
+            f_tt,
+            t_ext.tt,
+            is_min=is_min,
+        )
 
     if search_backward:
         return t_ext if t_ext.tt < t_start.tt else None
@@ -1115,6 +1242,7 @@ def _find_next_apogee(
         ts: Skyfield Timescale.
         t_start: Start time for the search.
         step_hours: Coarse sampling step in hours.
+        bracket_expand: Extra samples included on each side of the detected bracket.
 
     Returns:
         Skyfield Time at apogee, or None if not found in the window.
@@ -1125,6 +1253,7 @@ def _find_next_apogee(
         t_start,
         is_min=False,
         search_backward=False,
+        step_hours=step_hours,
         bracket_expand=bracket_expand,
     )
 
@@ -1144,6 +1273,7 @@ def _find_next_perigee(
         ts: Skyfield Timescale.
         t_start: Start time for the search.
         step_hours: Coarse sampling step in hours.
+        bracket_expand: Extra samples included on each side of the detected bracket.
 
     Returns:
         Skyfield Time at perigee, or None if not found in the window.
@@ -1154,6 +1284,7 @@ def _find_next_perigee(
         t_start,
         is_min=True,
         search_backward=False,
+        step_hours=step_hours,
         bracket_expand=bracket_expand,
     )
 
@@ -1209,6 +1340,7 @@ def _find_previous_apogee(
         ts: Skyfield Timescale.
         t_start: Reference time for the search.
         step_hours: Coarse sampling step in hours.
+        bracket_expand: Extra samples included on each side of the detected bracket.
 
     Returns:
         Skyfield Time at apogee, or None if not found in the window.
@@ -1219,6 +1351,7 @@ def _find_previous_apogee(
         t_start,
         is_min=False,
         search_backward=True,
+        step_hours=step_hours,
         bracket_expand=bracket_expand,
     )
 
@@ -1238,6 +1371,7 @@ def _find_previous_perigee(
         ts: Skyfield Timescale.
         t_start: Reference time for the search.
         step_hours: Coarse sampling step in hours.
+        bracket_expand: Extra samples included on each side of the detected bracket.
 
     Returns:
         Skyfield Time at perigee, or None if not found in the window.
@@ -1248,6 +1382,7 @@ def _find_previous_perigee(
         t_start,
         is_min=True,
         search_backward=True,
+        step_hours=step_hours,
         bracket_expand=bracket_expand,
     )
 

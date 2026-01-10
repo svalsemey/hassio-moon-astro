@@ -46,6 +46,11 @@ Some intermediate computations use non-rounded (“raw”) values internally to 
 
 Moon Astro can run in a high precision mode designed to reduce timestamp variability for event sensors (lunation phases, apogee/perigee, moonrise/moonset) by using a finer sampling step and a wider refinement bracket.
 
+In this mode, additional refinement is applied to apsides computations (apogee/perigee) to improve the stability of the computed timestamps:
+- the search uses a finer coarse sampling step to identify candidate extrema more reliably
+- the extremum bracket is refined more aggressively to converge to a stable solution
+- after convergence, the resulting instant is validated against neighboring minute instants to select the most extreme minute-aligned solution
+
 **CPU note:** high precision mode requires more computations and can significantly increase CPU usage. It is generally not recommended on low-power hardware (for example Raspberry Pi models with limited resources). If you enable it, prefer using a longer scan interval and monitor system load.
 
 ## Update frequency and minimum granularity
@@ -97,7 +102,7 @@ If you notice that a translation is incomplete or inaccurate, contributions are 
 
 ## Requirements
 
-- Home Assistant 2023.6+ (recommended)
+- Home Assistant 2024.4+ (implies Python 3.12)
 - Python dependencies are installed automatically by HA:
   - skyfield>=1.53
   - timezonefinder>=6.2.0
