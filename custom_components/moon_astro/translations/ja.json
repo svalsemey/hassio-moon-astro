@@ -10,6 +10,13 @@
                     "longitude": "経度",
                     "altitude": "標高 (m)"
                 }
+            },
+            "precision": {
+                "title": "ムーンアストロ",
+                "description": "高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリングステップと広いリファインメント範囲を使用するため CPU 使用率が増加します。Raspberry Pi のような低消費電力デバイスでは有効化を推奨しません。",
+                "data": {
+                    "high_precision": "高精度モード"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "ムーンアストロのオプション",
-                "description": "ポーリング間隔とタイムゾーンの挙動を更新します。",
+                "description": "センサーの更新間隔とタイムゾーンの扱いを調整します。\n\n高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリングステップと広いリファインメント範囲を使用するため CPU 使用率が増加します。Raspberry Pi のような低消費電力デバイスでは有効化を推奨しません。",
                 "data": {
-                    "scan_interval": "スキャン間隔（秒）",
-                    "use_ha_timezone": "Home Assistant のタイムゾーンを使用する"
+                    "scan_interval": "センサー更新間隔（秒）",
+                    "use_ha_timezone": "Home Assistant のタイムゾーンを使用",
+                    "high_precision": "高精度モード"
                 }
             }
         }

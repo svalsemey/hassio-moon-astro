@@ -28,11 +28,13 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import (
     CACHE_DIR_NAME,
     CONF_ALT,
+    CONF_HIGH_PRECISION,
     CONF_LAT,
     CONF_LON,
     CONF_USE_HA_TZ,
     DARK_MOON,
     DE440_FILE,
+    DEFAULT_HIGH_PRECISION,
     FIRST_QUARTER,
     FULL_MOON,
     FULL_MOON_STRICT_PCT,
@@ -900,6 +902,8 @@ def _refine_brackets(
     t_list: list[Time],
     y_list: list[float],
     kind: str = "max",
+    *,
+    expand: int = 1,
 ) -> list[tuple[float, float, int]]:
     """Return a list of candidate [a,b] TT brackets for local extrema.
 
@@ -917,6 +921,7 @@ def _refine_brackets(
         t_list: Monotonic list of Time samples.
         y_list: Corresponding function values.
         kind: Either "max" or "min".
+        expand: Number of extra samples to include on each side of the bracket.
 
     Returns:
         A list of tuples (tt_a, tt_b, idx_center) sorted by idx_center ascending.
@@ -973,8 +978,8 @@ def _refine_brackets(
         while right < len(sgn) and sgn[right] == 0:
             right += 1
 
-        i0 = max(0, left - 1)
-        i1 = min(n - 1, right + 1)
+        i0 = max(0, left - expand)
+        i1 = min(n - 1, right + expand)
 
         if i1 <= i0:
             continue
@@ -986,31 +991,6 @@ def _refine_brackets(
     return brackets
 
 
-def _refine_bracket(
-    t_list: list[Time],
-    y_list: list[float],
-    kind: str = "max",
-) -> tuple[float, float] | None:
-    """Select a single [a,b] bracket in TT days for an extremum.
-
-    This function keeps backward compatibility for call sites that expect a single bracket.
-    It returns the first detected bracket in chronological order.
-
-    Args:
-        t_list: Monotonic list of Time samples.
-        y_list: Corresponding function values.
-        kind: Either "max" or "min".
-
-    Returns:
-        A tuple (tt_a, tt_b) in TT days for refinement, or None.
-    """
-    brackets = _refine_brackets(t_list, y_list, kind=kind)
-    if not brackets:
-        return None
-    tt_a, tt_b, _idx = brackets[0]
-    return (tt_a, tt_b)
-
-
 def _find_geocentric_distance_extremum(
     eph: Ephemeris,
     ts: Timescale,
@@ -1020,6 +1000,7 @@ def _find_geocentric_distance_extremum(
     search_backward: bool,
     days_window: float = 40.0,
     step_hours: float = 2.0,
+    bracket_expand: int = 1,
     tol: float = 1e-7,
     max_iter: int = 200,
 ) -> Time | None:
@@ -1034,6 +1015,7 @@ def _find_geocentric_distance_extremum(
             False to search in the future window [t_start, t_start + days_window].
         days_window: Search window size in days.
         step_hours: Coarse sampling step in hours used to locate a bracketing interval.
+        bracket_expand: Extra samples included on each side of the detected bracket.
         tol: Absolute tolerance on TT Julian date during Brent refinement.
         max_iter: Maximum number of Brent iterations.
 
@@ -1077,7 +1059,12 @@ def _find_geocentric_distance_extremum(
         d_list.append(geocentric_distance_km(t_i))
 
     bracket_kind = "min" if is_min else "max"
-    brackets = _refine_brackets(t_list, d_list, kind=bracket_kind)
+    brackets = _refine_brackets(
+        t_list,
+        d_list,
+        kind=bracket_kind,
+        expand=bracket_expand,
+    )
     if not brackets:
         return None
 
@@ -1113,13 +1100,21 @@ def _find_geocentric_distance_extremum(
     return t_ext if t_ext.tt > t_start.tt else None
 
 
-def _find_next_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+def _find_next_apogee(
+    eph: Ephemeris,
+    ts: Timescale,
+    t_start: Time,
+    *,
+    step_hours: float = 2.0,
+    bracket_expand: int = 1,
+) -> Time | None:
     """Find the next apogee after t_start using distance maximization.
 
     Args:
         eph: Loaded ephemeris.
         ts: Skyfield Timescale.
         t_start: Start time for the search.
+        step_hours: Coarse sampling step in hours.
 
     Returns:
         Skyfield Time at apogee, or None if not found in the window.
@@ -1130,16 +1125,25 @@ def _find_next_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | No
         t_start,
         is_min=False,
         search_backward=False,
+        bracket_expand=bracket_expand,
     )
 
 
-def _find_next_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+def _find_next_perigee(
+    eph: Ephemeris,
+    ts: Timescale,
+    t_start: Time,
+    *,
+    step_hours: float = 2.0,
+    bracket_expand: int = 1,
+) -> Time | None:
     """Find the next perigee after t_start using distance minimization.
 
     Args:
         eph: Loaded ephemeris.
         ts: Skyfield Timescale.
         t_start: Start time for the search.
+        step_hours: Coarse sampling step in hours.
 
     Returns:
         Skyfield Time at perigee, or None if not found in the window.
@@ -1150,6 +1154,7 @@ def _find_next_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | N
         t_start,
         is_min=True,
         search_backward=False,
+        bracket_expand=bracket_expand,
     )
 
 
@@ -1189,13 +1194,21 @@ def _previous_rise_set(
     return prev_rise, prev_set
 
 
-def _find_previous_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+def _find_previous_apogee(
+    eph: Ephemeris,
+    ts: Timescale,
+    t_start: Time,
+    *,
+    step_hours: float = 2.0,
+    bracket_expand: int = 1,
+) -> Time | None:
     """Find the previous apogee before t_start using distance maximization.
 
     Args:
         eph: Loaded ephemeris.
         ts: Skyfield Timescale.
         t_start: Reference time for the search.
+        step_hours: Coarse sampling step in hours.
 
     Returns:
         Skyfield Time at apogee, or None if not found in the window.
@@ -1206,16 +1219,25 @@ def _find_previous_apogee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time 
         t_start,
         is_min=False,
         search_backward=True,
+        bracket_expand=bracket_expand,
     )
 
 
-def _find_previous_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time | None:
+def _find_previous_perigee(
+    eph: Ephemeris,
+    ts: Timescale,
+    t_start: Time,
+    *,
+    step_hours: float = 2.0,
+    bracket_expand: int = 1,
+) -> Time | None:
     """Find the previous perigee before t_start using distance minimization.
 
     Args:
         eph: Loaded ephemeris.
         ts: Skyfield Timescale.
         t_start: Reference time for the search.
+        step_hours: Coarse sampling step in hours.
 
     Returns:
         Skyfield Time at perigee, or None if not found in the window.
@@ -1226,6 +1248,7 @@ def _find_previous_perigee(eph: Ephemeris, ts: Timescale, t_start: Time) -> Time
         t_start,
         is_min=True,
         search_backward=True,
+        bracket_expand=bracket_expand,
     )
 
 
@@ -1659,7 +1682,12 @@ class _Calc:
 
     @staticmethod
     def apsis(
-        eph: Ephemeris, ts: Timescale, t: Time, tz: ZoneInfo | None
+        eph: Ephemeris,
+        ts: Timescale,
+        t: Time,
+        tz: ZoneInfo | None,
+        *,
+        high_precision: bool,
     ) -> dict[str, Any]:
         """Compute next and previous apogee/perigee times.
 
@@ -1668,27 +1696,55 @@ class _Calc:
             ts: Skyfield Timescale.
             t: Reference time.
             tz: Target timezone for formatting.
+            high_precision: Enable higher CPU usage to improve stability/accuracy.
 
         Returns:
             A payload dictionary fragment for apogee/perigee times.
         """
+        step_hours = 1.0 if high_precision else 2.0
+        bracket_expand = 2 if high_precision else 1
+
         try:
-            next_apogee = _find_next_apogee(eph, ts, t)
+            next_apogee = _find_next_apogee(
+                eph,
+                ts,
+                t,
+                step_hours=step_hours,
+                bracket_expand=bracket_expand,
+            )
         except _RECOVERABLE_NUMERIC_ERRORS:
             next_apogee = None
 
         try:
-            next_perigee = _find_next_perigee(eph, ts, t)
+            next_perigee = _find_next_perigee(
+                eph,
+                ts,
+                t,
+                step_hours=step_hours,
+                bracket_expand=bracket_expand,
+            )
         except _RECOVERABLE_NUMERIC_ERRORS:
             next_perigee = None
 
         try:
-            prev_apogee = _find_previous_apogee(eph, ts, t)
+            prev_apogee = _find_previous_apogee(
+                eph,
+                ts,
+                t,
+                step_hours=step_hours,
+                bracket_expand=bracket_expand,
+            )
         except _RECOVERABLE_NUMERIC_ERRORS:
             prev_apogee = None
 
         try:
-            prev_perigee = _find_previous_perigee(eph, ts, t)
+            prev_perigee = _find_previous_perigee(
+                eph,
+                ts,
+                t,
+                step_hours=step_hours,
+                bracket_expand=bracket_expand,
+            )
         except _RECOVERABLE_NUMERIC_ERRORS:
             prev_perigee = None
 
@@ -1970,6 +2026,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._ts: Timescale | None = None
         self._tz: ZoneInfo | None = None
         self._use_ha_tz: bool = False
+        self._high_precision: bool = DEFAULT_HIGH_PRECISION
         self._hass: HomeAssistant = hass
 
     @classmethod
@@ -1996,6 +2053,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         c._use_ha_tz = entry.options.get(CONF_USE_HA_TZ, True)
         c._tz = _tz_for_hass(hass) if c._use_ha_tz else _detect_timezone(c._lat, c._lon)
+        c._high_precision = entry.options.get(CONF_HIGH_PRECISION, True)
         return c
 
     async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
@@ -2078,7 +2136,15 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             phase_payload, events = _Calc.phases_and_names(eph, ts, t, self._tz)
             payload.update(phase_payload)
 
-            payload.update(_Calc.apsis(eph, ts, t, self._tz))
+            payload.update(
+                _Calc.apsis(
+                    eph,
+                    ts,
+                    t,
+                    self._tz,
+                    high_precision=self._high_precision,
+                )
+            )
 
             ecl_payload, ecl_raw_lons = _Calc.lunation_ecliptics(eph, events)
             payload.update(ecl_payload)

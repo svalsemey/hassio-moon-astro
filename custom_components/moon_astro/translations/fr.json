@@ -10,6 +10,13 @@
                     "longitude": "Longitude",
                     "altitude": "Altitude (m)"
                 }
+            },
+            "precision": {
+                "title": "Lune Astro",
+                "description": "Le mode haute précision diminue la variabilité des horodatages, mais augmente l’utilisation du CPU car il utilise un pas d’échantillonnage plus fin et un bracket de raffinement plus large. Il est déconseillé d’activer cette option sur les appareils peu puissants comme les Raspberry Pi.",
+                "data": {
+                    "high_precision": "Mode haute précision"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Options Lune Astro",
-                "description": "Mettre à jour l’intervalle d’interrogation et le comportement du fuseau horaire.",
+                "description": "Ajustez l’intervalle de mise à jour des capteurs et la gestion du fuseau horaire.\n\nLe mode haute précision diminue la variabilité des horodatages, mais augmente l’utilisation du CPU car il utilise un pas d’échantillonnage plus fin et un bracket de raffinement plus large. Il est déconseillé d’activer cette option sur les appareils peu puissants comme les Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Intervalle d’analyse (secondes)",
-                    "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant"
+                    "scan_interval": "Intervalle de mise à jour des capteurs (secondes)",
+                    "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant",
+                    "high_precision": "Mode haute précision"
                 }
             }
         }

@@ -10,6 +10,13 @@
                     "longitude": "Długość geograficzna",
                     "altitude": "Wysokość (m)"
                 }
+            },
+            "precision": {
+                "title": "Księżyc Astro",
+                "description": "Tryb wysokiej precyzji zmniejsza zmienność znaczników czasu, ale zwiększa użycie CPU, ponieważ wykorzystuje mniejszy krok próbkowania i szerszy zakres doprecyzowania. Nie zaleca się włączania tej opcji na urządzeniach o niskiej mocy, takich jak Raspberry Pi.",
+                "data": {
+                    "high_precision": "Tryb wysokiej precyzji"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Opcje Księżyc Astro",
-                "description": "Zaktualizuj interwał odpytywania i zachowanie strefy czasowej.",
+                "description": "Dostosuj interwał aktualizacji czujników oraz obsługę strefy czasowej.\n\nTryb wysokiej precyzji zmniejsza zmienność znaczników czasu, ale zwiększa użycie CPU, ponieważ wykorzystuje mniejszy krok próbkowania i szerszy zakres doprecyzowania. Nie zaleca się włączania tej opcji na urządzeniach o niskiej mocy, takich jak Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Interwał skanowania (sekundy)",
-                    "use_ha_timezone": "Użyj strefy czasowej Home Assistant"
+                    "scan_interval": "Interwał aktualizacji czujników (sekundy)",
+                    "use_ha_timezone": "Użyj strefy czasowej Home Assistant",
+                    "high_precision": "Tryb wysokiej precyzji"
                 }
             }
         }

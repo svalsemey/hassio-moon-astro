@@ -16,6 +16,7 @@ from homeassistant.core import callback
 
 from .const import (
     CONF_ALT,
+    CONF_HIGH_PRECISION,
     CONF_LAT,
     CONF_LON,
     CONF_SCAN_INTERVAL,
@@ -59,6 +60,7 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._user_input: dict[str, Any] | None = None
         self._download_task: asyncio.Task[bool] | None = None
         self._download_success: bool = False
+        self._options_input: dict[str, Any] | None = None
 
     def _is_reconfigure_flow(self) -> bool:
         """Return True when the current flow is a reconfiguration flow.
@@ -177,7 +179,7 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._download_task = None
 
-        next_step_id = "finalize" if self._download_success else "user"
+        next_step_id = "precision" if self._download_success else "user"
         return self.async_show_progress_done(next_step_id=next_step_id)
 
     async def _async_ensure_ephemeris(self) -> bool:
@@ -203,6 +205,28 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await cleanup_cache_dir(self.hass, remove_empty_dir=True)
             return False
 
+    async def async_step_precision(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Configure precision-related options.
+
+        Args:
+            user_input: Optional user-provided values.
+
+        Returns:
+            A ConfigFlowResult showing the form or moving to the finalize step.
+        """
+        if user_input is not None:
+            self._options_input = user_input
+            return await self.async_step_finalize()
+
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_HIGH_PRECISION, default=True): bool,
+            }
+        )
+        return self.async_show_form(step_id="precision", data_schema=schema)
+
     async def async_step_finalize(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
@@ -222,7 +246,16 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
-        return self.async_create_entry(title="Moon Astro", data=self._user_input)
+
+        options: dict[str, Any] = {}
+        if self._options_input is not None:
+            options.update(self._options_input)
+
+        return self.async_create_entry(
+            title="Moon Astro",
+            data=self._user_input,
+            options=options,
+        )
 
     async def async_step_import(
         self, user_input: dict[str, Any]
@@ -304,6 +337,10 @@ class MoonAstroOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_USE_HA_TZ,
                     default=options.get(CONF_USE_HA_TZ, True),
+                ): bool,
+                vol.Optional(
+                    CONF_HIGH_PRECISION,
+                    default=options.get(CONF_HIGH_PRECISION, True),
                 ): bool,
             }
         )

@@ -10,6 +10,13 @@
                     "longitude": "Hosszúság",
                     "altitude": "Magasság (m)"
                 }
+            },
+            "precision": {
+                "title": "Hold Asztro",
+                "description": "A nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-használatot, mivel finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott engedélyezni alacsony teljesítményű eszközökön, például Raspberry Pi-n.",
+                "data": {
+                    "high_precision": "Nagy pontosságú mód"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Hold Asztro beállítások",
-                "description": "A lekérdezési időköz és az időzóna viselkedésének frissítése.",
+                "description": "Állítsa be az érzékelők frissítési intervallumát és az időzóna kezelését.\n\nA nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-használatot, mivel finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott engedélyezni alacsony teljesítményű eszközökön, például Raspberry Pi-n.",
                 "data": {
-                    "scan_interval": "Letapogatási időköz (másodperc)",
-                    "use_ha_timezone": "A Home Assistant időzónájának használata"
+                    "scan_interval": "Érzékelők frissítési intervalluma (másodperc)",
+                    "use_ha_timezone": "Home Assistant időzónájának használata",
+                    "high_precision": "Nagy pontosságú mód"
                 }
             }
         }

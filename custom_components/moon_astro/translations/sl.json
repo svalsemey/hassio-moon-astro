@@ -10,6 +10,13 @@
                     "longitude": "Zemljepisna dolžina",
                     "altitude": "Nadmorska višina (m)"
                 }
+            },
+            "precision": {
+                "title": "Lunin Astro",
+                "description": "Način visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja finejši korak vzorčenja in širši interval izboljšave. Vklop te možnosti ni priporočljiv na napravah z manjšo zmogljivostjo, kot je Raspberry Pi.",
+                "data": {
+                    "high_precision": "Način visoke natančnosti"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Možnosti Lunin Astro",
-                "description": "Posodobite interval poizvedovanja in obnašanje časovnega pasu.",
+                "description": "Prilagodite interval posodabljanja senzorjev in ravnanje s časovnim pasom.\n\nNačin visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja finejši korak vzorčenja in širši interval izboljšave. Vklop te možnosti ni priporočljiv na napravah z manjšo zmogljivostjo, kot je Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Interval skeniranja (sekunde)",
-                    "use_ha_timezone": "Uporabi časovni pas Home Assistant"
+                    "scan_interval": "Interval posodabljanja senzorjev (sekunde)",
+                    "use_ha_timezone": "Uporabi časovni pas Home Assistant",
+                    "high_precision": "Način visoke natančnosti"
                 }
             }
         }

@@ -10,6 +10,13 @@
                     "longitude": "경도",
                     "altitude": "고도 (m)"
                 }
+            },
+            "precision": {
+                "title": "문 아스트로",
+                "description": "고정밀 모드는 타임스탬프 변동성을 줄이지만, 더 미세한 샘플링 단계와 더 넓은 정밀화 범위를 사용하므로 CPU 사용량이 증가합니다. Raspberry Pi와 같은 저사양 장치에서는 활성화를 권장하지 않습니다.",
+                "data": {
+                    "high_precision": "고정밀 모드"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "문 아스트로 옵션",
-                "description": "폴링 간격과 시간대 동작을 업데이트합니다.",
+                "description": "센서 업데이트 간격과 시간대 처리 방식을 조정합니다.\n\n고정밀 모드는 타임스탬프 변동성을 줄이지만, 더 미세한 샘플링 단계와 더 넓은 정밀화 범위를 사용하므로 CPU 사용량이 증가합니다. Raspberry Pi와 같은 저사양 장치에서는 활성화를 권장하지 않습니다.",
                 "data": {
-                    "scan_interval": "스캔 간격(초)",
-                    "use_ha_timezone": "Home Assistant의 시간대 사용"
+                    "scan_interval": "센서 업데이트 간격(초)",
+                    "use_ha_timezone": "Home Assistant 시간대 사용",
+                    "high_precision": "고정밀 모드"
                 }
             }
         }

@@ -10,6 +10,13 @@
                     "longitude": "Longitud",
                     "altitude": "Altitud (m)"
                 }
+            },
+            "precision": {
+                "title": "Luna Astro",
+                "description": "El modo de alta precisión reduce la variabilidad de las marcas de tiempo, pero aumenta el uso de CPU porque utiliza un paso de muestreo más fino y un rango de refinamiento más amplio. No se recomienda activar esta opción en dispositivos de baja potencia como Raspberry Pi.",
+                "data": {
+                    "high_precision": "Modo de alta precisión"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Opciones de Luna Astro",
-                "description": "Ajusta el intervalo de actualización y el manejo de la zona horaria",
+                "description": "Ajusta el intervalo de actualización de los sensores y la gestión de la zona horaria.\n\nEl modo de alta precisión reduce la variabilidad de las marcas de tiempo, pero aumenta el uso de CPU porque utiliza un paso de muestreo más fino y un rango de refinamiento más amplio. No se recomienda activar esta opción en dispositivos de baja potencia como Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Intervalo de actualización (segundos)",
-                    "use_ha_timezone": "Usar la zona horaria de Home Assistant"
+                    "scan_interval": "Intervalo de actualización de los sensores (segundos)",
+                    "use_ha_timezone": "Usar la zona horaria de Home Assistant",
+                    "high_precision": "Modo de alta precisión"
                 }
             }
         }

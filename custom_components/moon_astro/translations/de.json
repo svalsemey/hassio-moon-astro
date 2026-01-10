@@ -10,6 +10,13 @@
                     "longitude": "Längengrad",
                     "altitude": "Höhe (m)"
                 }
+            },
+            "precision": {
+                "title": "Mond Astro",
+                "description": "Der Hochpräzisionsmodus verringert die Variabilität der Zeitstempel, erhöht jedoch die CPU-Auslastung, da er eine feinere Abtastschrittweite und ein breiteres Verfeinerungsintervall verwendet. Es wird nicht empfohlen, diese Option auf leistungsschwachen Geräten wie Raspberry Pi zu aktivieren.",
+                "data": {
+                    "high_precision": "Hochpräzisionsmodus"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Optionen für Mond Astro",
-                "description": "Aktualisierungsintervall und Zeitzonenbehandlung anpassen",
+                "description": "Passen Sie das Aktualisierungsintervall der Sensoren und die Zeitzonenbehandlung an.\n\nDer Hochpräzisionsmodus verringert die Variabilität der Zeitstempel, erhöht jedoch die CPU-Auslastung, da er eine feinere Abtastschrittweite und ein breiteres Verfeinerungsintervall verwendet. Es wird nicht empfohlen, diese Option auf leistungsschwachen Geräten wie Raspberry Pi zu aktivieren.",
                 "data": {
-                    "scan_interval": "Abfrageintervall (Sekunden)",
-                    "use_ha_timezone": "Zeitzone von Home Assistant verwenden"
+                    "scan_interval": "Aktualisierungsintervall der Sensoren (Sekunden)",
+                    "use_ha_timezone": "Zeitzone von Home Assistant verwenden",
+                    "high_precision": "Hochpräzisionsmodus"
                 }
             }
         }

@@ -9,11 +9,13 @@ from __future__ import annotations
 # Domain and basic config
 DOMAIN = "moon_astro"
 DEFAULT_SCAN_INTERVAL = 300  # seconds
+DEFAULT_HIGH_PRECISION = True
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_LAT = "latitude"
 CONF_LON = "longitude"
 CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
+CONF_HIGH_PRECISION = "high_precision"
 
 # Files and external resources
 CACHE_DIR_NAME = ".skyfield"

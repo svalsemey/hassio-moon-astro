@@ -10,6 +10,13 @@
                     "longitude": "Pituusaste",
                     "altitude": "Korkeus (m)"
                 }
+            },
+            "precision": {
+                "title": "Kuu Astro",
+                "description": "Korkean tarkkuuden tila vähentää aikaleimojen vaihtelua, mutta lisää suorittimen käyttöä, koska se käyttää hienompaa näytteenottoväliä ja laajempaa tarkennushaarukkaa. Tätä ei suositella heikkotehoisille laitteille, kuten Raspberry Pi:lle.",
+                "data": {
+                    "high_precision": "Korkean tarkkuuden tila"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Kuu Astro -asetukset",
-                "description": "Säädä päivitysväliä ja aikavyöhykkeen käsittelyä.",
+                "description": "Säädä antureiden päivitysväliä ja aikavyöhykkeen käsittelyä.\n\nKorkean tarkkuuden tila vähentää aikaleimojen vaihtelua, mutta lisää suorittimen käyttöä, koska se käyttää hienompaa näytteenottoväliä ja laajempaa tarkennushaarukkaa. Tätä ei suositella heikkotehoisille laitteille, kuten Raspberry Pi:lle.",
                 "data": {
-                    "scan_interval": "Päivitysväli (s)",
-                    "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä"
+                    "scan_interval": "Antureiden päivitysväli (sekuntia)",
+                    "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä",
+                    "high_precision": "Korkean tarkkuuden tila"
                 }
             }
         }

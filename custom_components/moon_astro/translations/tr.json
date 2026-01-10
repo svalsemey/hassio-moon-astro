@@ -10,6 +10,13 @@
                     "longitude": "Boylam",
                     "altitude": "Rakım (m)"
                 }
+            },
+            "precision": {
+                "title": "Ay Astro",
+                "description": "Yüksek hassasiyet modu zaman damgası değişkenliğini azaltır, ancak daha ince bir örnekleme adımı ve daha geniş bir iyileştirme aralığı kullandığı için CPU kullanımını artırır. Raspberry Pi gibi düşük güçlü cihazlarda bu seçeneğin etkinleştirilmesi önerilmez.",
+                "data": {
+                    "high_precision": "Yüksek hassasiyet modu"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Ay Astro seçenekleri",
-                "description": "Yoklama aralığını ve saat dilimi davranışını güncelleyin.",
+                "description": "Sensör güncelleme aralığını ve saat dilimi işlemesini ayarlayın.\n\nYüksek hassasiyet modu zaman damgası değişkenliğini azaltır, ancak daha ince bir örnekleme adımı ve daha geniş bir iyileştirme aralığı kullandığı için CPU kullanımını artırır. Raspberry Pi gibi düşük güçlü cihazlarda bu seçeneğin etkinleştirilmesi önerilmez.",
                 "data": {
-                    "scan_interval": "Tarama aralığı (saniye)",
-                    "use_ha_timezone": "Home Assistant saat dilimini kullan"
+                    "scan_interval": "Sensör güncelleme aralığı (saniye)",
+                    "use_ha_timezone": "Home Assistant saat dilimini kullan",
+                    "high_precision": "Yüksek hassasiyet modu"
                 }
             }
         }

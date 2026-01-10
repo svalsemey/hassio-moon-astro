@@ -10,6 +10,13 @@
                     "longitude": "Longitude",
                     "altitude": "Altitude (m)"
                 }
+            },
+            "precision": {
+                "title": "Lua Astro",
+                "description": "O modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso de CPU porque utiliza um passo de amostragem mais fino e um intervalo de refinamento mais amplo. Não é recomendável ativar esta opção em dispositivos de baixo desempenho, como o Raspberry Pi.",
+                "data": {
+                    "high_precision": "Modo de alta precisão"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Opções do Lua Astro",
-                "description": "Atualize o intervalo de pesquisa e o comportamento do fuso horário.",
+                "description": "Ajuste o intervalo de atualização dos sensores e o tratamento do fuso horário.\n\nO modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso de CPU porque utiliza um passo de amostragem mais fino e um intervalo de refinamento mais amplo. Não é recomendável ativar esta opção em dispositivos de baixo desempenho, como o Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Intervalo de varredura (segundos)",
-                    "use_ha_timezone": "Usar o fuso horário do Home Assistant"
+                    "scan_interval": "Intervalo de atualização dos sensores (segundos)",
+                    "use_ha_timezone": "Usar o fuso horário do Home Assistant",
+                    "high_precision": "Modo de alta precisão"
                 }
             }
         }

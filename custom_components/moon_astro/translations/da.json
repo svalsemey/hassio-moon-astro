@@ -10,6 +10,13 @@
                     "longitude": "Længdegrad",
                     "altitude": "Højde (m)"
                 }
+            },
+            "precision": {
+                "title": "Måne Astro",
+                "description": "Højpræcisionstilstand reducerer variationen i tidsstempler, men øger CPU-forbruget, fordi den bruger et finere samplingtrin og et bredere forfinelsesinterval. Det anbefales ikke at aktivere denne mulighed på enheder med lav ydeevne som Raspberry Pi.",
+                "data": {
+                    "high_precision": "Højpræcisionstilstand"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Indstillinger for Måne Astro",
-                "description": "Juster opdateringsinterval og håndtering af tidszone",
+                "description": "Juster sensorernes opdateringsinterval og håndtering af tidszone.\n\nHøjpræcisionstilstand reducerer variationen i tidsstempler, men øger CPU-forbruget, fordi den bruger et finere samplingtrin og et bredere forfinelsesinterval. Det anbefales ikke at aktivere denne mulighed på enheder med lav ydeevne som Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Opdateringsinterval (sekunder)",
-                    "use_ha_timezone": "Brug Home Assistants tidszone"
+                    "scan_interval": "Opdateringsinterval for sensorer (sekunder)",
+                    "use_ha_timezone": "Brug Home Assistants tidszone",
+                    "high_precision": "Højpræcisionstilstand"
                 }
             }
         }

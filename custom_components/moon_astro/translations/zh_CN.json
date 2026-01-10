@@ -10,6 +10,13 @@
                     "longitude": "经度",
                     "altitude": "海拔（米）"
                 }
+            },
+            "precision": {
+                "title": "月亮阿斯特罗",
+                "description": "高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更精细的采样步长和更宽的精炼范围。不建议在 Raspberry Pi 等低性能设备上启用此选项。",
+                "data": {
+                    "high_precision": "高精度模式"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "月相天文选项",
-                "description": "调整更新间隔与时区处理方式",
+                "description": "调整传感器更新间隔以及时区处理方式。\n\n高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更精细的采样步长和更宽的精炼范围。不建议在 Raspberry Pi 等低性能设备上启用此选项。",
                 "data": {
-                    "scan_interval": "扫描间隔（秒）",
-                    "use_ha_timezone": "使用 Home Assistant 的时区"
+                    "scan_interval": "传感器更新间隔（秒）",
+                    "use_ha_timezone": "使用 Home Assistant 时区",
+                    "high_precision": "高精度模式"
                 }
             }
         }

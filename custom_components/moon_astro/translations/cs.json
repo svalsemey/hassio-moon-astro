@@ -10,6 +10,13 @@
                     "longitude": "Zeměpisná délka",
                     "altitude": "Nadmořská výška (m)"
                 }
+            },
+            "precision": {
+                "title": "Měsíc Astro",
+                "description": "Režim vysoké přesnosti snižuje variabilitu časových razítek, ale zvyšuje využití CPU, protože používá jemnější krok vzorkování a širší interval zpřesnění. Nedoporučuje se jej zapínat na méně výkonných zařízeních, jako je Raspberry Pi.",
+                "data": {
+                    "high_precision": "Režim vysoké přesnosti"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Možnosti Měsíc Astro",
-                "description": "Upravte interval aktualizace a zpracování časového pásma",
+                "description": "Upravte interval aktualizace senzorů a práci s časovým pásmem.\n\nRežim vysoké přesnosti snižuje variabilitu časových razítek, ale zvyšuje využití CPU, protože používá jemnější krok vzorkování a širší interval zpřesnění. Nedoporučuje se jej zapínat na méně výkonných zařízeních, jako je Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Interval aktualizace (sekundy)",
-                    "use_ha_timezone": "Použít časové pásmo Home Assistant"
+                    "scan_interval": "Interval aktualizace senzorů (sekundy)",
+                    "use_ha_timezone": "Použít časové pásmo Home Assistant",
+                    "high_precision": "Režim vysoké přesnosti"
                 }
             }
         }

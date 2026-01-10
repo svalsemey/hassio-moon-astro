@@ -10,6 +10,13 @@
                     "longitude": "Lengdegrad",
                     "altitude": "Høyde (m)"
                 }
+            },
+            "precision": {
+                "title": "Måne Astro",
+                "description": "Høypresisjonsmodus reduserer variasjonen i tidsstempler, men øker CPU-bruken fordi den bruker et finere samplingsteg og en bredere forfiningsbrakett. Det anbefales ikke å aktivere dette på enheter med lav ytelse som Raspberry Pi.",
+                "data": {
+                    "high_precision": "Høypresisjonsmodus"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Alternativer for Måne Astro",
-                "description": "Oppdater intervall for spørring og oppførsel for tidssone.",
+                "description": "Juster sensorenes oppdateringsintervall og håndtering av tidssone.\n\nHøypresisjonsmodus reduserer variasjonen i tidsstempler, men øker CPU-bruken fordi den bruker et finere samplingsteg og en bredere forfiningsbrakett. Det anbefales ikke å aktivere dette på enheter med lav ytelse som Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Skanningsintervall (sekunder)",
-                    "use_ha_timezone": "Bruk Home Assistants tidssone"
+                    "scan_interval": "Oppdateringsintervall for sensorer (sekunder)",
+                    "use_ha_timezone": "Bruk Home Assistant-tidssone",
+                    "high_precision": "Høypresisjonsmodus"
                 }
             }
         }

@@ -10,6 +10,13 @@
                     "longitude": "Longitudine",
                     "altitude": "Altitudine (m)"
                 }
+            },
+            "precision": {
+                "title": "Lună Astro",
+                "description": "Modul de înaltă precizie reduce variabilitatea marcajelor temporale, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat să activați această opțiune pe dispozitive cu putere redusă, precum Raspberry Pi.",
+                "data": {
+                    "high_precision": "Mod de înaltă precizie"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Opțiuni Lună Astro",
-                "description": "Actualizează intervalul de interogare și comportamentul fusului orar.",
+                "description": "Ajustați intervalul de actualizare al senzorilor și gestionarea fusului orar.\n\nModul de înaltă precizie reduce variabilitatea marcajelor temporale, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat să activați această opțiune pe dispozitive cu putere redusă, precum Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Interval de scanare (secunde)",
-                    "use_ha_timezone": "Folosește fusul orar al Home Assistant"
+                    "scan_interval": "Interval de actualizare a senzorilor (secunde)",
+                    "use_ha_timezone": "Utilizați fusul orar Home Assistant",
+                    "high_precision": "Mod de înaltă precizie"
                 }
             }
         }

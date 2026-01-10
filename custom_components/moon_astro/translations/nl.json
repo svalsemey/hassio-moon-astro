@@ -10,6 +10,13 @@
                     "longitude": "Lengtegraad",
                     "altitude": "Hoogte (m)"
                 }
+            },
+            "precision": {
+                "title": "Maan Astro",
+                "description": "De modus hoge precisie vermindert de variabiliteit van tijdstempels, maar verhoogt het CPU-gebruik omdat er een fijnere samplingstap en een bredere verfijningsmarge wordt gebruikt. Het wordt niet aanbevolen om deze optie in te schakelen op apparaten met weinig rekenkracht zoals Raspberry Pi.",
+                "data": {
+                    "high_precision": "Modus hoge precisie"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Maan Astro-opties",
-                "description": "Werk het poll-interval en het tijdzonegedrag bij.",
+                "description": "Pas het update-interval van de sensoren en de tijdzoneafhandeling aan.\n\nDe modus hoge precisie vermindert de variabiliteit van tijdstempels, maar verhoogt het CPU-gebruik omdat er een fijnere samplingstap en een bredere verfijningsmarge wordt gebruikt. Het wordt niet aanbevolen om deze optie in te schakelen op apparaten met weinig rekenkracht zoals Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Scaninterval (seconden)",
-                    "use_ha_timezone": "Tijdzone van Home Assistant gebruiken"
+                    "scan_interval": "Update-interval van sensoren (seconden)",
+                    "use_ha_timezone": "Tijdzone van Home Assistant gebruiken",
+                    "high_precision": "Modus hoge precisie"
                 }
             }
         }

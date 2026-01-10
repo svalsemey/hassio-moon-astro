@@ -10,6 +10,13 @@
                     "longitude": "Longitude",
                     "altitude": "Altitude (m)"
                 }
+            },
+            "precision": {
+                "title": "Moon Astro",
+                "description": "High precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.",
+                "data": {
+                    "high_precision": "High precision mode"
+                }
             }
         },
         "progress": {
@@ -25,10 +32,11 @@
         "step": {
             "init": {
                 "title": "Moon Astro options",
-                "description": "Adjust update interval and time zone handling",
+                "description": "Adjust the sensors update interval and time zone handling.\n\nHigh precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.",
                 "data": {
-                    "scan_interval": "Scan interval (seconds)",
-                    "use_ha_timezone": "Use Home Assistant time zone"
+                    "scan_interval": "Sensors update interval (seconds)",
+                    "use_ha_timezone": "Use Home Assistant time zone",
+                    "high_precision": "High precision mode"
                 }
             }
         }
@@ -43,7 +51,7 @@
                 }
             }
         },
-       "sensor": {
+        "sensor": {
             "sensor_phase": {
                 "name": "Phase",
                 "state": {
