@@ -38,6 +38,8 @@ from .const import (
     FIRST_QUARTER,
     FULL_MOON,
     FULL_MOON_STRICT_PCT,
+    HIGH_PRECISION_BRACKET_EXPAND,
+    HIGH_PRECISION_STEP_HOURS,
     KEY_ABOVE_HORIZON,
     KEY_AZIMUTH,
     KEY_DISTANCE,
@@ -1036,6 +1038,335 @@ def _local_rescan_refine_bracket(
     return best_a, best_b
 
 
+def _brent_root(
+    f: Callable[[float], float],
+    a: float,
+    b: float,
+    *,
+    tol: float = 1e-10,
+    max_iter: int = 200,
+) -> float | None:
+    """Find a root of f(x)=0 on [a,b] using a Brent-style bracketing method.
+
+    The function requires a sign change over the bracket. The implementation is
+    designed to be deterministic and robust for numerical derivatives.
+
+    Args:
+        f: Scalar function.
+        a: Left bracket bound.
+        b: Right bracket bound.
+        tol: Absolute tolerance on the abscissa.
+        max_iter: Maximum iterations.
+
+    Returns:
+        The root location in the independent variable, or None if no sign change.
+    """
+    fa = float(f(a))
+    fb = float(f(b))
+
+    if math.isnan(fa) or math.isnan(fb):
+        return None
+    if fa == 0.0:
+        return a
+    if fb == 0.0:
+        return b
+    if fa * fb > 0.0:
+        return None
+
+    c = a
+    fc = fa
+    d = e = b - a
+
+    for _ in range(max_iter):
+        if fb == 0.0:
+            return b
+
+        # Ensure |fb| <= |fc|
+        if abs(fc) < abs(fb):
+            a, b, c = b, c, b
+            fa, fb, fc = fb, fc, fb
+
+        tol1 = 2.0 * 1e-12 + 0.5 * tol
+        m = 0.5 * (c - b)
+
+        if abs(m) <= tol1:
+            return b
+
+        if abs(e) >= tol1 and abs(fa) > abs(fb):
+            s = fb / fa
+            p: float
+            q: float
+
+            if a == c:
+                # Secant
+                p = 2.0 * m * s
+                q = 1.0 - s
+            else:
+                # Inverse quadratic interpolation
+                q = fa / fc
+                r = fb / fc
+                p = s * (2.0 * m * q * (q - r) - (b - a) * (r - 1.0))
+                q = (q - 1.0) * (r - 1.0) * (s - 1.0)
+
+            if p > 0.0:
+                q = -q
+            p = abs(p)
+
+            cond1 = 2.0 * p >= 3.0 * m * q - abs(tol1 * q)
+            cond2 = p >= abs(0.5 * e * q)
+
+            if cond1 or cond2 or q == 0.0:
+                e = d
+                d = m
+            else:
+                e = d
+                d = p / q
+        else:
+            e = d
+            d = m
+
+        a = b
+        fa = fb
+        if abs(d) > tol1:
+            b = b + d
+        else:
+            b = b + (tol1 if m > 0 else -tol1)
+
+        fb = float(f(b))
+
+        # Maintain the bracket on (b,c)
+        if fb * fc > 0.0:
+            c = a
+            fc = fa
+            d = e = b - a
+
+    return None
+
+
+def _derivative_distance_tt(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    tt: float,
+    *,
+    h_minutes: float,
+) -> float:
+    """Return a centered finite-difference derivative of distance wrt TT time.
+
+    Args:
+        ts: Skyfield Timescale (not used directly, kept for signature symmetry).
+        f_tt: Distance function f(tt)->km.
+        tt: Evaluation point (TT Julian date).
+        h_minutes: Half-step in minutes for centered differences.
+
+    Returns:
+        Approximate derivative in km/day (TT days in denominator).
+    """
+    h_days = h_minutes / 1440.0
+    a = tt - h_days
+    b = tt + h_days
+    da = float(f_tt(a))
+    db = float(f_tt(b))
+    return (db - da) / (2.0 * h_days)
+
+
+def _find_derivative_sign_brackets(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    t_start: Time,
+    *,
+    search_backward: bool,
+    days_window: float,
+    step_minutes: float,
+    h_minutes: float,
+    max_candidates: int = 6,
+) -> list[tuple[float, float]]:
+    """Find brackets where the distance derivative changes sign.
+
+    The function samples a centered finite-difference derivative on a regular TT grid
+    and returns candidate intervals [tt_i, tt_{i+1}] where a sign change occurs.
+
+    The returned brackets are ordered by proximity to t_start to reduce variability
+    when multiple sign changes exist inside the search window.
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Distance function f(tt)->km.
+        t_start: Reference time.
+        search_backward: Search backward if True, otherwise forward.
+        days_window: Search window size in days.
+        step_minutes: Sampling step in minutes.
+        h_minutes: Half-step for centered derivative in minutes.
+        max_candidates: Hard cap on returned brackets.
+
+    Returns:
+        A list of (tt_left, tt_right) candidate brackets, ordered by proximity to t_start.
+    """
+    step_days = step_minutes / 1440.0
+    if step_days <= 0.0:
+        return []
+
+    tt_ref = float(t_start.tt)
+    tt0 = tt_ref - float(days_window) if search_backward else tt_ref
+    tt1 = tt_ref if search_backward else tt_ref + float(days_window)
+
+    if not (tt1 > tt0):
+        return []
+
+    span = tt1 - tt0
+    steps = int(math.ceil(span / step_days)) + 1
+    if steps < 3:
+        return []
+
+    tts: list[float] = []
+    vals: list[float] = []
+
+    for i in range(steps):
+        tt_i = min(tt0 + i * step_days, tt1)
+
+        tts.append(tt_i)
+        vals.append(_derivative_distance_tt(ts, f_tt, tt_i, h_minutes=h_minutes))
+
+        if tt_i == tt1:
+            break
+
+    brackets: list[tuple[float, float]] = []
+    for i in range(len(tts) - 1):
+        a_tt = tts[i]
+        b_tt = tts[i + 1]
+        fa = vals[i]
+        fb = vals[i + 1]
+
+        if math.isnan(fa) or math.isnan(fb):
+            continue
+
+        if fa == 0.0:
+            left = max(tt0, a_tt - step_days)
+            right = min(tt1, a_tt + step_days)
+            if right > left:
+                brackets.append((left, right))
+        elif fa * fb < 0.0:
+            brackets.append((a_tt, b_tt))
+
+    if not brackets:
+        return []
+
+    # Filter brackets by direction relative to t_start to avoid selecting "wrong side" candidates.
+    # A bracket is kept if its center lies strictly on the expected side of t_start.
+    filtered: list[tuple[float, float]] = []
+    for a_tt, b_tt in brackets:
+        center = 0.5 * (a_tt + b_tt)
+        if search_backward:
+            if center < tt_ref:
+                filtered.append((a_tt, b_tt))
+        elif center > tt_ref:
+            filtered.append((a_tt, b_tt))
+
+    if not filtered:
+        return []
+
+    # Sort by proximity to t_start (deterministic tie-breakers included).
+    # Primary: |center - tt_ref|
+    # Secondary: smaller bracket width first (tighter bracket is preferred)
+    # Tertiary: chronological order for full determinism
+    def _sort_key(item: tuple[float, float]) -> tuple[float, float, float]:
+        """Return a deterministic sort key for a bracket."""
+        a_tt, b_tt = item
+        center = 0.5 * (a_tt + b_tt)
+        width = max(0.0, b_tt - a_tt)
+        return (abs(center - tt_ref), width, a_tt)
+
+    filtered.sort(key=_sort_key)
+
+    # Limit output size after sorting to keep CPU bounded.
+    return filtered[: max(1, int(max_candidates))]
+
+
+def _classify_extremum_kind_at_tt(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    tt_center: float,
+) -> bool | None:
+    """Classify an extremum as minimum or maximum around a candidate center.
+
+    The classification uses a symmetric comparison around the center:
+    - if f(center) <= f(center±delta): minimum
+    - if f(center) >= f(center±delta): maximum
+
+    Args:
+        ts: Skyfield Timescale (not used directly, kept for signature symmetry).
+        f_tt: Distance function f(tt)->km.
+        tt_center: Candidate TT Julian date.
+
+    Returns:
+        True if the extremum is a minimum, False if maximum, or None if undecidable.
+    """
+    delta_days = 2.0 / 1440.0  # 2 minutes
+    y0 = float(f_tt(tt_center))
+    yl = float(f_tt(tt_center - delta_days))
+    yr = float(f_tt(tt_center + delta_days))
+
+    if math.isnan(y0) or math.isnan(yl) or math.isnan(yr):
+        return None
+
+    if y0 <= yl and y0 <= yr:
+        return True
+    if y0 >= yl and y0 >= yr:
+        return False
+    return None
+
+
+def _select_extremum_candidate(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    candidates_tt: list[float],
+    t_start: Time,
+    *,
+    is_min: bool,
+    search_backward: bool,
+) -> float | None:
+    """Select the nearest candidate extremum time matching direction and kind.
+
+    This selector is deterministic:
+    - it filters candidates by direction relative to t_start
+    - it filters by minimum/maximum classification
+    - it selects the chronologically nearest valid candidate
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Distance function f(tt)->km.
+        candidates_tt: Candidate TT solutions.
+        t_start: Reference time.
+        is_min: True for perigee, False for apogee.
+        search_backward: True for previous, False for next.
+
+    Returns:
+        Selected candidate TT or None.
+    """
+    ref_tt = t_start.tt
+    filtered: list[float] = []
+
+    for tt in candidates_tt:
+        if search_backward and not (tt < ref_tt):
+            continue
+        if (not search_backward) and not (tt > ref_tt):
+            continue
+
+        kind = _classify_extremum_kind_at_tt(ts, f_tt, tt)
+        if kind is None:
+            continue
+        if bool(kind) != bool(is_min):
+            continue
+
+        filtered.append(tt)
+
+    if not filtered:
+        return None
+
+    if search_backward:
+        return max(filtered)
+    return min(filtered)
+
+
 def _minute_validation_extremum(
     ts: Timescale,
     f_tt: Callable[[float], float],
@@ -1107,21 +1438,29 @@ def _find_geocentric_distance_extremum(
 ) -> Time | None:
     """Find a local extremum of the geocentric Earth-Moon distance around a reference time.
 
+    In high precision mode, a derivative-based strategy is used:
+    - detect sign-change brackets for d(distance)/dt on a TT grid
+    - refine root times using a bracketing root solver
+    - classify each root as minimum/maximum
+    - select the nearest candidate in the required direction
+    - snap to a deterministic minute-aligned extremum
+
+    In normal mode, the original distance-extremum strategy is preserved.
+
     Args:
         eph: Loaded ephemeris.
         ts: Skyfield Timescale.
         t_start: Reference time for the search.
         is_min: True to search for a minimum (perigee), False for a maximum (apogee).
-        search_backward: True to search in the past window [t_start - days_window, t_start],
-            False to search in the future window [t_start, t_start + days_window].
+        search_backward: True to search in the past window, False to search in the future window.
         days_window: Search window size in days.
-        step_hours: Coarse sampling step in hours used to locate a bracketing interval.
-        bracket_expand: Extra samples included on each side of the detected bracket.
-        tol: Absolute tolerance on TT Julian date during Brent refinement.
-        max_iter: Maximum number of Brent iterations.
+        step_hours: Coarse sampling step in hours used to locate a bracketing interval (normal mode).
+        bracket_expand: Extra samples included on each side of the detected bracket (normal mode).
+        tol: Absolute tolerance on TT Julian date during refinement.
+        max_iter: Maximum number of refinement iterations.
 
     Returns:
-        A Skyfield Time for the extremum, or None if no suitable bracket is found.
+        A Skyfield Time for the extremum, or None if not found.
     """
     earth, moon = eph["earth"], eph["moon"]
 
@@ -1145,9 +1484,72 @@ def _find_geocentric_distance_extremum(
         Returns:
             Geocentric distance in kilometers.
         """
-        return geocentric_distance_km(ts.tt_jd(tt))
+        return float(geocentric_distance_km(ts.tt_jd(tt)))
 
-    # Build a monotonic time grid for coarse sampling.
+    # Enable additional stability refinements only in high precision mode.
+    use_high_precision_refine = (
+        step_hours <= HIGH_PRECISION_STEP_HOURS
+        and bracket_expand >= HIGH_PRECISION_BRACKET_EXPAND
+    )
+
+    if use_high_precision_refine:
+        # Derivative sign-change + root refinement.
+        # Sampling in minutes is intentionally fine to eliminate ±10 min volatility.
+        step_minutes = 10.0
+        h_minutes = 20.0
+
+        brackets = _find_derivative_sign_brackets(
+            ts,
+            f_tt,
+            t_start,
+            search_backward=search_backward,
+            days_window=days_window,
+            step_minutes=step_minutes,
+            h_minutes=h_minutes,
+            max_candidates=8,
+        )
+        if not brackets:
+            return None
+
+        def g_tt(tt: float) -> float:
+            """Return derivative proxy d(distance)/d(TT day) at tt."""
+            return _derivative_distance_tt(ts, f_tt, tt, h_minutes=h_minutes)
+
+        # Choose refinement strategy:
+        # - Option 1: refine multiple brackets then select the nearest valid candidate (more robust).
+        # - Option 2: refine only the nearest bracket (lower CPU).
+        #
+        # The decision is derived from the same high-precision signature already used in this module
+        # (step_hours <= 1 and bracket_expand >= 2) and from the bracket list size after sorting.
+        refine_multiple = True
+        if len(brackets) <= 1:
+            refine_multiple = False
+
+        brackets_to_refine = brackets if refine_multiple else brackets[:1]
+
+        roots: list[float] = []
+        for a_tt, b_tt in brackets_to_refine:
+            root = _brent_root(g_tt, a_tt, b_tt, tol=tol, max_iter=max_iter)
+            if root is None:
+                continue
+            if not math.isfinite(root):
+                continue
+            roots.append(float(root))
+
+        selected_tt = _select_extremum_candidate(
+            ts,
+            f_tt,
+            roots,
+            t_start,
+            is_min=is_min,
+            search_backward=search_backward,
+        )
+        if selected_tt is None:
+            return None
+
+        return _minute_validation_extremum(ts, f_tt, selected_tt, is_min=is_min)
+
+    # Original extremum search (kept for non-high-precision mode).
     steps = int(days_window * 24.0 / step_hours) + 1
     t0 = (t_start - days_window) if search_backward else t_start
 
@@ -1161,31 +1563,22 @@ def _find_geocentric_distance_extremum(
 
     bracket_kind = "min" if is_min else "max"
     brackets = _refine_brackets(
-        t_list,
-        d_list,
-        kind=bracket_kind,
-        expand=bracket_expand,
+        t_list, d_list, kind=bracket_kind, expand=bracket_expand
     )
     if not brackets:
         return None
 
-    # Choose the nearest candidate bracket depending on search direction.
-    # - Forward: first bracket whose center time is strictly after t_start
-    # - Backward: last bracket whose center time is strictly before t_start
     t0_tt = t_start.tt
-
     chosen: tuple[float, float, int] | None = None
     if search_backward:
         for tt_a, tt_b, idx_center in brackets:
-            tt_center = t_list[idx_center].tt
-            if tt_center < t0_tt:
+            if t_list[idx_center].tt < t0_tt:
                 chosen = (tt_a, tt_b, idx_center)
             else:
                 break
     else:
         for tt_a, tt_b, idx_center in brackets:
-            tt_center = t_list[idx_center].tt
-            if tt_center > t0_tt:
+            if t_list[idx_center].tt > t0_tt:
                 chosen = (tt_a, tt_b, idx_center)
                 break
 
@@ -1193,34 +1586,8 @@ def _find_geocentric_distance_extremum(
         return None
 
     tt_a, tt_b, _idx_center = chosen
-
-    # Enable additional stability refinements only in high precision mode.
-    # The integration uses step_hours=1 and bracket_expand=2 for this mode.
-    # Determining high precision mode here from step_hours and bracket_expand
-    # avoids transmitting Home Assistant configuration settings down to this level.
-    use_high_precision_refine = (step_hours <= 1.0) and (bracket_expand >= 2)
-
-    if use_high_precision_refine:
-        refined = _local_rescan_refine_bracket(
-            ts,
-            f_tt,
-            tt_a,
-            tt_b,
-            is_min=is_min,
-        )
-        if refined is not None:
-            tt_a, tt_b = refined
-
     res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
     t_ext = ts.tt_jd(res.tt)
-
-    if use_high_precision_refine:
-        t_ext = _minute_validation_extremum(
-            ts,
-            f_tt,
-            t_ext.tt,
-            is_min=is_min,
-        )
 
     if search_backward:
         return t_ext if t_ext.tt < t_start.tt else None
@@ -1585,6 +1952,11 @@ def _next_full_moon_name_code(
 ) -> str | None:
     """Compute the next full moon name code using local timezone for "blue moon" detection.
 
+    The function returns:
+    - "blue_moon" when the next full moon is the second full moon occurring within the same
+      local calendar month as the previous full moon
+    - otherwise the canonical monthly name code based on the local month of the next full moon
+
     Args:
         ts: Skyfield Timescale.
         eph: Loaded ephemeris.
@@ -1597,13 +1969,17 @@ def _next_full_moon_name_code(
     try:
         f = almanac.moon_phases(eph)
 
-        # Next full moon strictly after t_start
+        # Next full moon strictly after t_start.
         t_full_1 = _find_phase_next(ts, f, t_start, FULL_MOON)
         if t_full_1 is None:
             return None
 
-        # Previous full moon relative to t_full_1 (needed to decide if t_full_1 is the second in month)
-        t_full_0 = _find_phase_previous(ts, f, t_full_1, FULL_MOON)
+        # Step back slightly to ensure the previous search does not re-select the same event
+        # in edge cases where time comparisons are close to the event instant.
+        t_before_full_1 = ts.tt_jd(t_full_1.tt - (1.0 / 86400.0))  # 1 second in TT days
+
+        # Previous full moon relative to the next full moon (candidate for first in local month).
+        t_full_0 = _find_phase_previous(ts, f, t_before_full_1, FULL_MOON)
 
         if _is_second_full_moon_in_same_month_local(t_full_0, t_full_1, tz):
             return "blue_moon"
@@ -1836,8 +2212,8 @@ class _Calc:
         Returns:
             A payload dictionary fragment for apogee/perigee times.
         """
-        step_hours = 1.0 if high_precision else 2.0
-        bracket_expand = 2 if high_precision else 1
+        step_hours = HIGH_PRECISION_STEP_HOURS if high_precision else 2.0
+        bracket_expand = HIGH_PRECISION_BRACKET_EXPAND if high_precision else 1
 
         try:
             next_apogee = _find_next_apogee(

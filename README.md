@@ -48,7 +48,7 @@ Moon Astro can run in a high precision mode designed to reduce timestamp variabi
 
 In this mode, additional refinement is applied to apsides computations (apogee/perigee) to improve the stability of the computed timestamps:
 - the search uses a finer coarse sampling step to identify candidate extrema more reliably
-- the extremum bracket is refined more aggressively to converge to a stable solution
+- the extremum refinement uses a wider bracket to converge more consistently
 - after convergence, the resulting instant is validated against neighboring minute instants to select the most extreme minute-aligned solution
 
 **CPU note:** high precision mode requires more computations and can significantly increase CPU usage. It is generally not recommended on low-power hardware (for example Raspberry Pi models with limited resources). If you enable it, prefer using a longer scan interval and monitor system load.
@@ -91,7 +91,7 @@ Options are available via **Configure** on the integration:
   When enabled, the integration uses Home Assistant’s configured time zone for timestamps and event calculations.
 
 - **High precision mode**
-  Default: false
+  Default: true
   Reduces timestamp variability but increases CPU usage due to finer sampling and wider refinement.
 
 ## Localization

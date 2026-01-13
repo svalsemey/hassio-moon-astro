@@ -17,6 +17,10 @@ CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
 CONF_HIGH_PRECISION = "high_precision"
 
+# High precision computation parameters
+HIGH_PRECISION_STEP_HOURS = 1.0
+HIGH_PRECISION_BRACKET_EXPAND = 2
+
 # Files and external resources
 CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
