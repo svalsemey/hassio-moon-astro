@@ -84,14 +84,19 @@ During setup, the integration pre-fills your Home Assistant latitude, longitude,
 Options are available via **Configure** on the integration:
 
 - **Sensors update interval (seconds)**
+  
   Default: 300 (min 60, max 21600)
 
 - **Use Home Assistant time zone**
+  
   Default: true
+  
   When enabled, the integration uses Home Assistant’s configured time zone for timestamps and event calculations.
 
 - **High precision mode**
+  
   Default: false
+  
   Reduces timestamp variability but increases CPU usage due to finer sampling and wider refinement.
 
 ## Localization
