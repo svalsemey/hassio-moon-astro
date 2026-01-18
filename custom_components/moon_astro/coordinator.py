@@ -2,11 +2,16 @@
 
 This module implements the data coordinator responsible for computing high-precision
 Moon position and related ephemerides for Home Assistant.
+
+The code is structured to:
+- keep deterministic results and minute-level timestamp stability
+- limit redundant heavy computations
+- keep full numerical precision while reducing CPU spikes on low-power devices
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 import logging
@@ -131,11 +136,22 @@ _RECOVERABLE_UPDATE_ERRORS: tuple[type[Exception], ...] = (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Phase values used by Skyfield almanac.moon_phases
+_PHASE_VALUES: tuple[int, int, int, int] = (
+    DARK_MOON,
+    FIRST_QUARTER,
+    FULL_MOON,
+    LAST_QUARTER,
+)
+
+
+# -----------------------------------------------------------------------------
+# Timezone and datetime formatting helpers
+# -----------------------------------------------------------------------------
+
 
 def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
     """Return a best-effort ZoneInfo for given coordinates.
-
-    If timezone cannot be found, UTC is returned.
 
     Args:
         lat: Latitude in decimal degrees.
@@ -144,9 +160,7 @@ def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
     Returns:
         A ZoneInfo instance representing the local timezone or UTC as fallback.
     """
-    tzname: str | None = None
-    tzname = TimezoneFinder().timezone_at(lat=lat, lng=lon)
-
+    tzname: str | None = TimezoneFinder().timezone_at(lat=lat, lng=lon)
     try:
         return ZoneInfo(tzname) if tzname else ZoneInfo("UTC")
     except ZoneInfoNotFoundError:
@@ -176,18 +190,14 @@ def _round_datetime_to_nearest_minute(dt: datetime) -> datetime:
         dt: Timezone-aware datetime.
 
     Returns:
-        A timezone-aware datetime rounded to the nearest minute.
+        Rounded timezone-aware datetime.
     """
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=UTC)
 
     seconds_in_minute = dt.second + (dt.microsecond / 1_000_000.0)
     base = dt.replace(second=0, microsecond=0)
-
-    if seconds_in_minute >= 30.0:
-        return base + timedelta(minutes=1)
-
-    return base
+    return base + timedelta(minutes=1) if seconds_in_minute >= 30.0 else base
 
 
 def _round_utc_datetime_to_nearest_minute(dt_utc: datetime) -> datetime:
@@ -229,9 +239,7 @@ def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
 
     # Round in UTC to keep behavior deterministic, then convert to target timezone.
     dt_utc_rounded = _round_utc_datetime_to_nearest_minute(dt_utc)
-    dt_local = dt_utc_rounded.astimezone(tz)
-
-    return dt_local.isoformat()
+    return dt_utc_rounded.astimezone(tz).isoformat()
 
 
 def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
@@ -266,6 +274,11 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
     return _to_local_iso(dt_utc.astimezone(UTC), tz)
 
 
+# -----------------------------------------------------------------------------
+# Core astronomical helpers
+# -----------------------------------------------------------------------------
+
+
 def _moon_illumination_percentage(eph: Ephemeris, t: Time) -> float:
     """Compute Moon illumination in percent at given time.
 
@@ -285,117 +298,6 @@ def _moon_illumination_percentage(eph: Ephemeris, t: Time) -> float:
     moon_app = earth.at(t).observe(eph["moon"]).apparent()
     frac = moon_app.fraction_illuminated(eph["sun"])
     return float(frac * 100.0)
-
-
-def _moon_phase_name(eph: Ephemeris, t: Time, ts: Timescale | None = None) -> str:
-    """Return a readable moon phase name using events proximity and illumination.
-
-    Strategy:
-    - Compute illumination at t and t+6h to infer waxing.
-    - Query discrete moon phase events around t (±30 days).
-    - If the nearest event is within a small window, return precise labels.
-    - Otherwise, fallback to a generic label based on illumination and waxing.
-
-    Args:
-        eph: Loaded ephemeris.
-        t: Skyfield Time for which the phase name is requested.
-        ts: Skyfield Timescale used to compute t+6h (optional).
-
-    Returns:
-        A phase name string.
-    """
-    illum_now = _moon_illumination_percentage(eph, t)
-
-    if ts is not None:
-        t_future = ts.tt_jd(t.tt + 6.0 / 24.0)
-
-        def _illum_future(ttime: Time) -> float:
-            """Return the illumination percentage at a future time."""
-            return _moon_illumination_percentage(eph, ttime)
-
-        illum_future = _illum_future(t_future)
-        waxing = illum_future > illum_now + 1e-6
-    else:
-        waxing = True
-
-    f = almanac.moon_phases(eph)
-    t0 = t - 30.0
-    t1 = t + 30.0
-    times, phases = almanac.find_discrete(t0, t1, f)
-
-    # Identify surrounding phase events
-    last_ev: tuple[Time, int] | None = None
-    next_ev: tuple[Time, int] | None = None
-    for ti, pv in zip(times, phases, strict=False):
-        if ti.tt <= t.tt:
-            last_ev = (ti, int(pv))
-        elif next_ev is None and ti.tt > t.tt:
-            next_ev = (ti, int(pv))
-
-    def close_to(pct: float, target: float, tol: float = QUARTER_TOL_PCT) -> bool:
-        """Return True when pct is within ±tol of target."""
-        return abs(pct - target) <= tol
-
-    # Windows (hours) for "exact" labels
-    WIN_FULL_H = 6.0
-    WIN_QUARTER_H = 6.0
-    WIN_NEW_H = 6.0
-
-    # Helper to test time proximity
-    def _within_hours(t_event: Time | None, hours_window: float) -> bool:
-        """Return True if t_event is within hours_window of t."""
-        if t_event is None:
-            return False
-        return abs((t_event.tt - t.tt) * 24.0) <= hours_window
-
-    # Find nearest known event types around t
-    last_time = last_ev[0] if last_ev else None
-    next_time = next_ev[0] if next_ev else None
-    last_type = last_ev[1] if last_ev else None
-    next_type = next_ev[1] if next_ev else None
-
-    # Exact event labeling using proximity windows
-    if (last_type == DARK_MOON and _within_hours(last_time, WIN_NEW_H)) or (
-        next_type == DARK_MOON and _within_hours(next_time, WIN_NEW_H)
-    ):
-        return "new_moon"
-    if (last_type == FIRST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (
-        next_type == FIRST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)
-    ):
-        return "first_quarter" if waxing else "last_quarter"
-    if (last_type == FULL_MOON and _within_hours(last_time, WIN_FULL_H)) or (
-        next_type == FULL_MOON and _within_hours(next_time, WIN_FULL_H)
-    ):
-        return "full_moon"
-    if (last_type == LAST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (
-        next_type == LAST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)
-    ):
-        return "last_quarter" if not waxing else "first_quarter"
-
-    # Hints based on last canonical event and illumination
-    if last_ev is not None:
-        _, phase_value = last_ev
-        if phase_value == DARK_MOON:
-            if waxing and illum_now <= NEW_MOON_STRICT_PCT:
-                return "new_moon"
-        elif phase_value == FIRST_QUARTER:
-            if close_to(illum_now, 50.0) and waxing:
-                return "first_quarter"
-        elif phase_value == LAST_QUARTER:
-            if close_to(illum_now, 50.0) and (not waxing):
-                return "last_quarter"
-
-    # Generic mapping by illumination and waxing
-    if illum_now <= NEW_MOON_STRICT_PCT:
-        return "new_moon" if waxing else "waning_crescent"
-    if illum_now <= 45.0:
-        return "waxing_crescent" if waxing else "waning_crescent"
-    if 45.0 < illum_now < 55.0:
-        return "first_quarter" if waxing else "last_quarter"
-    if illum_now < FULL_MOON_STRICT_PCT:
-        return "waxing_gibbous" if waxing else "waning_gibbous"
-    # Close to 100% but not in the proximity window: choose gibbous based on waxing state
-    return "waxing_gibbous" if waxing else "waning_gibbous"
 
 
 def _topocentric_vectors(
@@ -729,6 +631,7 @@ def _ecliptic_lon_lat_deg_of_date(apparent_vector: Apparent) -> tuple[float, flo
     # Rotate around X by +eps (equatorial -> ecliptic of date)
     cos_e = math.cos(eps)
     sin_e = math.sin(eps)
+
     x_ecl = x
     y_ecl = y * cos_e + z * sin_e
     z_ecl = -y * sin_e + z * cos_e
@@ -755,6 +658,108 @@ def _moon_parallax_angle_deg(distance_km: float) -> float:
     return math.degrees(math.asin(x))
 
 
+# -----------------------------------------------------------------------------
+# Phase naming helper
+# -----------------------------------------------------------------------------
+
+
+def _moon_phase_name(eph: Ephemeris, t: Time, ts: Timescale | None = None) -> str:
+    """Return a readable moon phase name using events proximity and illumination.
+
+    Args:
+        eph: Loaded ephemeris.
+        t: Skyfield Time.
+        ts: Skyfield Timescale.
+
+    Returns:
+        Phase code string.
+    """
+    illum_now = _moon_illumination_percentage(eph, t)
+
+    if ts is not None:
+        t_future = ts.tt_jd(t.tt + 6.0 / 24.0)
+        illum_future = _moon_illumination_percentage(eph, t_future)
+        waxing = illum_future > illum_now + 1e-6
+    else:
+        waxing = True
+
+    f = almanac.moon_phases(eph)
+    t0 = t - 30.0
+    t1 = t + 30.0
+    times, phases = almanac.find_discrete(t0, t1, f)
+
+    last_ev: tuple[Time, int] | None = None
+    next_ev: tuple[Time, int] | None = None
+    for ti, pv in zip(times, phases, strict=False):
+        if ti.tt <= t.tt:
+            last_ev = (ti, int(pv))
+        elif next_ev is None and ti.tt > t.tt:
+            next_ev = (ti, int(pv))
+
+    def close_to(pct: float, target: float, tol: float = QUARTER_TOL_PCT) -> bool:
+        """Return True when pct is within tolerance of target."""
+        return abs(pct - target) <= tol
+
+    WIN_FULL_H = 6.0
+    WIN_QUARTER_H = 6.0
+    WIN_NEW_H = 6.0
+
+    def _within_hours(t_event: Time | None, hours_window: float) -> bool:
+        """Return True if t_event is within hours_window of t."""
+        if t_event is None:
+            return False
+        return abs((t_event.tt - t.tt) * 24.0) <= hours_window
+
+    last_time = last_ev[0] if last_ev else None
+    next_time = next_ev[0] if next_ev else None
+    last_type = last_ev[1] if last_ev else None
+    next_type = next_ev[1] if next_ev else None
+
+    if (last_type == DARK_MOON and _within_hours(last_time, WIN_NEW_H)) or (
+        next_type == DARK_MOON and _within_hours(next_time, WIN_NEW_H)
+    ):
+        return "new_moon"
+    if (last_type == FIRST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (
+        next_type == FIRST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)
+    ):
+        return "first_quarter" if waxing else "last_quarter"
+    if (last_type == FULL_MOON and _within_hours(last_time, WIN_FULL_H)) or (
+        next_type == FULL_MOON and _within_hours(next_time, WIN_FULL_H)
+    ):
+        return "full_moon"
+    if (last_type == LAST_QUARTER and _within_hours(last_time, WIN_QUARTER_H)) or (
+        next_type == LAST_QUARTER and _within_hours(next_time, WIN_QUARTER_H)
+    ):
+        return "last_quarter" if not waxing else "first_quarter"
+
+    if last_ev is not None:
+        _, phase_value = last_ev
+        if phase_value == DARK_MOON:
+            if waxing and illum_now <= NEW_MOON_STRICT_PCT:
+                return "new_moon"
+        elif phase_value == FIRST_QUARTER:
+            if close_to(illum_now, 50.0) and waxing:
+                return "first_quarter"
+        elif phase_value == LAST_QUARTER:
+            if close_to(illum_now, 50.0) and (not waxing):
+                return "last_quarter"
+
+    if illum_now <= NEW_MOON_STRICT_PCT:
+        return "new_moon" if waxing else "waning_crescent"
+    if illum_now <= 45.0:
+        return "waxing_crescent" if waxing else "waning_crescent"
+    if 45.0 < illum_now < 55.0:
+        return "first_quarter" if waxing else "last_quarter"
+    if illum_now < FULL_MOON_STRICT_PCT:
+        return "waxing_gibbous" if waxing else "waning_gibbous"
+    return "waxing_gibbous" if waxing else "waning_gibbous"
+
+
+# -----------------------------------------------------------------------------
+# Rise/Set helpers
+# -----------------------------------------------------------------------------
+
+
 def _next_rise_set(
     eph: Ephemeris, lat: float, lon: float, alt_m: float, t_start: Time
 ) -> tuple[Time | None, Time | None]:
@@ -777,6 +782,7 @@ def _next_rise_set(
     t0 = t_start
     t1 = t_start + 7.0
     times, events = almanac.find_discrete(t0, t1, f)
+
     next_rise: Time | None = None
     next_set: Time | None = None
     for ti, ei in zip(times, events, strict=False):
@@ -787,6 +793,46 @@ def _next_rise_set(
         if next_rise is not None and next_set is not None:
             break
     return next_rise, next_set
+
+
+def _previous_rise_set(
+    eph: Ephemeris, lat: float, lon: float, alt_m: float, t_start: Time
+) -> tuple[Time | None, Time | None]:
+    """Compute previous rise and set times for the Moon at observer location.
+
+    Args:
+        eph: Loaded ephemeris.
+        lat: Latitude in degrees.
+        lon: Longitude in degrees.
+        alt_m: Elevation in meters.
+        t_start: Reference time.
+
+    Returns:
+        (previous_rise, previous_set)
+    """
+    observer = wgs84.latlon(
+        latitude_degrees=lat, longitude_degrees=lon, elevation_m=alt_m
+    )
+    f = almanac.risings_and_settings(eph, eph["moon"], observer)
+    t0 = t_start - 7.0
+    t1 = t_start
+    times, events = almanac.find_discrete(t0, t1, f)
+
+    prev_rise: Time | None = None
+    prev_set: Time | None = None
+    for ti, ei in zip(times, events, strict=False):
+        if ti.tt >= t_start.tt:
+            continue
+        if ei:
+            prev_rise = ti
+        else:
+            prev_set = ti
+    return prev_rise, prev_set
+
+
+# -----------------------------------------------------------------------------
+# Numeric root/extremum helpers
+# -----------------------------------------------------------------------------
 
 
 @dataclass
@@ -885,159 +931,6 @@ def _brent_extremum(
     return _BrentResult(tt=x, fval=(fx if is_min else -fx), iterations=max_iter)
 
 
-def _refine_brackets(
-    t_list: list[Time],
-    y_list: list[float],
-    kind: str = "max",
-    *,
-    expand: int = 1,
-) -> list[tuple[float, float, int]]:
-    """Return a list of candidate [a,b] TT brackets for local extrema.
-
-    This function detects multiple extrema candidates in the sampled series and returns
-    an ordered list of brackets. Each bracket is associated with a representative index
-    in the sample grid, which can later be used to choose the nearest extremum depending
-    on the forward/backward search direction.
-
-    The detection is tolerant to:
-    - small numeric jitter in sampled values
-    - locally flat extrema (plateaus)
-    - multiple extrema in the sampled window
-
-    Args:
-        t_list: Monotonic list of Time samples.
-        y_list: Corresponding function values.
-        kind: Either "max" or "min".
-        expand: Number of extra samples to include on each side of the bracket.
-
-    Returns:
-        A list of tuples (tt_a, tt_b, idx_center) sorted by idx_center ascending.
-        The list may be empty if no suitable bracket is found.
-    """
-    if len(t_list) < 3 or len(y_list) < 3:
-        return []
-
-    y = np.asarray(y_list, dtype=float)
-    slopes = np.diff(y)
-
-    # Scale-aware epsilon to avoid jitter-driven sign flips.
-    y_scale = float(np.nanmax(np.abs(y))) if np.isfinite(y).any() else 0.0
-    eps = max(1e-12, y_scale * 1e-12)
-
-    # Ternary slope sign: -1, 0, +1.
-    sgn = np.zeros_like(slopes, dtype=int)
-    sgn[slopes > eps] = 1
-    sgn[slopes < -eps] = -1
-
-    want_left = 1 if kind == "max" else -1
-    want_right = -1 if kind == "max" else 1
-
-    n = len(y)
-    candidates: list[int] = []
-
-    for i in range(1, n - 1):
-        # Resolve effective left sign (skip flat slopes to the left).
-        k = i - 1
-        while k >= 0 and sgn[k] == 0:
-            k -= 1
-        left_eff = sgn[k] if k >= 0 else 0
-
-        # Resolve effective right sign (skip flat slopes to the right).
-        j = i
-        while j < len(sgn) and sgn[j] == 0:
-            j += 1
-        right_eff = sgn[j] if j < len(sgn) else 0
-
-        if left_eff == want_left and right_eff == want_right:
-            candidates.append(i)
-
-    if not candidates:
-        return []
-
-    # Build a stable bracket for each candidate.
-    brackets: list[tuple[float, float, int]] = []
-    for idx in candidates:
-        left = idx
-        while left > 0 and sgn[left - 1] == 0:
-            left -= 1
-
-        right = idx
-        while right < len(sgn) and sgn[right] == 0:
-            right += 1
-
-        i0 = max(0, left - expand)
-        i1 = min(n - 1, right + expand)
-
-        if i1 <= i0:
-            continue
-
-        brackets.append((t_list[i0].tt, t_list[i1].tt, idx))
-
-    # Ensure chronological order by index.
-    brackets.sort(key=lambda item: item[2])
-    return brackets
-
-
-def _local_rescan_refine_bracket(
-    ts: Timescale,
-    f_tt: Callable[[float], float],
-    tt_a: float,
-    tt_b: float,
-    *,
-    is_min: bool,
-) -> tuple[float, float] | None:
-    """Perform a local rescan inside a coarse bracket and return a tighter bracket.
-
-    The rescan uses a fixed step of 1 hour to keep CPU usage bounded, then rebuilds
-    candidate brackets from the resampled series and keeps the bracket that contains
-    the strongest local extremum.
-
-    Args:
-        ts: Skyfield Timescale.
-        f_tt: Function evaluated on TT Julian dates.
-        tt_a: Left bound (TT Julian date).
-        tt_b: Right bound (TT Julian date).
-        is_min: True for perigee, False for apogee.
-
-    Returns:
-        A tighter (tt_left, tt_right) bracket, or None if it cannot be constructed.
-    """
-    if not (tt_b > tt_a):
-        return None
-
-    step_days = 1.0 / 24.0  # 1 hour
-    n_steps = int((tt_b - tt_a) / step_days) + 1
-    if n_steps < 3:
-        return None
-
-    t_list: list[Time] = []
-    y_list: list[float] = []
-    for i in range(n_steps):
-        tt_i = tt_a + (i * step_days)
-        t_list.append(ts.tt_jd(tt_i))
-        y_list.append(float(f_tt(tt_i)))
-
-    kind = "min" if is_min else "max"
-    brackets = _refine_brackets(t_list, y_list, kind=kind, expand=1)
-    if not brackets:
-        return None
-
-    best: tuple[float, float, float] | None = None
-    for cand_a, cand_b, idx_center in brackets:
-        y_center = float(y_list[idx_center])
-        score = y_center if is_min else -y_center
-        if best is None or score < best[0]:
-            best = (score, cand_a, cand_b)
-
-    if best is None:
-        return None
-
-    _score, best_a, best_b = best
-    if not (best_b > best_a):
-        return None
-    return best_a, best_b
-
-
 def _brent_root(
     f: Callable[[float], float],
     a: float,
@@ -1094,9 +987,6 @@ def _brent_root(
 
         if abs(e) >= tol1 and abs(fa) > abs(fb):
             s = fb / fa
-            p: float
-            q: float
-
             if a == c:
                 # Secant
                 p = 2.0 * m * s
@@ -1162,10 +1052,8 @@ def _derivative_distance_tt(
         Approximate derivative in km/day (TT days in denominator).
     """
     h_days = h_minutes / 1440.0
-    a = tt - h_days
-    b = tt + h_days
-    da = float(f_tt(a))
-    db = float(f_tt(b))
+    da = float(f_tt(tt - h_days))
+    db = float(f_tt(tt + h_days))
     return (db - da) / (2.0 * h_days)
 
 
@@ -1362,9 +1250,7 @@ def _select_extremum_candidate(
     if not filtered:
         return None
 
-    if search_backward:
-        return max(filtered)
-    return min(filtered)
+    return max(filtered) if search_backward else min(filtered)
 
 
 def _minute_validation_extremum(
@@ -1423,6 +1309,91 @@ def _minute_validation_extremum(
     return ts.tt_jd(best_tt)
 
 
+# -----------------------------------------------------------------------------
+# Extremum bracket detection for normal mode
+# -----------------------------------------------------------------------------
+
+
+def _refine_brackets(
+    t_list: list[Time],
+    y_list: list[float],
+    kind: str = "max",
+    *,
+    expand: int = 1,
+) -> list[tuple[float, float, int]]:
+    """Return candidate TT brackets for local extrema in a sampled series.
+
+    Args:
+        t_list: Monotonic Time samples.
+        y_list: Sample values.
+        kind: "max" or "min".
+        expand: Number of samples added on both sides of the bracket.
+
+    Returns:
+        List of (tt_a, tt_b, idx_center) ordered by idx_center.
+    """
+    if len(t_list) < 3 or len(y_list) < 3:
+        return []
+
+    y = np.asarray(y_list, dtype=float)
+    slopes = np.diff(y)
+
+    y_scale = float(np.nanmax(np.abs(y))) if np.isfinite(y).any() else 0.0
+    eps = max(1e-12, y_scale * 1e-12)
+
+    sgn = np.zeros_like(slopes, dtype=int)
+    sgn[slopes > eps] = 1
+    sgn[slopes < -eps] = -1
+
+    want_left = 1 if kind == "max" else -1
+    want_right = -1 if kind == "max" else 1
+
+    n = len(y)
+    candidates: list[int] = []
+
+    for i in range(1, n - 1):
+        k = i - 1
+        while k >= 0 and sgn[k] == 0:
+            k -= 1
+        left_eff = sgn[k] if k >= 0 else 0
+
+        j = i
+        while j < len(sgn) and sgn[j] == 0:
+            j += 1
+        right_eff = sgn[j] if j < len(sgn) else 0
+
+        if left_eff == want_left and right_eff == want_right:
+            candidates.append(i)
+
+    if not candidates:
+        return []
+
+    brackets: list[tuple[float, float, int]] = []
+    for idx in candidates:
+        left = idx
+        while left > 0 and sgn[left - 1] == 0:
+            left -= 1
+
+        right = idx
+        while right < len(sgn) and sgn[right] == 0:
+            right += 1
+
+        i0 = max(0, left - expand)
+        i1 = min(n - 1, right + expand)
+        if i1 <= i0:
+            continue
+
+        brackets.append((t_list[i0].tt, t_list[i1].tt, idx))
+
+    brackets.sort(key=lambda item: item[2])
+    return brackets
+
+
+# -----------------------------------------------------------------------------
+# Apsides (apogee/perigee) computation
+# -----------------------------------------------------------------------------
+
+
 def _find_geocentric_distance_extremum(
     eph: Ephemeris,
     ts: Timescale,
@@ -1475,6 +1446,56 @@ def _find_geocentric_distance_extremum(
         """
         return earth.at(t).observe(moon).distance().km
 
+    # Local bounded cache for distance evaluations to avoid repeated Skyfield calls.
+    # The cache key uses a quantized TT value to merge near-identical evaluations
+    # commonly produced by bracketing/Brent iterations.
+    dist_cache: dict[float, float] = {}
+    dist_cache_order: list[float] = []
+    DIST_CACHE_MAX = 256
+
+    def _quantize_tt(tt: float) -> float:
+        """Quantize a TT Julian date for stable cache keys.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Quantized TT Julian date.
+        """
+        # 1e-10 day is ~8.64 microseconds; it avoids missing reuse due to tiny float jitter.
+        return round(float(tt), 10)
+
+    def _cache_get(tt: float) -> float | None:
+        """Return cached value if present.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Cached distance in km or None.
+        """
+        return dist_cache.get(tt)
+
+    def _cache_put(tt: float, value: float) -> None:
+        """Insert a value into the bounded cache.
+
+        Args:
+            tt: Quantized TT Julian date key.
+            value: Distance in km.
+
+        Returns:
+            None.
+        """
+        if tt in dist_cache:
+            return
+
+        dist_cache[tt] = value
+        dist_cache_order.append(tt)
+
+        if len(dist_cache_order) > DIST_CACHE_MAX:
+            old = dist_cache_order.pop(0)
+            dist_cache.pop(old, None)
+
     def f_tt(tt: float) -> float:
         """Return geocentric Earth-Moon distance in km as a function of TT Julian date.
 
@@ -1484,7 +1505,14 @@ def _find_geocentric_distance_extremum(
         Returns:
             Geocentric distance in kilometers.
         """
-        return float(geocentric_distance_km(ts.tt_jd(tt)))
+        key = _quantize_tt(tt)
+        cached = _cache_get(key)
+        if cached is not None:
+            return cached
+
+        value = float(geocentric_distance_km(ts.tt_jd(tt)))
+        _cache_put(key, value)
+        return value
 
     # Enable additional stability refinements only in high precision mode.
     use_high_precision_refine = (
@@ -1494,7 +1522,6 @@ def _find_geocentric_distance_extremum(
 
     if use_high_precision_refine:
         # Derivative sign-change + root refinement.
-        # Sampling in minutes is intentionally fine to eliminate ±10 min volatility.
         step_minutes = 10.0
         h_minutes = 20.0
 
@@ -1512,27 +1539,23 @@ def _find_geocentric_distance_extremum(
             return None
 
         def g_tt(tt: float) -> float:
-            """Return derivative proxy d(distance)/d(TT day) at tt."""
+            """Return derivative proxy d(distance)/d(TT day) at tt.
+
+            Args:
+                tt: TT Julian date.
+
+            Returns:
+                Derivative estimate.
+            """
             return _derivative_distance_tt(ts, f_tt, tt, h_minutes=h_minutes)
 
-        # Choose refinement strategy:
-        # - Option 1: refine multiple brackets then select the nearest valid candidate (more robust).
-        # - Option 2: refine only the nearest bracket (lower CPU).
-        #
-        # The decision is derived from the same high-precision signature already used in this module
-        # (step_hours <= 1 and bracket_expand >= 2) and from the bracket list size after sorting.
-        refine_multiple = True
-        if len(brackets) <= 1:
-            refine_multiple = False
-
-        brackets_to_refine = brackets if refine_multiple else brackets[:1]
+        # Refine only the nearest bracket to keep CPU usage bounded.
+        brackets_to_refine = brackets[:1]
 
         roots: list[float] = []
         for a_tt, b_tt in brackets_to_refine:
             root = _brent_root(g_tt, a_tt, b_tt, tol=tol, max_iter=max_iter)
-            if root is None:
-                continue
-            if not math.isfinite(root):
+            if root is None or not math.isfinite(root):
                 continue
             roots.append(float(root))
 
@@ -1549,7 +1572,7 @@ def _find_geocentric_distance_extremum(
 
         return _minute_validation_extremum(ts, f_tt, selected_tt, is_min=is_min)
 
-    # Original extremum search (kept for non-high-precision mode).
+    # Normal mode: sample and bracket a local extremum then refine with Brent extremum.
     steps = int(days_window * 24.0 / step_hours) + 1
     t0 = (t_start - days_window) if search_backward else t_start
 
@@ -1570,6 +1593,7 @@ def _find_geocentric_distance_extremum(
 
     t0_tt = t_start.tt
     chosen: tuple[float, float, int] | None = None
+
     if search_backward:
         for tt_a, tt_b, idx_center in brackets:
             if t_list[idx_center].tt < t0_tt:
@@ -1656,42 +1680,6 @@ def _find_next_perigee(
     )
 
 
-def _previous_rise_set(
-    eph: Ephemeris, lat: float, lon: float, alt_m: float, t_start: Time
-) -> tuple[Time | None, Time | None]:
-    """Compute previous rise and set times for the Moon at observer location.
-
-    Args:
-        eph: Loaded ephemeris.
-        lat: Latitude in degrees.
-        lon: Longitude in degrees.
-        alt_m: Elevation in meters.
-        t_start: Reference time for the search.
-
-    Returns:
-        A tuple (previous_rise, previous_set) as Skyfield Times or None if not found.
-    """
-    observer = wgs84.latlon(
-        latitude_degrees=lat, longitude_degrees=lon, elevation_m=alt_m
-    )
-    f = almanac.risings_and_settings(eph, eph["moon"], observer)
-    t0 = t_start - 7.0
-    t1 = t_start
-    times, events = almanac.find_discrete(t0, t1, f)
-
-    prev_rise: Time | None = None
-    prev_set: Time | None = None
-    for ti, ei in zip(times, events, strict=False):
-        if ti.tt >= t_start.tt:
-            continue
-        if ei:
-            prev_rise = ti
-        else:
-            prev_set = ti
-
-    return prev_rise, prev_set
-
-
 def _find_previous_apogee(
     eph: Ephemeris,
     ts: Timescale,
@@ -1754,96 +1742,78 @@ def _find_previous_perigee(
     )
 
 
-def _find_phase_next(
-    ts: Timescale, f: Any, t_start: Time, phase_value: int
-) -> Time | None:
-    """Find the next occurrence of a given moon phase after t_start.
+# -----------------------------------------------------------------------------
+# Phase events extraction (single find_discrete call) and full moon naming
+# -----------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class _PhaseEvents:
+    """Container for phase events used across computations."""
+
+    next_new: Time | None
+    next_first: Time | None
+    next_full: Time | None
+    next_last: Time | None
+    prev_new: Time | None
+    prev_first: Time | None
+    prev_full: Time | None
+    prev_last: Time | None
+
+
+def _iter_phase_pairs(
+    times: Iterable[Time], phases: Iterable[int]
+) -> Iterable[tuple[Time, int]]:
+    """Yield (Time, phase_value) pairs with int conversion.
 
     Args:
-        ts: Skyfield Timescale.
-        f: Almanac function for moon phases.
-        t_start: Start time for the search.
-        phase_value: Target phase identifier.
+        times: Iterable of Time objects.
+        phases: Iterable of phase values.
 
-    Returns:
-        The Skyfield Time of the next matching phase, or None if not found.
+    Yields:
+        (time, phase_value)
     """
-    t0 = t_start
-    t1 = t_start + 40.0
-    times, phases = almanac.find_discrete(t0, t1, f)
     for ti, pv in zip(times, phases, strict=False):
-        if int(pv) == int(phase_value) and ti.tt > t_start.tt:
-            return ti
-    return None
+        yield ti, int(pv)
 
 
-def _find_phase_previous(
-    ts: Timescale, f: Any, t_start: Time, phase_value: int
-) -> Time | None:
-    """Find the previous occurrence of a given moon phase before t_start.
+def _extract_phase_events_from_discrete(
+    t_ref: Time, times: list[Time], phases: list[int]
+) -> _PhaseEvents:
+    """Extract next/previous phase events from a discrete event list.
 
     Args:
-        ts: Skyfield Timescale.
-        f: Almanac function for moon phases.
-        t_start: Start time for the search.
-        phase_value: Target phase identifier.
+        t_ref: Reference time.
+        times: Event times.
+        phases: Event phase values.
 
     Returns:
-        The Skyfield Time of the previous matching phase.
+        Phase events container.
     """
-    t0 = t_start - 40.0
-    t1 = t_start
-    times, phases = almanac.find_discrete(t0, t1, f)
+    next_map: dict[int, Time | None] = dict.fromkeys(_PHASE_VALUES, None)
+    prev_map: dict[int, Time | None] = dict.fromkeys(_PHASE_VALUES, None)
 
-    prev_match: Time | None = None
-    for ti, pv in zip(times, phases, strict=False):
-        if int(pv) == int(phase_value) and ti.tt < t_start.tt:
-            prev_match = ti
-    return prev_match
+    for ti, pv in _iter_phase_pairs(times, phases):
+        if ti.tt > t_ref.tt and next_map.get(pv) is None:
+            next_map[pv] = ti
+        if ti.tt < t_ref.tt:
+            prev_map[pv] = ti
 
+        if all(next_map[p] is not None for p in _PHASE_VALUES):
+            # We still want complete prev_map, but it is safe to stop early if we already
+            # crossed t_ref and have found all next values and the list is ordered.
+            pass
 
-def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | None:
-    """Return the translation state code for full moon alternative names.
-
-    Args:
-        full_moon_name_code: Full moon name code (e.g. 'wolf_moon', 'blue_moon').
-
-    Returns:
-        A stable translation state code (e.g. 'wolf_moon_alt_names'), or None.
-    """
-    if not full_moon_name_code:
-        return None
-    if full_moon_name_code == "blue_moon":
-        return ""
-    if full_moon_name_code == "unknown":
-        return "unknown"
-    return f"{full_moon_name_code}_alt_names"
-
-
-def _full_moon_name_code(month: int) -> str:
-    """Return the canonical full moon name code for a given month.
-
-    Args:
-        month: Month number in [1..12].
-
-    Returns:
-        A lowercase string code used as sensor state.
-    """
-    mapping: dict[int, str] = {
-        1: "wolf_moon",
-        2: "snow_moon",
-        3: "worm_moon",
-        4: "pink_moon",
-        5: "flower_moon",
-        6: "strawberry_moon",
-        7: "buck_moon",
-        8: "sturgeon_moon",
-        9: "harvest_moon",
-        10: "hunters_moon",
-        11: "beaver_moon",
-        12: "cold_moon",
-    }
-    return mapping.get(month, "unknown")
+    return _PhaseEvents(
+        next_new=next_map[DARK_MOON],
+        next_first=next_map[FIRST_QUARTER],
+        next_full=next_map[FULL_MOON],
+        next_last=next_map[LAST_QUARTER],
+        prev_new=prev_map[DARK_MOON],
+        prev_first=prev_map[FIRST_QUARTER],
+        prev_full=prev_map[FULL_MOON],
+        prev_last=prev_map[LAST_QUARTER],
+    )
 
 
 def _time_to_local_datetime(t_obj: Time, tz: ZoneInfo) -> datetime:
@@ -1899,95 +1869,95 @@ def _is_second_full_moon_in_same_month_local(
     return (dt1.year, dt1.month) == (dt2.year, dt2.month)
 
 
-def _previous_full_moon_name_code(
-    ts: Timescale,
-    eph: Ephemeris,
-    t_start: Time,
-    tz: ZoneInfo,
-) -> str | None:
-    """Compute the previous full moon name code using local timezone for blue moon detection.
-
-    This function returns:
-    - "blue_moon" when the most recent full moon is the second full moon in the same local month
-    - otherwise the canonical monthly name code based on the local month of that full moon
+def _full_moon_name_code(month: int) -> str:
+    """Return the canonical full moon name code for a given month.
 
     Args:
-        ts: Skyfield Timescale.
-        eph: Loaded ephemeris.
-        t_start: Reference time.
-        tz: Timezone used to define the calendar month boundary.
+        month: Month number [1..12].
 
     Returns:
-        Full moon name code, "blue_moon" when applicable, or None.
+        Name code.
     """
-    try:
-        f = almanac.moon_phases(eph)
-
-        # Most recent full moon strictly before t_start.
-        t_full_2 = _find_phase_previous(ts, f, t_start, FULL_MOON)
-        if t_full_2 is None:
-            return None
-
-        # Step back a small amount to avoid re-selecting the same event due to rounding.
-        # 1 second in TT days.
-        t_before_full_2 = ts.tt_jd(t_full_2.tt - (1.0 / 86400.0))
-
-        # Full moon before t_full_2 (candidate for first in local month).
-        t_full_1 = _find_phase_previous(ts, f, t_before_full_2, FULL_MOON)
-
-        if _is_second_full_moon_in_same_month_local(t_full_1, t_full_2, tz):
-            return "blue_moon"
-
-        dt_local = _time_to_local_datetime(t_full_2, tz)
-        return _full_moon_name_code(dt_local.month)
-    except _RECOVERABLE_SKYFIELD_ERRORS:
-        return None
+    mapping: dict[int, str] = {
+        1: "wolf_moon",
+        2: "snow_moon",
+        3: "worm_moon",
+        4: "pink_moon",
+        5: "flower_moon",
+        6: "strawberry_moon",
+        7: "buck_moon",
+        8: "sturgeon_moon",
+        9: "harvest_moon",
+        10: "hunters_moon",
+        11: "beaver_moon",
+        12: "cold_moon",
+    }
+    return mapping.get(month, "unknown")
 
 
-def _next_full_moon_name_code(
-    ts: Timescale,
-    eph: Ephemeris,
-    t_start: Time,
-    tz: ZoneInfo,
-) -> str | None:
-    """Compute the next full moon name code using local timezone for "blue moon" detection.
-
-    The function returns:
-    - "blue_moon" when the next full moon is the second full moon occurring within the same
-      local calendar month as the previous full moon
-    - otherwise the canonical monthly name code based on the local month of the next full moon
+def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | None:
+    """Return the translation state code for full moon alternative names.
 
     Args:
-        ts: Skyfield Timescale.
-        eph: Loaded ephemeris.
-        t_start: Start time for the search.
-        tz: Timezone used to define the calendar month boundary.
+        full_moon_name_code: Full moon name code.
 
     Returns:
-        Full moon name code, 'blue_moon' when applicable, or None.
+        Translation state code or None.
     """
-    try:
-        f = almanac.moon_phases(eph)
-
-        # Next full moon strictly after t_start.
-        t_full_1 = _find_phase_next(ts, f, t_start, FULL_MOON)
-        if t_full_1 is None:
-            return None
-
-        # Step back slightly to ensure the previous search does not re-select the same event
-        # in edge cases where time comparisons are close to the event instant.
-        t_before_full_1 = ts.tt_jd(t_full_1.tt - (1.0 / 86400.0))  # 1 second in TT days
-
-        # Previous full moon relative to the next full moon (candidate for first in local month).
-        t_full_0 = _find_phase_previous(ts, f, t_before_full_1, FULL_MOON)
-
-        if _is_second_full_moon_in_same_month_local(t_full_0, t_full_1, tz):
-            return "blue_moon"
-
-        dt_local = _time_to_local_datetime(t_full_1, tz)
-        return _full_moon_name_code(dt_local.month)
-    except _RECOVERABLE_SKYFIELD_ERRORS:
+    if not full_moon_name_code:
         return None
+    if full_moon_name_code == "blue_moon":
+        return ""
+    if full_moon_name_code == "unknown":
+        return "unknown"
+    return f"{full_moon_name_code}_alt_names"
+
+
+def _previous_full_moon_name_code_from_events(
+    tz: ZoneInfo, *, prev_full: Time | None
+) -> str | None:
+    """Compute previous full moon name code from a previous full moon event.
+
+    Args:
+        tz: Timezone used for month boundaries.
+        prev_full: Previous full moon time.
+
+    Returns:
+        Name code or None.
+    """
+    if prev_full is None:
+        return None
+
+    dt_local = _time_to_local_datetime(prev_full, tz)
+    return _full_moon_name_code(dt_local.month)
+
+
+def _next_full_moon_name_code_from_events(
+    tz: ZoneInfo, *, next_full: Time | None, prev_full: Time | None
+) -> str | None:
+    """Compute next full moon name code using next_full and prev_full.
+
+    Args:
+        tz: Timezone used for month boundaries.
+        next_full: Next full moon time.
+        prev_full: Previous full moon time relative to next_full.
+
+    Returns:
+        Name code or None.
+    """
+    if next_full is None:
+        return None
+
+    if _is_second_full_moon_in_same_month_local(prev_full, next_full, tz):
+        return "blue_moon"
+
+    dt_local = _time_to_local_datetime(next_full, tz)
+    return _full_moon_name_code(dt_local.month)
+
+
+# -----------------------------------------------------------------------------
+# Zodiac helpers
+# -----------------------------------------------------------------------------
 
 
 def _zodiac_sign_from_longitude_deg(lon_deg: float) -> str | None:
@@ -2061,7 +2031,7 @@ def _zodiac_icon(sign: str | None) -> str | None:
 
 
 # -----------------------------------------------------------------------------
-# Computation grouping helpers for Moon Astro
+# Computation grouping helpers
 # -----------------------------------------------------------------------------
 
 
@@ -2275,6 +2245,9 @@ class _Calc:
     ) -> tuple[dict[str, Any], dict[str, Time | None]]:
         """Compute phase event timestamps and full moon name codes.
 
+        This implementation performs a single discrete search for moon phases and extracts
+        all next/previous events from that result.
+
         Args:
             eph: Loaded ephemeris.
             ts: Skyfield Timescale.
@@ -2286,65 +2259,44 @@ class _Calc:
               - payload dictionary fragment for phase-related keys
               - raw event times dictionary used downstream (ecliptic/zodiac)
         """
-
-        def phase_events() -> dict[str, Time | None]:
-            """Compute next and previous main lunar phase event times.
-
-            Args:
-                None.
-
-            Returns:
-                A dictionary containing raw Skyfield Time objects for events.
-            """
-            try:
-                f = almanac.moon_phases(eph)
-                return {
-                    "next_new": _find_phase_next(ts, f, t, DARK_MOON),
-                    "next_first": _find_phase_next(ts, f, t, FIRST_QUARTER),
-                    "next_full": _find_phase_next(ts, f, t, FULL_MOON),
-                    "next_last": _find_phase_next(ts, f, t, LAST_QUARTER),
-                    "prev_new": _find_phase_previous(ts, f, t, DARK_MOON),
-                    "prev_first": _find_phase_previous(ts, f, t, FIRST_QUARTER),
-                    "prev_full": _find_phase_previous(ts, f, t, FULL_MOON),
-                    "prev_last": _find_phase_previous(ts, f, t, LAST_QUARTER),
-                }
-            except _RECOVERABLE_SKYFIELD_ERRORS:
-                return {
-                    "next_new": None,
-                    "next_first": None,
-                    "next_full": None,
-                    "next_last": None,
-                    "prev_new": None,
-                    "prev_first": None,
-                    "prev_full": None,
-                    "prev_last": None,
-                }
-
-        events = phase_events()
+        tz_effective = tz or ZoneInfo("UTC")
 
         try:
-            next_full_name = _next_full_moon_name_code(
-                ts, eph, t, tz or ZoneInfo("UTC")
+            f = almanac.moon_phases(eph)
+            t0 = t - 40.0
+            t1 = t + 40.0
+            times, phases = almanac.find_discrete(t0, t1, f)
+            events_obj = _extract_phase_events_from_discrete(
+                t, list(times), list(phases)
             )
         except _RECOVERABLE_SKYFIELD_ERRORS:
-            next_full_name = None
+            events_obj = _PhaseEvents(
+                next_new=None,
+                next_first=None,
+                next_full=None,
+                next_last=None,
+                prev_new=None,
+                prev_first=None,
+                prev_full=None,
+                prev_last=None,
+            )
 
-        try:
-            prev_full_name = _previous_full_moon_name_code(
-                ts, eph, t, tz or ZoneInfo("UTC")
-            )
-        except _RECOVERABLE_SKYFIELD_ERRORS:
-            prev_full_name = None
+        next_full_name = _next_full_moon_name_code_from_events(
+            tz_effective, next_full=events_obj.next_full, prev_full=events_obj.prev_full
+        )
+        prev_full_name = _previous_full_moon_name_code_from_events(
+            tz_effective, prev_full=events_obj.prev_full
+        )
 
         payload = {
-            KEY_NEXT_NEW_MOON: _safe_time_iso(events["next_new"], tz),
-            KEY_NEXT_FIRST_QUARTER: _safe_time_iso(events["next_first"], tz),
-            KEY_NEXT_FULL_MOON: _safe_time_iso(events["next_full"], tz),
-            KEY_NEXT_LAST_QUARTER: _safe_time_iso(events["next_last"], tz),
-            KEY_PREVIOUS_NEW_MOON: _safe_time_iso(events["prev_new"], tz),
-            KEY_PREVIOUS_FIRST_QUARTER: _safe_time_iso(events["prev_first"], tz),
-            KEY_PREVIOUS_FULL_MOON: _safe_time_iso(events["prev_full"], tz),
-            KEY_PREVIOUS_LAST_QUARTER: _safe_time_iso(events["prev_last"], tz),
+            KEY_NEXT_NEW_MOON: _safe_time_iso(events_obj.next_new, tz),
+            KEY_NEXT_FIRST_QUARTER: _safe_time_iso(events_obj.next_first, tz),
+            KEY_NEXT_FULL_MOON: _safe_time_iso(events_obj.next_full, tz),
+            KEY_NEXT_LAST_QUARTER: _safe_time_iso(events_obj.next_last, tz),
+            KEY_PREVIOUS_NEW_MOON: _safe_time_iso(events_obj.prev_new, tz),
+            KEY_PREVIOUS_FIRST_QUARTER: _safe_time_iso(events_obj.prev_first, tz),
+            KEY_PREVIOUS_FULL_MOON: _safe_time_iso(events_obj.prev_full, tz),
+            KEY_PREVIOUS_LAST_QUARTER: _safe_time_iso(events_obj.prev_last, tz),
             KEY_NEXT_FULL_MOON_NAME: next_full_name,
             KEY_NEXT_FULL_MOON_ALT_NAMES: _full_moon_alt_names_state_code(
                 next_full_name
@@ -2354,7 +2306,18 @@ class _Calc:
                 prev_full_name
             ),
         }
-        return payload, events
+
+        raw_events: dict[str, Time | None] = {
+            "next_new": events_obj.next_new,
+            "next_first": events_obj.next_first,
+            "next_full": events_obj.next_full,
+            "next_last": events_obj.next_last,
+            "prev_new": events_obj.prev_new,
+            "prev_first": events_obj.prev_first,
+            "prev_full": events_obj.prev_full,
+            "prev_last": events_obj.prev_last,
+        }
+        return payload, raw_events
 
     @staticmethod
     def lunation_ecliptics(
@@ -2504,6 +2467,11 @@ class _Calc:
         }
 
 
+# -----------------------------------------------------------------------------
+# Coordinator
+# -----------------------------------------------------------------------------
+
+
 class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator computing lunar ephemerides and derived quantities for HA sensors."""
 
@@ -2575,7 +2543,11 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         """
 
         def _load() -> tuple[Ephemeris, Timescale]:
-            """Blocking loader executed in the executor."""
+            """Blocking loader executed in the executor.
+
+            Returns:
+                A tuple (ephemeris, timescale).
+            """
             cache_dir = self._hass.config.path(CACHE_DIR_NAME)
             Path(cache_dir).mkdir(parents=True, exist_ok=True)
             load = Loader(cache_dir)
@@ -2598,10 +2570,24 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         assert self._ts is not None, "Timescale must be loaded"
         return self._eph, self._ts
 
+    async def _async_exec(self, func: Callable[[], Any]) -> Any:
+        """Run a blocking callable in Home Assistant executor.
+
+        Args:
+            func: A zero-argument callable performing blocking work.
+
+        Returns:
+            The callable return value.
+        """
+        return await self._hass.async_add_executor_job(func)
+
     async def _async_compute_payload(
         self, eph: Ephemeris, ts: Timescale
     ) -> dict[str, Any]:
-        """Compute the coordinator payload using an executor thread.
+        """Compute the coordinator payload using concurrent executor tasks.
+
+        The computation is split into independent blocking parts to reduce the time a
+        single executor job monopolizes the threadpool and to allow better scheduling.
 
         Args:
             eph: Loaded ephemeris.
@@ -2614,15 +2600,14 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         t = ts.from_datetime(now_utc)
         t_future = ts.from_datetime(now_utc + timedelta(hours=6))
 
-        def _calc() -> dict[str, Any]:
-            """Heavy computation executed in the executor thread.
+        # Prepare blocking callables. Each callable must be pure and return its data.
+        def _calc_current() -> tuple[dict[str, Any], dict[str, float]]:
+            """Compute current observation payload and raw values.
 
             Returns:
-                A dictionary with all computed keys ready to be exposed by entities.
+                Tuple (payload, raw_values).
             """
-            payload: dict[str, Any] = {}
-
-            current_payload, current_raw = _Calc.current(
+            return _Calc.current(
                 eph,
                 ts,
                 t,
@@ -2631,48 +2616,98 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 lon=self._lon,
                 elev_m=self._elev,
             )
-            payload.update(current_payload)
 
-            payload.update(
-                _Calc.rise_set(
-                    eph,
-                    t,
-                    self._tz,
-                    lat=self._lat,
-                    lon=self._lon,
-                    elev_m=self._elev,
-                )
+        def _calc_rise_set() -> dict[str, Any]:
+            """Compute rise and set payload.
+
+            Returns:
+                Payload dictionary fragment.
+            """
+            return _Calc.rise_set(
+                eph,
+                t,
+                self._tz,
+                lat=self._lat,
+                lon=self._lon,
+                elev_m=self._elev,
             )
 
-            phase_payload, events = _Calc.phases_and_names(eph, ts, t, self._tz)
-            payload.update(phase_payload)
+        def _calc_phases_and_names() -> tuple[dict[str, Any], dict[str, Time | None]]:
+            """Compute phase events and full moon name payload.
 
-            payload.update(
-                _Calc.apsis(
-                    eph,
-                    ts,
-                    t,
-                    self._tz,
-                    high_precision=self._high_precision,
-                )
+            Returns:
+                Tuple (payload, raw_events).
+            """
+            return _Calc.phases_and_names(eph, ts, t, self._tz)
+
+        def _calc_apsis() -> dict[str, Any]:
+            """Compute apsides payload.
+
+            Returns:
+                Payload dictionary fragment.
+            """
+            return _Calc.apsis(
+                eph,
+                ts,
+                t,
+                self._tz,
+                high_precision=self._high_precision,
             )
 
-            ecl_payload, ecl_raw_lons = _Calc.lunation_ecliptics(eph, events)
-            payload.update(ecl_payload)
+        # Launch independent computations concurrently.
+        current_task = self._hass.async_create_task(self._async_exec(_calc_current))
+        rise_set_task = self._hass.async_create_task(self._async_exec(_calc_rise_set))
+        phases_task = self._hass.async_create_task(
+            self._async_exec(_calc_phases_and_names)
+        )
+        apsis_task = self._hass.async_create_task(self._async_exec(_calc_apsis))
 
-            payload.update(
-                _Calc.zodiac(
-                    current_raw["ecl_lon_geo"],
-                    lon_next_new=ecl_raw_lons["next_new"],
-                    lon_next_full=ecl_raw_lons["next_full"],
-                    lon_prev_new=ecl_raw_lons["prev_new"],
-                    lon_prev_full=ecl_raw_lons["prev_full"],
-                )
+        # Await the independent results.
+        current_payload, current_raw = await current_task
+        rise_set_payload = await rise_set_task
+        phase_payload, events = await phases_task
+        apsis_payload = await apsis_task
+
+        # Dependent computations (lunation ecliptics depends on events).
+        def _calc_lunation_ecliptics() -> tuple[
+            dict[str, Any], dict[str, float | None]
+        ]:
+            """Compute lunation ecliptics payload and raw longitudes.
+
+            Returns:
+                Tuple (payload, raw_longitudes).
+            """
+            return _Calc.lunation_ecliptics(eph, events)
+
+        ecl_payload, ecl_raw_lons = await self._async_exec(_calc_lunation_ecliptics)
+
+        # Zodiac depends on current longitude and lunation longitudes.
+        def _calc_zodiac() -> dict[str, Any]:
+            """Compute zodiac payload.
+
+            Returns:
+                Payload dictionary fragment.
+            """
+            return _Calc.zodiac(
+                current_raw["ecl_lon_geo"],
+                lon_next_new=ecl_raw_lons["next_new"],
+                lon_next_full=ecl_raw_lons["next_full"],
+                lon_prev_new=ecl_raw_lons["prev_new"],
+                lon_prev_full=ecl_raw_lons["prev_full"],
             )
 
-            return payload
+        zodiac_payload = await self._async_exec(_calc_zodiac)
 
-        return await self._hass.async_add_executor_job(_calc)
+        # Merge all payload fragments.
+        payload: dict[str, Any] = {}
+        payload.update(current_payload)
+        payload.update(rise_set_payload)
+        payload.update(phase_payload)
+        payload.update(apsis_payload)
+        payload.update(ecl_payload)
+        payload.update(zodiac_payload)
+
+        return payload
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Compute current lunar data and upcoming events for sensors.
