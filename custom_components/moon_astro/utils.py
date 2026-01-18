@@ -7,15 +7,18 @@ blocking the event loop.
 
 from __future__ import annotations
 
+import asyncio
 from contextlib import suppress
 import logging
 from pathlib import Path
 
 from homeassistant.core import HomeAssistant
 
-from .const import CACHE_DIR_NAME, DE440_FILE
+from .const import CACHE_DIR_NAME, DE440_FILE, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
+_EPHEMERIS_LOCK = "ephemeris_lock"
 
 try:
     from skyfield.api import Loader
@@ -24,6 +27,25 @@ try:
     SKYFIELD_AVAILABLE = True
 except ImportError:  # pragma: no cover
     SKYFIELD_AVAILABLE = False
+
+
+def get_ephemeris_lock(hass: HomeAssistant) -> asyncio.Lock:
+    """Return the shared lock used to prevent concurrent ephemeris downloads.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        A shared asyncio.Lock instance stored in hass.data.
+    """
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    lock = domain_data.get(_EPHEMERIS_LOCK)
+    if isinstance(lock, asyncio.Lock):
+        return lock
+
+    lock = asyncio.Lock()
+    domain_data[_EPHEMERIS_LOCK] = lock
+    return lock
 
 
 def get_cache_dir(hass: HomeAssistant) -> Path:
@@ -194,9 +216,7 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
             _LOGGER.info("Ephemeris download failed: %r", exc)
             return False
 
-        # Ensure the file exists where the integration expects it.
         if not ephemeris_path.exists():
-            # Some environments may redirect cache paths; log to diagnose quickly.
             try:
                 actual = None
                 if hasattr(loader, "path_to"):

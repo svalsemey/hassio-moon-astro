@@ -24,30 +24,14 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .utils import cleanup_cache_dir, ensure_valid_ephemeris
+from .utils import (
+    cleanup_cache_dir,
+    ensure_valid_ephemeris,
+    get_ephemeris_lock,
+    validate_ephemeris_file,
+)
 
 _LOGGER = logging.getLogger(__name__)
-
-_EPHEMERIS_LOCK = "ephemeris_lock"
-
-
-def _get_ephemeris_lock(hass) -> asyncio.Lock:
-    """Return a global lock used to prevent concurrent ephemeris downloads.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        A shared asyncio.Lock instance.
-    """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    lock = domain_data.get(_EPHEMERIS_LOCK)
-    if isinstance(lock, asyncio.Lock):
-        return lock
-
-    lock = asyncio.Lock()
-    domain_data[_EPHEMERIS_LOCK] = lock
-    return lock
 
 
 class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -160,6 +144,18 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         Returns:
             A ConfigFlowResult showing progress or advancing to the next step.
         """
+        # Fast-path: if the ephemeris is already valid, skip the progress UI entirely.
+        # This avoids staying stuck on the progress screen when no download is needed.
+        if self._download_task is None:
+            try:
+                if await validate_ephemeris_file(self.hass, remove_on_invalid=False):
+                    self._download_success = True
+                    return self.async_show_progress_done(next_step_id="precision")
+            except (OSError, RuntimeError, ValueError, AttributeError):
+                # Any unexpected validation failure will fall back to the normal download logic.
+                self._download_success = False
+
+        # Normal path: create the download task once and reuse it across step calls.
         if self._download_task is None:
             self._download_task = self.hass.async_create_task(
                 self._async_ensure_ephemeris()
@@ -191,12 +187,24 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         Returns:
             True if a valid ephemeris is available, False otherwise.
         """
-        lock = _get_ephemeris_lock(self.hass)
+        lock = get_ephemeris_lock(self.hass)
 
         try:
             _LOGGER.info("Config flow ephemeris: waiting for download lock")
             async with lock:
                 _LOGGER.info("Config flow ephemeris: acquired download lock")
+
+                # Revalidate under lock to avoid unnecessary downloads when another task
+                # completed the preparation while this flow was waiting.
+                try:
+                    if await validate_ephemeris_file(
+                        self.hass, remove_on_invalid=False
+                    ):
+                        return True
+                except (OSError, RuntimeError, ValueError, AttributeError):
+                    # Fall back to the standard ensure path.
+                    pass
+
                 return await ensure_valid_ephemeris(self.hass)
         except asyncio.CancelledError:
             await cleanup_cache_dir(self.hass, remove_empty_dir=True)

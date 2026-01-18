@@ -9,7 +9,7 @@ from __future__ import annotations
 # Domain and basic config
 DOMAIN = "moon_astro"
 DEFAULT_SCAN_INTERVAL = 300  # seconds
-DEFAULT_HIGH_PRECISION = True
+DEFAULT_HIGH_PRECISION = False
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_LAT = "latitude"
 CONF_LON = "longitude"

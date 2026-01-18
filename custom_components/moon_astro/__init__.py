@@ -29,6 +29,7 @@ from .coordinator import MoonAstroCoordinator
 from .utils import (
     cleanup_cache_dir,
     ensure_valid_ephemeris,
+    get_ephemeris_lock,
     get_ephemeris_path,
     validate_ephemeris_file,
 )
@@ -36,7 +37,6 @@ from .utils import (
 PLATFORMS: list[str] = ["binary_sensor", "sensor"]
 
 _DATA_REFRESH_TASKS = "refresh_tasks"
-_EPHEMERIS_LOCK = "ephemeris_lock"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,25 +55,6 @@ def _get_refresh_tasks(hass: HomeAssistant) -> dict[str, asyncio.Task[None]]:
         _DATA_REFRESH_TASKS, {}
     )
     return tasks
-
-
-def _get_ephemeris_lock(hass: HomeAssistant) -> asyncio.Lock:
-    """Return a global lock used to prevent concurrent ephemeris downloads.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        A shared asyncio.Lock instance.
-    """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    lock = domain_data.get(_EPHEMERIS_LOCK)
-    if isinstance(lock, asyncio.Lock):
-        return lock
-
-    lock = asyncio.Lock()
-    domain_data[_EPHEMERIS_LOCK] = lock
-    return lock
 
 
 def _ephemeris_path(hass: HomeAssistant) -> Path:
@@ -119,7 +100,7 @@ async def _async_prepare_ephemeris(hass: HomeAssistant, *, reason: str) -> None:
     Raises:
         ConfigEntryNotReady: When the ephemeris could not be prepared.
     """
-    lock = _get_ephemeris_lock(hass)
+    lock = get_ephemeris_lock(hass)
     eph_path = get_ephemeris_path(hass)
     cache_dir = eph_path.parent
 
