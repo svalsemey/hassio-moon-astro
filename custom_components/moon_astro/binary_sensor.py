@@ -9,8 +9,9 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, KEY_ABOVE_HORIZON
+from .const import KEY_ABOVE_HORIZON
 from .coordinator import MoonAstroCoordinator
+from .utils import get_entry_coordinators, get_entry_device_info
 
 
 async def async_setup_entry(
@@ -26,13 +27,12 @@ async def async_setup_entry(
     Returns:
         None.
     """
-    coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
-    device_info = DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer="Moon Astro",
-        model="Skyfield DE440",
-        name="Moon Astro",
-    )
+    coordinator, _events_coordinator = get_entry_coordinators(hass, entry)
+    if coordinator is None:
+        return
+
+    device_info = get_entry_device_info(entry)
+
     async_add_entities(
         [MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)],
         update_before_add=False,
@@ -64,12 +64,12 @@ class MoonAboveHorizonBinary(
         super().__init__(coordinator)
         self._attr_unique_id = f"moon_astro_{entry_id}_above_horizon"
         self._attr_has_entity_name = True
-        self._attr_translation_key = "binary_above_horizon"
+        self._attr_translation_key = "above_horizon"
         self._attr_device_info = device_info
         # Stable slug for entity_id creation
         self._attr_suggested_object_id = "above_horizon"
 
-        self._last_written_is_on: bool | None = object()  # type: ignore[assignment]
+        self._last_written_is_on: bool | None = None
 
     def _compute_is_on(self) -> bool | None:
         """Compute the current binary value without triggering a state write.
@@ -98,8 +98,11 @@ class MoonAboveHorizonBinary(
         This method avoids updating the entity state if the computed value is unchanged.
         """
         new_state = self._compute_is_on()
+        if new_state is None and self._last_written_is_on is None:
+            return
         if self._last_written_is_on == new_state:
             return
+
         self._last_written_is_on = new_state
         self.async_write_ha_state()
 

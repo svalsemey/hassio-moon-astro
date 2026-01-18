@@ -16,13 +16,16 @@ from homeassistant.core import callback
 
 from .const import (
     CONF_ALT,
+    CONF_EVENTS_REFRESH_FALLBACK,
     CONF_HIGH_PRECISION,
     CONF_LAT,
     CONF_LON,
     CONF_SCAN_INTERVAL,
     CONF_USE_HA_TZ,
+    DEFAULT_EVENTS_REFRESH_FALLBACK,
     DEFAULT_HIGH_PRECISION,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_USE_HA_TZ,
     DOMAIN,
 )
 from .utils import (
@@ -231,7 +234,10 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema = vol.Schema(
             {
-                vol.Optional(CONF_HIGH_PRECISION, default=DEFAULT_HIGH_PRECISION): bool,
+                vol.Optional(
+                    CONF_HIGH_PRECISION,
+                    default=DEFAULT_HIGH_PRECISION,
+                ): bool,
             }
         )
         return self.async_show_form(step_id="precision", data_schema=schema)
@@ -341,16 +347,32 @@ class MoonAstroOptionsFlow(config_entries.OptionsFlow):
             {
                 vol.Optional(
                     CONF_SCAN_INTERVAL,
-                    default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                    default=options.get(
+                        CONF_SCAN_INTERVAL,
+                        DEFAULT_SCAN_INTERVAL,
+                    ),
                 ): vol.All(vol.Coerce(int), vol.Range(min=30, max=21600)),
                 vol.Optional(
                     CONF_USE_HA_TZ,
-                    default=options.get(CONF_USE_HA_TZ, True),
+                    default=options.get(
+                        CONF_USE_HA_TZ,
+                        DEFAULT_USE_HA_TZ,
+                    ),
                 ): bool,
                 vol.Optional(
                     CONF_HIGH_PRECISION,
-                    default=options.get(CONF_HIGH_PRECISION, True),
+                    default=options.get(
+                        CONF_HIGH_PRECISION,
+                        DEFAULT_HIGH_PRECISION,
+                    ),
                 ): bool,
+                vol.Optional(
+                    CONF_EVENTS_REFRESH_FALLBACK,
+                    default=options.get(
+                        CONF_EVENTS_REFRESH_FALLBACK,
+                        DEFAULT_EVENTS_REFRESH_FALLBACK,
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=3600, max=604800)),
             }
         )
         return self.async_show_form(step_id="init", data_schema=schema)

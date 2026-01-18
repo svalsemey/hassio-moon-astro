@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "चंद्र एस्ट्रो विकल्प",
-                "description": "सेंसर अपडेट अंतराल और टाइम ज़ोन हैंडलिंग समायोजित करें।\n\nहाई प्रिसिजन मोड टाइमस्टैम्प की परिवर्तनशीलता को कम करता है, लेकिन CPU उपयोग बढ़ाता है क्योंकि यह अधिक सूक्ष्म सैम्पलिंग स्टेप और व्यापक रिफाइनमेंट ब्रैकेट का उपयोग करता है। Raspberry Pi जैसे कम-शक्ति वाले उपकरणों पर इसे सक्षम करने की अनुशंसा नहीं की जाती।",
+                "description": "सेंसर अपडेट अंतराल और समय क्षेत्र प्रबंधन को समायोजित करें।\n\nउच्च सटीकता मोड टाइमस्टैम्प की परिवर्तनशीलता कम करता है, लेकिन CPU उपयोग बढ़ाता है क्योंकि यह अधिक सूक्ष्म सैम्पलिंग चरण और अधिक व्यापक रिफाइनमेंट ब्रैकेट का उपयोग करता है। Raspberry Pi जैसे कम-शक्ति वाले उपकरणों पर इसकी अनुशंसा नहीं की जाती।\n\nइवेंट्स रिफ्रेश फ़ॉलबैक अंतराल इवेंट-आधारित सेंसरों (अगली/पिछली अवस्थाएँ, अपोजी/पेरिजी, ल्युनेशन पर राशि) का आवधिक रिफ्रेश मजबूर करता है, यदि अगले इवेंट के आसपास निर्धारित रिफ्रेश छूट जाए (रीस्टार्ट, समय परिवर्तन, देरी)। कम मान अधिक बार रिफ्रेश करते हैं; अधिक मान CPU उपयोग कम करते हैं।",
                 "data": {
                     "scan_interval": "सेंसर अपडेट अंतराल (सेकंड)",
                     "use_ha_timezone": "Home Assistant का टाइम ज़ोन उपयोग करें",
-                    "high_precision": "हाई प्रिसिजन मोड"
+                    "high_precision": "हाई प्रिसिजन मोड",
+                    "events_refresh_fallback": "इवेंट्स रिफ्रेश फ़ॉलबैक अंतराल (सेकंड)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "क्षितिज के ऊपर",
                 "state": {
                     "on": "क्षितिज के ऊपर",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "चरण",
                 "state": {
                     "new_moon": "अमावस्या",
@@ -66,55 +67,55 @@
                     "unknown": "अज्ञात"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "अज़िमुथ"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "ऊँचाई कोण"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "प्रकाशमानता"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "दूरी"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "पैरालैक्स"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "क्रांतिवृत्त देशांतर (टोपोसेंट्रिक)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "क्रांतिवृत्त अक्षांश (टोपोसेंट्रिक)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "क्रांतिवृत्त देशांतर (जियोसेंट्रिक)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "क्रांतिवृत्त अक्षांश (जियोसेंट्रिक)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "अगला उदय"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "अगला अस्त"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "अगला अपसौर"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "अगला उपसौर"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "अगला अमावस्या"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "अगला प्रथम चरण"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "अगला पूर्णिमा"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "अगली पूर्णिमा का नाम",
                 "state": {
                     "wolf_moon": "भेड़िया चंद्रमा",
@@ -133,7 +134,7 @@
                     "unknown": "अज्ञात"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "अगली पूर्णिमा के वैकल्पिक नाम",
                 "state": {
                     "wolf_moon_alt_names": "यूल के बाद का चंद्रमा, घर पर रहने वाला चंद्रमा, शांत चंद्रमा, कठोर चंद्रमा, केंद्र चंद्रमा",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "अगला अंतिम चरण"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "पिछला उदय"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "पिछला अस्त"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "पिछला अपसौर"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "पिछला उपसौर"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "पिछली अमावस्या"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "पिछला प्रथम चरण"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "पिछली पूर्णिमा"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "पिछली पूर्णिमा का नाम",
                 "state": {
                     "wolf_moon": "भेड़िया चंद्रमा",
@@ -195,7 +196,7 @@
                     "unknown": "अज्ञात"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "पिछली पूर्णिमा के वैकल्पिक नाम",
                 "state": {
                     "wolf_moon_alt_names": "यूल के बाद का चंद्रमा, घर पर रहने वाला चंद्रमा, शांत चंद्रमा, कठोर चंद्रमा, केंद्र चंद्रमा",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "पिछला अंतिम चरण"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "अगली पूर्णिमा पर क्रांतिवृत्त देशांतर"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "अगली पूर्णिमा पर क्रांतिवृत्त अक्षांश"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "अगली अमावस्या पर क्रांतिवृत्त देशांतर"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "अगली अमावस्या पर क्रांतिवृत्त अक्षांश"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "पिछली पूर्णिमा पर क्रांतिवृत्त देशांतर"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "पिछली पूर्णिमा पर क्रांतिवृत्त अक्षांश"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "पिछली अमावस्या पर क्रांतिवृत्त देशांतर"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "पिछली अमावस्या पर क्रांतिवृत्त अक्षांश"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "राशि चिह्न (वर्तमान)",
                 "state": {
                     "aries": "मेष",
@@ -259,7 +260,7 @@
                     "pisces": "मीन"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "अगली अमावस्या पर राशि चिह्न",
                 "state": {
                     "aries": "मेष",
@@ -276,7 +277,7 @@
                     "pisces": "मीन"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "अगली पूर्णिमा पर राशि चिह्न",
                 "state": {
                     "aries": "मेष",
@@ -293,7 +294,7 @@
                     "pisces": "मीन"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "पिछली अमावस्या पर राशि चिह्न",
                 "state": {
                     "aries": "मेष",
@@ -310,7 +311,7 @@
                     "pisces": "मीन"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "पिछली पूर्णिमा पर राशि चिह्न",
                 "state": {
                     "aries": "मेष",
@@ -327,19 +328,19 @@
                     "pisces": "मीन"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "राशि अंश (वर्तमान)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "अगली अमावस्या पर राशि अंश"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "अगली पूर्णिमा पर राशि अंश"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "पिछली अमावस्या पर राशि अंश"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "पिछली पूर्णिमा पर राशि अंश"
             }
         }

@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Možnosti Mesiac Astro",
-                "description": "Upravte interval aktualizácie senzorov a prácu s časovým pásmom.\n\nRežim vysokej presnosti znižuje variabilitu časových pečiatok, ale zvyšuje využitie CPU, pretože používa jemnejší krok vzorkovania a širší interval spresnenia. Neodporúča sa zapínať túto možnosť na menej výkonných zariadeniach, ako je Raspberry Pi.",
+                "description": "Upravte interval aktualizácie senzorov a spracovanie časového pásma.\n\nRežim vysokej presnosti znižuje variabilitu časových pečiatok, ale zvyšuje využitie CPU, pretože používa jemnejší krok vzorkovania a širší rozsah spresnenia. Neodporúča sa na zariadeniach s nízkym výkonom, ako je Raspberry Pi.\n\nZáložný interval obnovovania udalostí vynucuje periodické obnovenie senzorov založených na udalostiach (nasledujúce/predchádzajúce fázy, apogeum/perigeum, zverokruh pri lunáciách) pre prípad, že sa zmešká plánované obnovenie okolo nasledujúcej udalosti (reštart, zmena času, oneskorenie). Nižšie hodnoty obnovujú častejšie; vyššie hodnoty znižujú využitie CPU.",
                 "data": {
                     "scan_interval": "Interval aktualizácie senzorov (sekundy)",
                     "use_ha_timezone": "Použiť časové pásmo Home Assistant",
-                    "high_precision": "Režim vysokej presnosti"
+                    "high_precision": "Režim vysokej presnosti",
+                    "events_refresh_fallback": "Záložný interval obnovovania udalostí (sekundy)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Nad obzorom",
                 "state": {
                     "on": "Nad obzorom",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Fáza",
                 "state": {
                     "new_moon": "Nov",
@@ -66,55 +67,55 @@
                     "unknown": "Neznáme"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Výška"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Osvetlenie"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Vzdialenosť"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaxa"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Ekliptikálna dĺžka (topocentrická)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Ekliptikálna šírka (topocentrická)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Ekliptikálna dĺžka (geocentrická)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Ekliptikálna šírka (geocentrická)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Najbližší východ"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Najbližší západ"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Najbližšie apogeum"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Najbližšie perigeum"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Najbližší nov"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Najbližšia prvá štvrť"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Najbližší spln"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Názov nasledujúceho splnu",
                 "state": {
                     "wolf_moon": "Vlčí spln",
@@ -133,7 +134,7 @@
                     "unknown": "Neznáme"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Alternatívne názvy nasledujúceho splnu",
                 "state": {
                     "wolf_moon_alt_names": "Mesiac po Yule, Domáci mesiac, Tichý mesiac, Prísny mesiac, Stredový mesiac",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Najbližšia posledná štvrť"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Predchádzajúci východ"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Predchádzajúci západ"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Predchádzajúce apogeum"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Predchádzajúce perigeum"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Predchádzajúci nov"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Predchádzajúca prvá štvrť"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Predchádzajúci spln"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Názov predchádzajúceho splnu",
                 "state": {
                     "wolf_moon": "Vlčí spln",
@@ -195,7 +196,7 @@
                     "unknown": "Neznáme"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Alternatívne názvy predchádzajúceho splnu",
                 "state": {
                     "wolf_moon_alt_names": "Mesiac po Yule, Domáci mesiac, Tichý mesiac, Prísny mesiac, Stredový mesiac",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Predchádzajúca posledná štvrť"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptikálna dĺžka pri najbližšom splne"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Ekliptikálna šírka pri najbližšom splne"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Ekliptikálna dĺžka pri najbližšom nove"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptikálna šírka pri najbližšom nove"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Ekliptikálna dĺžka pri predchádzajúcom splne"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Ekliptikálna šírka pri predchádzajúcom splne"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Ekliptikálna dĺžka pri predchádzajúcom nove"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptikálna šírka pri predchádzajúcom nove"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Znamenie zverokruhu (aktuálne)",
                 "state": {
                     "aries": "Baran",
@@ -259,7 +260,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Znamenie zverokruhu pri najbližšom nove",
                 "state": {
                     "aries": "Baran",
@@ -276,7 +277,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Znamenie zverokruhu pri najbližšom splne",
                 "state": {
                     "aries": "Baran",
@@ -293,7 +294,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Znamenie zverokruhu pri predchádzajúcom nove",
                 "state": {
                     "aries": "Baran",
@@ -310,7 +311,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Znamenie zverokruhu pri predchádzajúcom splne",
                 "state": {
                     "aries": "Baran",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Stupeň zverokruhu (aktuálny)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Stupeň zverokruhu pri najbližšom nove"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Stupeň zverokruhu pri najbližšom splne"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Stupeň zverokruhu pri predchádzajúcom nove"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Stupeň zverokruhu pri predchádzajúcom splne"
             }
         }

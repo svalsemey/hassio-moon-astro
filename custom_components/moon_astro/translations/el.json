@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Επιλογές Σελήνη Άστρο",
-                "description": "Ρυθμίστε το διάστημα ενημέρωσης των αισθητήρων και τη διαχείριση ζώνης ώρας.\n\nΗ λειτουργία υψηλής ακρίβειας μειώνει τη μεταβλητότητα των χρονικών σημάνσεων, αλλά αυξάνει τη χρήση CPU επειδή χρησιμοποιεί λεπτότερο βήμα δειγματοληψίας και ευρύτερο εύρος βελτίωσης. Δεν συνιστάται η ενεργοποίησή της σε συσκευές χαμηλής ισχύος όπως το Raspberry Pi.",
+                "description": "Ρυθμίστε το διάστημα ενημέρωσης των αισθητήρων και τη διαχείριση ζώνης ώρας.\n\nΗ λειτουργία υψηλής ακρίβειας μειώνει τη μεταβλητότητα των χρονικών σφραγίδων, αλλά αυξάνει τη χρήση CPU επειδή χρησιμοποιεί μικρότερο βήμα δειγματοληψίας και ευρύτερο εύρος βελτίωσης. Δεν συνιστάται σε συσκευές χαμηλής ισχύος όπως το Raspberry Pi.\n\nΤο εφεδρικό διάστημα ανανέωσης συμβάντων επιβάλλει περιοδική ανανέωση των αισθητήρων που βασίζονται σε συμβάντα (επόμενες/προηγούμενες φάσεις, απόγειο/περίγειο, ζώδια στις σεληνιακές συνόδους) σε περίπτωση που χαθεί η προγραμματισμένη ανανέωση γύρω από το επόμενο συμβάν (επανεκκίνηση, αλλαγή ώρας, καθυστέρηση). Μικρότερες τιμές ανανεώνουν συχνότερα· μεγαλύτερες τιμές μειώνουν τη χρήση CPU.",
                 "data": {
                     "scan_interval": "Διάστημα ενημέρωσης αισθητήρων (δευτερόλεπτα)",
                     "use_ha_timezone": "Χρήση ζώνης ώρας του Home Assistant",
-                    "high_precision": "Λειτουργία υψηλής ακρίβειας"
+                    "high_precision": "Λειτουργία υψηλής ακρίβειας",
+                    "events_refresh_fallback": "Εφεδρικό διάστημα ανανέωσης συμβάντων (δευτερόλεπτα)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Πάνω από τον ορίζοντα",
                 "state": {
                     "on": "Πάνω από τον ορίζοντα",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Φάση",
                 "state": {
                     "new_moon": "Νέα σελήνη",
@@ -66,55 +67,55 @@
                     "unknown": "Άγνωστο"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Αζιμούθιο"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Υψομετρική γωνία"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Φωτισμός"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Απόσταση"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Παράλλαξη"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Εκλειπτική μήκος (τοποκεντρικό)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Εκλειπτική πλάτος (τοποκεντρικό)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Εκλειπτική μήκος (γεωκεντρικό)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Εκλειπτική πλάτος (γεωκεντρικό)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Επόμενη ανατολή"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Επόμενη δύση"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Επόμενο απόγειο"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Επόμενο περίγειο"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Επόμενη νέα σελήνη"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Επόμενο πρώτο τέταρτο"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Επόμενη πανσέληνος"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Όνομα της επόμενης πανσελήνου",
                 "state": {
                     "wolf_moon": "Πανσέληνος του Λύκου",
@@ -133,7 +134,7 @@
                     "unknown": "Άγνωστο"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Εναλλακτικά ονόματα της επόμενης πανσελήνου",
                 "state": {
                     "wolf_moon_alt_names": "Σελήνη μετά το Yule, Σελήνη «Μείνε Σπίτι», Ήσυχη Σελήνη, Αυστηρή Σελήνη, Κεντρική Σελήνη",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Επόμενο τελευταίο τέταρτο"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Προηγούμενη ανατολή"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Προηγούμενη δύση"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Προηγούμενο απόγειο"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Προηγούμενο περίγειο"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Προηγούμενη νέα σελήνη"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Προηγούμενο πρώτο τέταρτο"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Προηγούμενη πανσέληνος"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Όνομα της προηγούμενης πανσελήνου",
                 "state": {
                     "wolf_moon": "Πανσέληνος του Λύκου",
@@ -195,7 +196,7 @@
                     "unknown": "Άγνωστο"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Εναλλακτικά ονόματα της προηγούμενης πανσελήνου",
                 "state": {
                     "wolf_moon_alt_names": "Σελήνη μετά το Yule, Σελήνη «Μείνε Σπίτι», Ήσυχη Σελήνη, Αυστηρή Σελήνη, Κεντρική Σελήνη",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Προηγούμενο τελευταίο τέταρτο"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Εκλειπτική μήκος στην επόμενη πανσέληνο"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Εκλειπτική πλάτος στην επόμενη πανσέληνο"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Εκλειπτική μήκος στην επόμενη νέα σελήνη"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Εκλειπτική πλάτος στην επόμενη νέα σελήνη"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Εκλειπτική μήκος στην προηγούμενη πανσέληνο"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Εκλειπτική πλάτος στην προηγούμενη πανσέληνο"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Εκλειπτική μήκος στην προηγούμενη νέα σελήνη"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Εκλειπτική πλάτος στην προηγούμενη νέα σελήνη"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Ζώδιο (τρέχον)",
                 "state": {
                     "aries": "Κριός",
@@ -259,7 +260,7 @@
                     "pisces": "Ιχθύες"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Ζώδιο στην επόμενη νέα σελήνη",
                 "state": {
                     "aries": "Κριός",
@@ -276,7 +277,7 @@
                     "pisces": "Ιχθύες"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Ζώδιο στην επόμενη πανσέληνο",
                 "state": {
                     "aries": "Κριός",
@@ -293,7 +294,7 @@
                     "pisces": "Ιχθύες"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Ζώδιο στην προηγούμενη νέα σελήνη",
                 "state": {
                     "aries": "Κριός",
@@ -310,7 +311,7 @@
                     "pisces": "Ιχθύες"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Ζώδιο στην προηγούμενη πανσέληνο",
                 "state": {
                     "aries": "Κριός",
@@ -327,19 +328,19 @@
                     "pisces": "Ιχθύες"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Μοίρα ζωδίου (τρέχουσα)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Μοίρα ζωδίου στην επόμενη νέα σελήνη"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Μοίρα ζωδίου στην επόμενη πανσέληνο"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Μοίρα ζωδίου στην προηγούμενη νέα σελήνη"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Μοίρα ζωδίου στην προηγούμενη πανσέληνο"
             }
         }

@@ -11,7 +11,9 @@ The code is structured to:
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable, Iterable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 import logging
@@ -28,6 +30,7 @@ from timezonefinder import TimezoneFinder
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -40,10 +43,12 @@ from .const import (
     DARK_MOON,
     DE440_FILE,
     DEFAULT_HIGH_PRECISION,
+    DOMAIN,
     FIRST_QUARTER,
     FULL_MOON,
     FULL_MOON_STRICT_PCT,
     HIGH_PRECISION_BRACKET_EXPAND,
+    HIGH_PRECISION_BRACKETS_TO_REFINE,
     HIGH_PRECISION_STEP_HOURS,
     KEY_ABOVE_HORIZON,
     KEY_AZIMUTH,
@@ -103,6 +108,8 @@ from .const import (
     LAST_QUARTER,
     NEW_MOON_STRICT_PCT,
     QUARTER_TOL_PCT,
+    STANDARD_PRECISION_BRACKET_EXPAND,
+    STANDARD_PRECISION_STEP_HOURS,
 )
 
 # Type aliases to improve readability where the 3rd-party library does not expose stable typing.
@@ -144,6 +151,8 @@ _PHASE_VALUES: tuple[int, int, int, int] = (
     LAST_QUARTER,
 )
 
+_SHARED_EPHEMERIS_STORE_KEY = "shared_ephemeris_store"
+_SHARED_EPHEMERIS_ITEM_KEY = "eph_ts"
 
 # -----------------------------------------------------------------------------
 # Timezone and datetime formatting helpers
@@ -272,6 +281,32 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
         dt_utc = dt_utc.replace(tzinfo=UTC)
 
     return _to_local_iso(dt_utc.astimezone(UTC), tz)
+
+
+def _parse_iso_to_utc(value: Any) -> datetime | None:
+    """Parse an ISO 8601 timestamp into a timezone-aware UTC datetime.
+
+    Args:
+        value: ISO string or datetime-like value.
+
+    Returns:
+        A timezone-aware UTC datetime, or None when parsing fails.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, datetime):
+        dt = value
+    else:
+        try:
+            dt = datetime.fromisoformat(str(value))
+        except (ValueError, TypeError):
+            return None
+
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+
+    return dt.astimezone(UTC)
 
 
 # -----------------------------------------------------------------------------
@@ -1230,7 +1265,7 @@ def _select_extremum_candidate(
     Returns:
         Selected candidate TT or None.
     """
-    ref_tt = t_start.tt
+    ref_tt = float(t_start.tt)
     filtered: list[float] = []
 
     for tt in candidates_tt:
@@ -1394,6 +1429,310 @@ def _refine_brackets(
 # -----------------------------------------------------------------------------
 
 
+def _make_geocentric_distance_tt_function(
+    eph: Ephemeris,
+    ts: Timescale,
+) -> Callable[[float], float]:
+    """Build a cached distance function f(tt)->km for geocentric Earth-Moon distance.
+
+    The returned function is bounded-cached using quantized TT values to reduce
+    repeated Skyfield evaluations during bracketing and iterative refinement.
+
+    Args:
+        eph: Loaded ephemeris.
+        ts: Skyfield Timescale.
+
+    Returns:
+        A callable mapping TT Julian date to geocentric distance in kilometers.
+    """
+    earth, moon = eph["earth"], eph["moon"]
+
+    dist_cache: dict[float, float] = {}
+    dist_cache_order: list[float] = []
+    dist_cache_max = 256
+
+    def _quantize_tt(tt: float) -> float:
+        """Quantize a TT Julian date for stable cache keys.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Quantized TT Julian date.
+        """
+        # 1e-10 day is ~8.64 microseconds; it avoids missing reuse due to tiny float jitter.
+        return round(float(tt), 10)
+
+    def _cache_put(key: float, value: float) -> None:
+        """Insert a value into the bounded cache.
+
+        Args:
+            key: Quantized TT Julian date.
+            value: Distance in km.
+
+        Returns:
+            None.
+        """
+        if key in dist_cache:
+            return
+
+        dist_cache[key] = value
+        dist_cache_order.append(key)
+
+        if len(dist_cache_order) > dist_cache_max:
+            old = dist_cache_order.pop(0)
+            dist_cache.pop(old, None)
+
+    def f_tt(tt: float) -> float:
+        """Return geocentric Earth-Moon distance in km as a function of TT Julian date.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Geocentric distance in kilometers.
+        """
+        key = _quantize_tt(tt)
+        cached = dist_cache.get(key)
+        if cached is not None:
+            return cached
+
+        value = float(earth.at(ts.tt_jd(tt)).observe(moon).distance().km)
+        _cache_put(key, value)
+        return value
+
+    return f_tt
+
+
+def _find_extremum_high_precision(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    t_start: Time,
+    *,
+    is_min: bool,
+    search_backward: bool,
+    days_window: float,
+    tol: float,
+    max_iter: int,
+) -> Time | None:
+    """Find an extremum using derivative sign-change brackets and root refinement.
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Cached distance function f(tt)->km.
+        t_start: Reference time.
+        is_min: True to search for a minimum, False for a maximum.
+        search_backward: True for previous, False for next.
+        days_window: Search window in days.
+        tol: Root solver tolerance.
+        max_iter: Root solver max iterations.
+
+    Returns:
+        Skyfield Time for the extremum, or None if not found.
+    """
+    step_minutes = 10.0
+    h_minutes = 20.0
+
+    brackets = _find_derivative_sign_brackets(
+        ts,
+        f_tt,
+        t_start,
+        search_backward=search_backward,
+        days_window=days_window,
+        step_minutes=step_minutes,
+        h_minutes=h_minutes,
+        max_candidates=8,
+    )
+
+    _LOGGER.debug(
+        "Distance extremum: mode=high_precision is_min=%s search_backward=%s brackets_found=%s",
+        is_min,
+        search_backward,
+        len(brackets),
+    )
+
+    if not brackets:
+        _LOGGER.debug("Distance extremum: no brackets found")
+        return None
+
+    def g_tt(tt: float) -> float:
+        """Return derivative proxy d(distance)/d(TT day) at tt.
+
+        Args:
+            tt: TT Julian date.
+
+        Returns:
+            Derivative estimate.
+        """
+        return _derivative_distance_tt(ts, f_tt, tt, h_minutes=h_minutes)
+
+    roots_tt: list[float] = []
+    refined = 0
+
+    for a_tt, b_tt in brackets:
+        if refined >= HIGH_PRECISION_BRACKETS_TO_REFINE:
+            break
+        refined += 1
+
+        root = _brent_root(g_tt, a_tt, b_tt, tol=tol, max_iter=max_iter)
+        if root is None or not math.isfinite(root):
+            continue
+
+        roots_tt.append(float(root))
+
+    _LOGGER.debug(
+        "Distance extremum: refined_brackets=%s candidate_roots_found=%s",
+        refined,
+        len(roots_tt),
+    )
+
+    selected_tt = _select_extremum_candidate(
+        ts,
+        f_tt,
+        roots_tt,
+        t_start,
+        is_min=is_min,
+        search_backward=search_backward,
+    )
+
+    if selected_tt is None:
+        _LOGGER.debug("Distance extremum: no candidate matched direction/kind filters")
+        return None
+
+    _LOGGER.debug(
+        "Distance extremum: selected_candidate_tt=%s (search_backward=%s)",
+        selected_tt,
+        search_backward,
+    )
+    try:
+        selected_distance_km = float(f_tt(selected_tt))
+    except (ValueError, ArithmeticError, OverflowError) as exc:
+        _LOGGER.debug(
+            "Distance extremum: failed to evaluate distance at selected_tt (error=%r)",
+            exc,
+        )
+    else:
+        _LOGGER.debug(
+            "Distance extremum: selected_distance_km=%.3f (expected_kind=%s)",
+            selected_distance_km,
+            "minimum" if is_min else "maximum",
+        )
+
+    t_ext = _minute_validation_extremum(ts, f_tt, selected_tt, is_min=is_min)
+
+    _LOGGER.debug(
+        "Distance extremum: selected_time_utc=%s",
+        t_ext.utc_datetime().isoformat()
+        if hasattr(t_ext, "utc_datetime")
+        else "unknown",
+    )
+    return t_ext
+
+
+def _find_extremum_standard(
+    ts: Timescale,
+    f_tt: Callable[[float], float],
+    eph: Ephemeris,
+    t_start: Time,
+    *,
+    is_min: bool,
+    search_backward: bool,
+    days_window: float,
+    step_hours: float,
+    bracket_expand: int,
+    tol: float,
+    max_iter: int,
+) -> Time | None:
+    """Find an extremum by sampling distance and refining a local bracket.
+
+    Args:
+        ts: Skyfield Timescale.
+        f_tt: Cached distance function f(tt)->km.
+        eph: Loaded ephemeris (used for direct distance sampling on Time objects).
+        t_start: Reference time.
+        is_min: True to search for a minimum, False for a maximum.
+        search_backward: True for previous, False for next.
+        days_window: Search window in days.
+        step_hours: Sampling step in hours.
+        bracket_expand: Bracket expansion in samples.
+        tol: Extremum solver tolerance.
+        max_iter: Extremum solver max iterations.
+
+    Returns:
+        Skyfield Time for the extremum, or None if not found.
+    """
+    earth, moon = eph["earth"], eph["moon"]
+
+    def geocentric_distance_km(t: Time) -> float:
+        """Return geocentric Earth-Moon distance at time t in kilometers.
+
+        Args:
+            t: Skyfield Time.
+
+        Returns:
+            Geocentric distance in kilometers.
+        """
+        return earth.at(t).observe(moon).distance().km
+
+    steps = int(days_window * 24.0 / step_hours) + 1
+    t0 = (t_start - days_window) if search_backward else t_start
+
+    t_list: list[Time] = []
+    d_list: list[float] = []
+    for i in range(steps):
+        dt_days = i * (step_hours / 24.0)
+        t_i = t0 + dt_days
+        t_list.append(t_i)
+        d_list.append(geocentric_distance_km(t_i))
+
+    bracket_kind = "min" if is_min else "max"
+    brackets = _refine_brackets(
+        t_list, d_list, kind=bracket_kind, expand=bracket_expand
+    )
+
+    _LOGGER.debug(
+        "Distance extremum: mode=standard is_min=%s search_backward=%s brackets_found=%s",
+        is_min,
+        search_backward,
+        len(brackets),
+    )
+    if not brackets:
+        return None
+
+    t0_tt = t_start.tt
+    chosen: tuple[float, float, int] | None = None
+
+    if search_backward:
+        for tt_a, tt_b, idx_center in brackets:
+            if t_list[idx_center].tt < t0_tt:
+                chosen = (tt_a, tt_b, idx_center)
+            else:
+                break
+    else:
+        for tt_a, tt_b, idx_center in brackets:
+            if t_list[idx_center].tt > t0_tt:
+                chosen = (tt_a, tt_b, idx_center)
+                break
+
+    if chosen is None:
+        return None
+
+    _LOGGER.debug(
+        "Distance extremum: chosen_bracket_tt=(%s, %s) idx_center=%s",
+        chosen[0],
+        chosen[1],
+        chosen[2],
+    )
+
+    tt_a, tt_b, _idx_center = chosen
+    res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
+    t_ext = ts.tt_jd(res.tt)
+
+    if search_backward:
+        return t_ext if t_ext.tt < t_start.tt else None
+    return t_ext if t_ext.tt > t_start.tt else None
+
+
 def _find_geocentric_distance_extremum(
     eph: Ephemeris,
     ts: Timescale,
@@ -1402,8 +1741,8 @@ def _find_geocentric_distance_extremum(
     is_min: bool,
     search_backward: bool,
     days_window: float = 40.0,
-    step_hours: float = 2.0,
-    bracket_expand: int = 1,
+    step_hours: float = STANDARD_PRECISION_STEP_HOURS,
+    bracket_expand: int = STANDARD_PRECISION_BRACKET_EXPAND,
     tol: float = 1e-7,
     max_iter: int = 200,
 ) -> Time | None:
@@ -1433,189 +1772,38 @@ def _find_geocentric_distance_extremum(
     Returns:
         A Skyfield Time for the extremum, or None if not found.
     """
-    earth, moon = eph["earth"], eph["moon"]
+    f_tt = _make_geocentric_distance_tt_function(eph, ts)
 
-    def geocentric_distance_km(t: Time) -> float:
-        """Return geocentric Earth-Moon distance at time t in kilometers.
-
-        Args:
-            t: Skyfield Time.
-
-        Returns:
-            Geocentric distance in kilometers.
-        """
-        return earth.at(t).observe(moon).distance().km
-
-    # Local bounded cache for distance evaluations to avoid repeated Skyfield calls.
-    # The cache key uses a quantized TT value to merge near-identical evaluations
-    # commonly produced by bracketing/Brent iterations.
-    dist_cache: dict[float, float] = {}
-    dist_cache_order: list[float] = []
-    DIST_CACHE_MAX = 256
-
-    def _quantize_tt(tt: float) -> float:
-        """Quantize a TT Julian date for stable cache keys.
-
-        Args:
-            tt: TT Julian date.
-
-        Returns:
-            Quantized TT Julian date.
-        """
-        # 1e-10 day is ~8.64 microseconds; it avoids missing reuse due to tiny float jitter.
-        return round(float(tt), 10)
-
-    def _cache_get(tt: float) -> float | None:
-        """Return cached value if present.
-
-        Args:
-            tt: TT Julian date.
-
-        Returns:
-            Cached distance in km or None.
-        """
-        return dist_cache.get(tt)
-
-    def _cache_put(tt: float, value: float) -> None:
-        """Insert a value into the bounded cache.
-
-        Args:
-            tt: Quantized TT Julian date key.
-            value: Distance in km.
-
-        Returns:
-            None.
-        """
-        if tt in dist_cache:
-            return
-
-        dist_cache[tt] = value
-        dist_cache_order.append(tt)
-
-        if len(dist_cache_order) > DIST_CACHE_MAX:
-            old = dist_cache_order.pop(0)
-            dist_cache.pop(old, None)
-
-    def f_tt(tt: float) -> float:
-        """Return geocentric Earth-Moon distance in km as a function of TT Julian date.
-
-        Args:
-            tt: TT Julian date.
-
-        Returns:
-            Geocentric distance in kilometers.
-        """
-        key = _quantize_tt(tt)
-        cached = _cache_get(key)
-        if cached is not None:
-            return cached
-
-        value = float(geocentric_distance_km(ts.tt_jd(tt)))
-        _cache_put(key, value)
-        return value
-
-    # Enable additional stability refinements only in high precision mode.
     use_high_precision_refine = (
         step_hours <= HIGH_PRECISION_STEP_HOURS
         and bracket_expand >= HIGH_PRECISION_BRACKET_EXPAND
     )
 
     if use_high_precision_refine:
-        # Derivative sign-change + root refinement.
-        step_minutes = 10.0
-        h_minutes = 20.0
-
-        brackets = _find_derivative_sign_brackets(
+        return _find_extremum_high_precision(
             ts,
             f_tt,
-            t_start,
-            search_backward=search_backward,
-            days_window=days_window,
-            step_minutes=step_minutes,
-            h_minutes=h_minutes,
-            max_candidates=8,
-        )
-        if not brackets:
-            return None
-
-        def g_tt(tt: float) -> float:
-            """Return derivative proxy d(distance)/d(TT day) at tt.
-
-            Args:
-                tt: TT Julian date.
-
-            Returns:
-                Derivative estimate.
-            """
-            return _derivative_distance_tt(ts, f_tt, tt, h_minutes=h_minutes)
-
-        # Refine only the nearest bracket to keep CPU usage bounded.
-        brackets_to_refine = brackets[:1]
-
-        roots: list[float] = []
-        for a_tt, b_tt in brackets_to_refine:
-            root = _brent_root(g_tt, a_tt, b_tt, tol=tol, max_iter=max_iter)
-            if root is None or not math.isfinite(root):
-                continue
-            roots.append(float(root))
-
-        selected_tt = _select_extremum_candidate(
-            ts,
-            f_tt,
-            roots,
             t_start,
             is_min=is_min,
             search_backward=search_backward,
+            days_window=days_window,
+            tol=tol,
+            max_iter=max_iter,
         )
-        if selected_tt is None:
-            return None
 
-        return _minute_validation_extremum(ts, f_tt, selected_tt, is_min=is_min)
-
-    # Normal mode: sample and bracket a local extremum then refine with Brent extremum.
-    steps = int(days_window * 24.0 / step_hours) + 1
-    t0 = (t_start - days_window) if search_backward else t_start
-
-    t_list: list[Time] = []
-    d_list: list[float] = []
-    for i in range(steps):
-        dt_days = i * (step_hours / 24.0)
-        t_i = t0 + dt_days
-        t_list.append(t_i)
-        d_list.append(geocentric_distance_km(t_i))
-
-    bracket_kind = "min" if is_min else "max"
-    brackets = _refine_brackets(
-        t_list, d_list, kind=bracket_kind, expand=bracket_expand
+    return _find_extremum_standard(
+        ts,
+        f_tt,
+        eph,
+        t_start,
+        is_min=is_min,
+        search_backward=search_backward,
+        days_window=days_window,
+        step_hours=step_hours,
+        bracket_expand=bracket_expand,
+        tol=tol,
+        max_iter=max_iter,
     )
-    if not brackets:
-        return None
-
-    t0_tt = t_start.tt
-    chosen: tuple[float, float, int] | None = None
-
-    if search_backward:
-        for tt_a, tt_b, idx_center in brackets:
-            if t_list[idx_center].tt < t0_tt:
-                chosen = (tt_a, tt_b, idx_center)
-            else:
-                break
-    else:
-        for tt_a, tt_b, idx_center in brackets:
-            if t_list[idx_center].tt > t0_tt:
-                chosen = (tt_a, tt_b, idx_center)
-                break
-
-    if chosen is None:
-        return None
-
-    tt_a, tt_b, _idx_center = chosen
-    res = _brent_extremum(f_tt, tt_a, tt_b, is_min=is_min, tol=tol, max_iter=max_iter)
-    t_ext = ts.tt_jd(res.tt)
-
-    if search_backward:
-        return t_ext if t_ext.tt < t_start.tt else None
-    return t_ext if t_ext.tt > t_start.tt else None
 
 
 def _find_next_apogee(
@@ -1623,8 +1811,8 @@ def _find_next_apogee(
     ts: Timescale,
     t_start: Time,
     *,
-    step_hours: float = 2.0,
-    bracket_expand: int = 1,
+    step_hours: float = STANDARD_PRECISION_STEP_HOURS,
+    bracket_expand: int = STANDARD_PRECISION_BRACKET_EXPAND,
 ) -> Time | None:
     """Find the next apogee after t_start using distance maximization.
 
@@ -1654,8 +1842,8 @@ def _find_next_perigee(
     ts: Timescale,
     t_start: Time,
     *,
-    step_hours: float = 2.0,
-    bracket_expand: int = 1,
+    step_hours: float = STANDARD_PRECISION_STEP_HOURS,
+    bracket_expand: int = STANDARD_PRECISION_BRACKET_EXPAND,
 ) -> Time | None:
     """Find the next perigee after t_start using distance minimization.
 
@@ -1685,8 +1873,8 @@ def _find_previous_apogee(
     ts: Timescale,
     t_start: Time,
     *,
-    step_hours: float = 2.0,
-    bracket_expand: int = 1,
+    step_hours: float = STANDARD_PRECISION_STEP_HOURS,
+    bracket_expand: int = STANDARD_PRECISION_BRACKET_EXPAND,
 ) -> Time | None:
     """Find the previous apogee before t_start using distance maximization.
 
@@ -1716,8 +1904,8 @@ def _find_previous_perigee(
     ts: Timescale,
     t_start: Time,
     *,
-    step_hours: float = 2.0,
-    bracket_expand: int = 1,
+    step_hours: float = STANDARD_PRECISION_STEP_HOURS,
+    bracket_expand: int = STANDARD_PRECISION_BRACKET_EXPAND,
 ) -> Time | None:
     """Find the previous perigee before t_start using distance minimization.
 
@@ -2184,6 +2372,12 @@ class _Calc:
         """
         step_hours = HIGH_PRECISION_STEP_HOURS if high_precision else 2.0
         bracket_expand = HIGH_PRECISION_BRACKET_EXPAND if high_precision else 1
+        _LOGGER.debug(
+            "Apsis computation: high_precision=%s step_hours=%s bracket_expand=%s",
+            high_precision,
+            step_hours,
+            bracket_expand,
+        )
 
         try:
             next_apogee = _find_next_apogee(
@@ -2229,6 +2423,13 @@ class _Calc:
         except _RECOVERABLE_NUMERIC_ERRORS:
             prev_perigee = None
 
+        _LOGGER.debug(
+            "Apsis computation: results next_apogee=%s next_perigee=%s prev_apogee=%s prev_perigee=%s",
+            _safe_time_iso(next_apogee, tz),
+            _safe_time_iso(next_perigee, tz),
+            _safe_time_iso(prev_apogee, tz),
+            _safe_time_iso(prev_perigee, tz),
+        )
         return {
             KEY_NEXT_APOGEE: _safe_time_iso(next_apogee, tz),
             KEY_NEXT_PERIGEE: _safe_time_iso(next_perigee, tz),
@@ -2266,9 +2467,11 @@ class _Calc:
             t0 = t - 40.0
             t1 = t + 40.0
             times, phases = almanac.find_discrete(t0, t1, f)
-            events_obj = _extract_phase_events_from_discrete(
-                t, list(times), list(phases)
-            )
+
+            times_list = times if isinstance(times, list) else list(times)
+            phases_list = phases if isinstance(phases, list) else list(phases)
+
+            events_obj = _extract_phase_events_from_discrete(t, times_list, phases_list)
         except _RECOVERABLE_SKYFIELD_ERRORS:
             events_obj = _PhaseEvents(
                 next_new=None,
@@ -2467,6 +2670,47 @@ class _Calc:
         }
 
 
+def _get_shared_ephemeris_store(hass: HomeAssistant) -> dict[str, Any]:
+    """Return the shared store used to reuse loaded ephemeris objects.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        A dictionary stored in hass.data used to share heavy Skyfield objects.
+    """
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    raw = domain_data.get(_SHARED_EPHEMERIS_STORE_KEY)
+    if isinstance(raw, dict):
+        return raw
+
+    store: dict[str, Any] = {}
+    domain_data[_SHARED_EPHEMERIS_STORE_KEY] = store
+    return store
+
+
+def _get_cached_ephemeris_tuple(
+    store: dict[str, Any],
+) -> tuple[Ephemeris, Timescale] | None:
+    """Return a cached (ephemeris, timescale) tuple from the shared store.
+
+    Args:
+        store: Shared store dictionary.
+
+    Returns:
+        A (ephemeris, timescale) tuple or None if not available/invalid.
+    """
+    cached = store.get(_SHARED_EPHEMERIS_ITEM_KEY)
+    if not (isinstance(cached, tuple) and len(cached) == 2):
+        return None
+
+    eph, ts = cached
+    if eph is None or ts is None:
+        return None
+
+    return eph, ts
+
+
 # -----------------------------------------------------------------------------
 # Coordinator
 # -----------------------------------------------------------------------------
@@ -2541,6 +2785,11 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Returns:
             A tuple (ephemeris, timescale).
         """
+        store = _get_shared_ephemeris_store(self._hass)
+
+        cached_tuple = _get_cached_ephemeris_tuple(store)
+        if cached_tuple is not None:
+            return cached_tuple
 
         def _load() -> tuple[Ephemeris, Timescale]:
             """Blocking loader executed in the executor.
@@ -2555,7 +2804,9 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             ts: Timescale = load.timescale()
             return eph, ts
 
-        return await self._hass.async_add_executor_job(_load)
+        eph, ts = await self._hass.async_add_executor_job(_load)
+        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
+        return eph, ts
 
     async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
         """Ensure ephemeris and timescale are loaded and return them.
@@ -2632,79 +2883,35 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 elev_m=self._elev,
             )
 
-        def _calc_phases_and_names() -> tuple[dict[str, Any], dict[str, Time | None]]:
-            """Compute phase events and full moon name payload.
-
-            Returns:
-                Tuple (payload, raw_events).
-            """
-            return _Calc.phases_and_names(eph, ts, t, self._tz)
-
-        def _calc_apsis() -> dict[str, Any]:
-            """Compute apsides payload.
-
-            Returns:
-                Payload dictionary fragment.
-            """
-            return _Calc.apsis(
-                eph,
-                ts,
-                t,
-                self._tz,
-                high_precision=self._high_precision,
-            )
-
         # Launch independent computations concurrently.
         current_task = self._hass.async_create_task(self._async_exec(_calc_current))
         rise_set_task = self._hass.async_create_task(self._async_exec(_calc_rise_set))
-        phases_task = self._hass.async_create_task(
-            self._async_exec(_calc_phases_and_names)
-        )
-        apsis_task = self._hass.async_create_task(self._async_exec(_calc_apsis))
 
         # Await the independent results.
         current_payload, current_raw = await current_task
         rise_set_payload = await rise_set_task
-        phase_payload, events = await phases_task
-        apsis_payload = await apsis_task
-
-        # Dependent computations (lunation ecliptics depends on events).
-        def _calc_lunation_ecliptics() -> tuple[
-            dict[str, Any], dict[str, float | None]
-        ]:
-            """Compute lunation ecliptics payload and raw longitudes.
-
-            Returns:
-                Tuple (payload, raw_longitudes).
-            """
-            return _Calc.lunation_ecliptics(eph, events)
-
-        ecl_payload, ecl_raw_lons = await self._async_exec(_calc_lunation_ecliptics)
 
         # Zodiac depends on current longitude and lunation longitudes.
         def _calc_zodiac() -> dict[str, Any]:
-            """Compute zodiac payload.
+            """Compute zodiac payload for the current Moon position.
 
             Returns:
                 Payload dictionary fragment.
             """
             return _Calc.zodiac(
                 current_raw["ecl_lon_geo"],
-                lon_next_new=ecl_raw_lons["next_new"],
-                lon_next_full=ecl_raw_lons["next_full"],
-                lon_prev_new=ecl_raw_lons["prev_new"],
-                lon_prev_full=ecl_raw_lons["prev_full"],
+                lon_next_new=None,
+                lon_next_full=None,
+                lon_prev_new=None,
+                lon_prev_full=None,
             )
 
         zodiac_payload = await self._async_exec(_calc_zodiac)
 
-        # Merge all payload fragments.
+        # Merge only frequently changing payload fragments.
         payload: dict[str, Any] = {}
         payload.update(current_payload)
         payload.update(rise_set_payload)
-        payload.update(phase_payload)
-        payload.update(apsis_payload)
-        payload.update(ecl_payload)
         payload.update(zodiac_payload)
 
         return payload
@@ -2723,3 +2930,365 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return await self._async_compute_payload(eph, ts)
         except _RECOVERABLE_UPDATE_ERRORS as err:
             raise UpdateFailed(str(err)) from err
+
+
+# -----------------------------------------------------------------------------
+# Events Coordinator
+# -----------------------------------------------------------------------------
+
+
+class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
+    """Coordinator computing rare event-based lunar values.
+
+    This coordinator focuses on values that only change when crossing an astronomical
+    event boundary. A lightweight periodic fallback is kept to ensure eventual
+    resynchronization.
+    """
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        lat: float,
+        lon: float,
+        elev: float,
+        interval: timedelta,
+    ) -> None:
+        """Initialize the coordinator with observer and scheduling settings.
+
+        Args:
+            hass: Home Assistant instance.
+            lat: Observer latitude in degrees.
+            lon: Observer longitude in degrees.
+            elev: Observer elevation in meters.
+            interval: Fallback update interval.
+
+        Returns:
+            None.
+        """
+        super().__init__(
+            hass,
+            logger=logging.getLogger(__name__),
+            name="Moon Astro Events",
+            update_interval=interval,
+        )
+        self._lat: float = float(lat)
+        self._lon: float = float(lon)
+        self._elev: float = float(elev)
+        self._hass: HomeAssistant = hass
+
+        self._eph: Ephemeris | None = None
+        self._ts: Timescale | None = None
+        self._tz: ZoneInfo | None = None
+        self._use_ha_tz: bool = False
+        self._high_precision: bool = DEFAULT_HIGH_PRECISION
+
+        self._unsub_next_event: Callable[[], None] | None = None
+
+        # Dedicated executor to avoid monopolizing Home Assistant's shared thread pool.
+        # A single worker enforces determinism and prevents concurrent heavy computations.
+        self._executor: ThreadPoolExecutor = ThreadPoolExecutor(
+            max_workers=1,
+            thread_name_prefix="moon_astro_events",
+        )
+
+        # Lock used to prevent concurrent event-based computations.
+        self._compute_lock: asyncio.Lock = asyncio.Lock()
+
+        # Track an in-flight refresh task to avoid spawning multiple long-running
+        # computations when many refresh requests happen close together.
+        self._inflight_task: asyncio.Task[None] | None = None
+
+    @classmethod
+    def from_config_entry(
+        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta
+    ) -> MoonAstroEventsCoordinator:
+        """Build the coordinator from a ConfigEntry.
+
+        Args:
+            hass: Home Assistant instance.
+            entry: Config entry containing coordinates and options.
+            interval: Fallback update interval.
+
+        Returns:
+            A fully configured MoonAstroEventsCoordinator instance.
+        """
+        data = entry.data
+        c = cls(
+            hass=hass,
+            lat=float(data.get(CONF_LAT, hass.config.latitude)),
+            lon=float(data.get(CONF_LON, hass.config.longitude)),
+            elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
+            interval=interval,
+        )
+        c._use_ha_tz = entry.options.get(CONF_USE_HA_TZ, True)
+        c._tz = _tz_for_hass(hass) if c._use_ha_tz else _detect_timezone(c._lat, c._lon)
+        c._high_precision = entry.options.get(CONF_HIGH_PRECISION, True)
+        return c
+
+    async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
+        """Load ephemerides and timescale asynchronously with caching.
+
+        Returns:
+            A tuple (ephemeris, timescale).
+        """
+        store = _get_shared_ephemeris_store(self._hass)
+
+        cached_tuple = _get_cached_ephemeris_tuple(store)
+        if cached_tuple is not None:
+            return cached_tuple
+
+        def _load() -> tuple[Ephemeris, Timescale]:
+            """Blocking loader executed in the executor.
+
+            Returns:
+                A tuple (ephemeris, timescale).
+            """
+            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
+            Path(cache_dir).mkdir(parents=True, exist_ok=True)
+            load = Loader(cache_dir)
+            eph: Ephemeris = load(DE440_FILE)
+            ts: Timescale = load.timescale()
+            return eph, ts
+
+        eph, ts = await self._hass.async_add_executor_job(_load)
+        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
+        return eph, ts
+
+    async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
+        """Ensure ephemeris and timescale are loaded and return them.
+
+        Returns:
+            A tuple (ephemeris, timescale).
+        """
+        if self._eph is None or self._ts is None:
+            self._eph, self._ts = await self._async_load_ephemeris()
+
+        assert self._eph is not None, "Ephemeris must be loaded"
+        assert self._ts is not None, "Timescale must be loaded"
+        return self._eph, self._ts
+
+    async def _async_exec(self, func: Callable[[], Any]) -> Any:
+        """Run a blocking callable in a dedicated executor.
+
+        This avoids monopolizing Home Assistant's shared thread pool when event-based
+        computations take a long time.
+
+        Args:
+            func: A zero-argument callable performing blocking work.
+
+        Returns:
+            The callable return value.
+        """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(self._executor, func)
+
+    def _cancel_next_event_timer(self) -> None:
+        """Cancel the scheduled next event refresh timer.
+
+        Returns:
+            None.
+        """
+        if self._unsub_next_event is not None:
+            self._unsub_next_event()
+            self._unsub_next_event = None
+
+    def _schedule_next_event_refresh(self, data: dict[str, Any]) -> None:
+        """Schedule a refresh shortly after the next computed astronomical event.
+
+        Args:
+            data: Coordinator data containing timestamp keys.
+
+        Returns:
+            None.
+        """
+        self._cancel_next_event_timer()
+
+        candidates: list[datetime] = []
+        for key in (
+            KEY_NEXT_NEW_MOON,
+            KEY_NEXT_FIRST_QUARTER,
+            KEY_NEXT_FULL_MOON,
+            KEY_NEXT_LAST_QUARTER,
+            KEY_NEXT_APOGEE,
+            KEY_NEXT_PERIGEE,
+        ):
+            dt = _parse_iso_to_utc(data.get(key))
+            if dt is None:
+                continue
+            candidates.append(dt)
+
+        if not candidates:
+            return
+
+        next_dt = min(candidates)
+        _LOGGER.debug(
+            "Events scheduler: next_event_candidate_utc=%s candidates_count=%s",
+            next_dt.isoformat(),
+            len(candidates),
+        )
+
+        # Schedule slightly after the event boundary to avoid edge instability.
+        when = next_dt + timedelta(minutes=2)
+
+        # If the event is already in the past (clock jump or delayed startup), refresh soon.
+        now = datetime.now(UTC)
+        if when <= now:
+            when = now + timedelta(seconds=30)
+
+        def _cb(_: datetime) -> None:
+            """Callback scheduled at the next event boundary.
+
+            Args:
+                _: The trigger time provided by the scheduler.
+
+            Returns:
+                None.
+            """
+            _LOGGER.debug("Events scheduler: triggering refresh task")
+            self._unsub_next_event = None
+            self._hass.async_create_task(self.async_request_refresh())
+
+        _LOGGER.debug(
+            "Events scheduler: scheduling refresh at when_utc=%s (now_utc=%s)",
+            when.isoformat(),
+            datetime.now(UTC).isoformat(),
+        )
+        self._unsub_next_event = async_track_point_in_time(self._hass, _cb, when)
+
+    async def _async_compute_events_payload(
+        self, eph: Ephemeris, ts: Timescale
+    ) -> dict[str, Any]:
+        """Compute the events-only payload in an executor thread.
+
+        Args:
+            eph: Loaded ephemeris.
+            ts: Loaded timescale.
+
+        Returns:
+            A dictionary containing only rare event-based keys.
+        """
+        now_utc = _round_utc_datetime_to_nearest_minute(datetime.now(UTC))
+        t = ts.from_datetime(now_utc)
+
+        def _calc() -> dict[str, Any]:
+            """Heavy event computations executed in the executor.
+
+            Returns:
+                Payload dictionary fragment.
+            """
+            payload: dict[str, Any] = {}
+
+            phase_payload, events = _Calc.phases_and_names(eph, ts, t, self._tz)
+            payload.update(phase_payload)
+
+            payload.update(
+                _Calc.apsis(
+                    eph,
+                    ts,
+                    t,
+                    self._tz,
+                    high_precision=self._high_precision,
+                )
+            )
+
+            ecl_payload, ecl_raw_lons = _Calc.lunation_ecliptics(eph, events)
+            payload.update(ecl_payload)
+
+            # Compute zodiac only for lunation longitudes. The "current" zodiac remains
+            # handled by the main coordinator.
+            payload.update(
+                _Calc.zodiac(
+                    current_lon_geo=float("nan"),
+                    lon_next_new=ecl_raw_lons["next_new"],
+                    lon_next_full=ecl_raw_lons["next_full"],
+                    lon_prev_new=ecl_raw_lons["prev_new"],
+                    lon_prev_full=ecl_raw_lons["prev_full"],
+                )
+            )
+
+            # Remove keys that should not be produced by this coordinator.
+            payload.pop(KEY_ZODIAC_SIGN_CURRENT_MOON, None)
+            payload.pop(KEY_ZODIAC_DEGREE_CURRENT_MOON, None)
+            payload.pop(KEY_ZODIAC_ICON_CURRENT_MOON, None)
+
+            return payload
+
+        return await self._async_exec(_calc)
+
+    async def _async_run_refresh_job(self) -> None:
+        """Run a full refresh job without blocking the update caller.
+
+        This method is responsible for:
+        - computing event-based payload in the dedicated executor
+        - updating self.data through DataUpdateCoordinator mechanisms
+        - scheduling the next event-based refresh time
+
+        Returns:
+            None.
+        """
+        if self._compute_lock.locked():
+            _LOGGER.debug(
+                "Events coordinator: refresh job skipped (computation already running)"
+            )
+            return
+
+        async with self._compute_lock:
+            try:
+                eph, ts = await self._async_ensure_ephemeris_loaded()
+                data = await self._async_compute_events_payload(eph, ts)
+
+                # Store and notify listeners.
+                self.async_set_updated_data(data)
+
+                # Schedule next refresh around the next computed event.
+                self._schedule_next_event_refresh(data)
+            except asyncio.CancelledError:
+                raise
+            except _RECOVERABLE_UPDATE_ERRORS as err:
+                _LOGGER.debug("Events coordinator: refresh job failed: %r", err)
+                # Keep old data when a job fails to avoid oscillating states.
+
+    async def _async_update_data(self) -> dict[str, Any]:
+        """Compute rare event-based lunar data.
+
+        This implementation ensures Home Assistant stays responsive by not awaiting
+        long-running computations inside the coordinator update path. The actual
+        work is performed by a background task using a dedicated executor.
+
+        Returns:
+            The latest available event-based data (possibly stale if a job is running).
+        """
+        # If a refresh job is already in-flight, do not spawn another one.
+        if self._inflight_task is not None and not self._inflight_task.done():
+            _LOGGER.debug(
+                "Events coordinator: returning cached data (refresh already running)"
+            )
+            return self.data or {}
+
+        # Start a background refresh job and immediately return the last data.
+        self._inflight_task = self._hass.async_create_task(
+            self._async_run_refresh_job(),
+            name=f"{DOMAIN}-events-refresh",
+        )
+
+        return self.data or {}
+
+    async def async_shutdown(self) -> None:
+        """Release scheduled callbacks and executor resources held by this coordinator.
+
+        Returns:
+            None.
+        """
+        self._cancel_next_event_timer()
+
+        task = self._inflight_task
+        if task is not None and not task.done():
+            task.cancel()
+
+        executor = self._executor
+
+        def _shutdown() -> None:
+            """Shutdown the dedicated executor."""
+            executor.shutdown(wait=True, cancel_futures=True)
+
+        await self._hass.async_add_executor_job(_shutdown)

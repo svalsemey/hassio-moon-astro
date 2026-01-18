@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "אפשרויות ירח אסטרו",
-                "description": "התאם את מרווח העדכון של החיישנים ואת הטיפול באזור הזמן.\n\nמצב דיוק גבוה מפחית את השונות של חותמות הזמן, אך מגדיל את השימוש ב־CPU משום שהוא משתמש בצעד דגימה עדין יותר ובטווח חידוד רחב יותר. לא מומלץ להפעיל אפשרות זו במכשירים חלשים כגון Raspberry Pi.",
+                "description": "התאם את מרווח העדכון של החיישנים ואת הטיפול באזור הזמן.\n\nמצב דיוק גבוה מפחית את התנודתיות של חותמות הזמן, אך מגדיל את השימוש ב-CPU משום שהוא משתמש בצעד דגימה עדין יותר ובטווח חידוד רחב יותר. אינו מומלץ במכשירים חלשים כגון Raspberry Pi.\n\nמרווח רענון הגיבוי לאירועים כופה רענון תקופתי של חיישנים מבוססי אירועים (שלבים הבאים/הקודמים, אפוגיאה/פריגיאה, גלגל המזלות בלונציות) במקרה שהרענון המתוזמן סביב האירוע הבא הוחמץ (אתחול מחדש, שינוי שעה, עיכוב). ערכים נמוכים מרעננים לעיתים קרובות יותר; ערכים גבוהים מפחיתים שימוש ב-CPU.",
                 "data": {
                     "scan_interval": "מרווח עדכון החיישנים (שניות)",
                     "use_ha_timezone": "השתמש באזור הזמן של Home Assistant",
-                    "high_precision": "מצב דיוק גבוה"
+                    "high_precision": "מצב דיוק גבוה",
+                    "events_refresh_fallback": "מרווח רענון גיבוי לאירועים (שניות)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "מעל האופק",
                 "state": {
                     "on": "מעל האופק",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "מופע",
                 "state": {
                     "new_moon": "מולד",
@@ -66,55 +67,55 @@
                     "unknown": "לא ידוע"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "אזימוט"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "גובה זוויתי"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "הארה"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "מרחק"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "פרלקסה"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "אורך אקליפטי (טופוצנטרי)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "רוחב אקליפטי (טופוצנטרי)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "אורך אקליפטי (גאוצנטרי)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "רוחב אקליפטי (גאוצנטרי)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "הזריחה הבאה"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "השקיעה הבאה"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "אפוגיאה הבאה"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "פריגיאה הבאה"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "מולד ירח הבא"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "רבע ראשון הבא"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "ירח מלא הבא"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "שם הירח המלא הבא",
                 "state": {
                     "wolf_moon": "ירח הזאב",
@@ -133,7 +134,7 @@
                     "unknown": "לא ידוע"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "שמות חלופיים לירח המלא הבא",
                 "state": {
                     "wolf_moon_alt_names": "הירח שלאחר יול, ירח “הישאר בבית”, ירח שקט, ירח קשוח, ירח המרכז",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "רבע אחרון הבא"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "הזריחה הקודמת"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "השקיעה הקודמת"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "אפוגיאה קודמת"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "פריגיאה קודמת"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "מולד ירח קודם"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "רבע ראשון קודם"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "ירח מלא קודם"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "שם הירח המלא הקודם",
                 "state": {
                     "wolf_moon": "ירח הזאב",
@@ -195,7 +196,7 @@
                     "unknown": "לא ידוע"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "שמות חלופיים לירח המלא הקודם",
                 "state": {
                     "wolf_moon_alt_names": "הירח שלאחר יול, ירח “הישאר בבית”, ירח שקט, ירח קשוח, ירח המרכז",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "רבע אחרון קודם"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "אורך אקליפטי בירח המלא הבא"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "רוחב אקליפטי בירח המלא הבא"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "אורך אקליפטי במולד הירח הבא"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "רוחב אקליפטי במולד הירח הבא"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "אורך אקליפטי בירח המלא הקודם"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "רוחב אקליפטי בירח המלא הקודם"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "אורך אקליפטי במולד הירח הקודם"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "רוחב אקליפטי במולד הירח הקודם"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "מזל בגלגל המזלות (נוכחי)",
                 "state": {
                     "aries": "טלה",
@@ -259,7 +260,7 @@
                     "pisces": "דגים"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "מזל בגלגל המזלות במולד הירח הבא",
                 "state": {
                     "aries": "טלה",
@@ -276,7 +277,7 @@
                     "pisces": "דגים"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "מזל בגלגל המזלות בירח המלא הבא",
                 "state": {
                     "aries": "טלה",
@@ -293,7 +294,7 @@
                     "pisces": "דגים"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "מזל בגלגל המזלות במולד הירח הקודם",
                 "state": {
                     "aries": "טלה",
@@ -310,7 +311,7 @@
                     "pisces": "דגים"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "מזל בגלגל המזלות בירח המלא הקודם",
                 "state": {
                     "aries": "טלה",
@@ -327,19 +328,19 @@
                     "pisces": "דגים"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "מעלה בגלגל המזלות (נוכחי)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "מעלה בגלגל המזלות במולד הירח הבא"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "מעלה בגלגל המזלות בירח המלא הבא"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "מעלה בגלגל המזלות במולד הירח הקודם"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "מעלה בגלגל המזלות בירח המלא הקודם"
             }
         }

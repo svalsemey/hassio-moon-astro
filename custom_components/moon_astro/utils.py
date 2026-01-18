@@ -12,9 +12,21 @@ from contextlib import suppress
 import logging
 from pathlib import Path
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 
-from .const import CACHE_DIR_NAME, DE440_FILE, DOMAIN
+from .const import (
+    CACHE_DIR_NAME,
+    DATA_COORDINATOR,
+    DATA_EVENTS_COORDINATOR,
+    DE440_FILE,
+    DOMAIN,
+    MANUFACTURER,
+    MODEL,
+    NAME,
+)
+from .coordinator import MoonAstroCoordinator, MoonAstroEventsCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,12 +154,21 @@ async def validate_ephemeris_file(
 
         cache_dir = get_cache_dir(hass)
         ephemeris_path = cache_dir / DE440_FILE
-
+        _LOGGER.debug(
+            "Ephemeris validation: path=%s exists=%s",
+            str(ephemeris_path),
+            ephemeris_path.exists(),
+        )
         if not ephemeris_path.exists():
             return False
 
         min_expected_size = 100 * 1024 * 1024
         try:
+            _LOGGER.debug(
+                "Ephemeris validation: size_bytes=%s min_expected_bytes=%s",
+                ephemeris_path.stat().st_size,
+                min_expected_size,
+            )
             if ephemeris_path.stat().st_size < min_expected_size:
                 if remove_on_invalid:
                     with suppress(OSError):
@@ -172,6 +193,12 @@ async def validate_ephemeris_file(
             return False
 
         if 0 not in eph or 3 not in eph or 301 not in eph:
+            _LOGGER.debug(
+                "Ephemeris validation: missing required bodies (0=%s 3=%s 301=%s)",
+                0 in eph,
+                3 in eph,
+                301 in eph,
+            )
             if remove_on_invalid:
                 with suppress(OSError):
                     ephemeris_path.unlink()
@@ -196,6 +223,7 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
 
     await cleanup_cache_dir(hass)
 
+    _LOGGER.debug("Ephemeris ensure: validating existing file before download")
     if await validate_ephemeris_file(hass, remove_on_invalid=False):
         return True
 
@@ -226,7 +254,15 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
                     str(ephemeris_path),
                     str(actual) if actual is not None else "unknown",
                 )
-            except Exception as exc:  # pragma: no cover
+            except asyncio.CancelledError:
+                raise
+            except (
+                OSError,
+                RuntimeError,
+                ValueError,
+                AttributeError,
+                TypeError,
+            ) as exc:
                 _LOGGER.info(
                     "Ephemeris download completed but file not found at expected path: expected=%s (error=%r)",
                     str(ephemeris_path),
@@ -237,7 +273,85 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
         _LOGGER.info("Ephemeris file ready in cache: %s", str(ephemeris_path))
         return True
 
+    _LOGGER.debug(
+        "Ephemeris ensure: existing file invalid or missing, starting download"
+    )
     if not await hass.async_add_executor_job(_blocking_download):
         return False
 
     return await validate_ephemeris_file(hass, remove_on_invalid=False)
+
+
+def get_entry_coordinators(
+    hass: HomeAssistant, entry: ConfigEntry
+) -> tuple[MoonAstroCoordinator | None, MoonAstroEventsCoordinator | None]:
+    """Return the main and events coordinators for a config entry.
+
+    This helper centralizes hass.data access and ensures runtime objects are validated
+    before use by platforms.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry.
+
+    Returns:
+        A tuple (main_coordinator, events_coordinator). Each item may be None if the
+        corresponding object cannot be resolved.
+    """
+    domain_data = hass.data.get(DOMAIN)
+    if not isinstance(domain_data, dict):
+        return None, None
+
+    entry_data = domain_data.get(entry.entry_id)
+    if not isinstance(entry_data, dict):
+        return None, None
+
+    main_raw = entry_data.get(DATA_COORDINATOR)
+    main = main_raw if isinstance(main_raw, MoonAstroCoordinator) else None
+
+    events_raw = entry_data.get(DATA_EVENTS_COORDINATOR)
+    events = events_raw if isinstance(events_raw, MoonAstroEventsCoordinator) else None
+
+    return main, events
+
+
+def get_entry_device_info(entry: ConfigEntry) -> DeviceInfo:
+    """Return the DeviceInfo shared by all entities of a config entry.
+
+    Args:
+        entry: Config entry.
+
+    Returns:
+        A DeviceInfo instance using stable identifiers and human-friendly metadata.
+    """
+    return DeviceInfo(
+        identifiers={(DOMAIN, entry.entry_id)},
+        manufacturer=MANUFACTURER,
+        model=MODEL,
+        name=NAME,
+    )
+
+
+def make_unique_id(entry_id: str, suffix: str) -> str:
+    """Build a stable unique_id for an entity.
+
+    Args:
+        entry_id: Home Assistant config entry ID.
+        suffix: Entity-specific suffix (stable identifier).
+
+    Returns:
+        A stable unique_id string.
+    """
+    return f"moon_astro_{entry_id}_{suffix}"
+
+
+def make_suggested_object_id(slug: str) -> str:
+    """Return a stable suggested object_id for entity_id creation.
+
+    Args:
+        slug: Stable non-localized slug.
+
+    Returns:
+        A suggested object_id string.
+    """
+    return slug

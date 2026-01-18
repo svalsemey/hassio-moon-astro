@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Ay Astro seçenekleri",
-                "description": "Sensör güncelleme aralığını ve saat dilimi işlemesini ayarlayın.\n\nYüksek hassasiyet modu zaman damgası değişkenliğini azaltır, ancak daha ince bir örnekleme adımı ve daha geniş bir iyileştirme aralığı kullandığı için CPU kullanımını artırır. Raspberry Pi gibi düşük güçlü cihazlarda bu seçeneğin etkinleştirilmesi önerilmez.",
+                "description": "Sensörlerin güncelleme aralığını ve saat dilimi yönetimini ayarlayın.\n\nYüksek hassasiyet modu zaman damgası değişkenliğini azaltır, ancak daha ince örnekleme adımı ve daha geniş bir iyileştirme aralığı kullandığı için CPU kullanımını artırır. Raspberry Pi gibi düşük güçlü cihazlarda önerilmez.\n\nOlay yenileme yedek aralığı, bir sonraki olay etrafındaki planlı yenileme kaçırılırsa (yeniden başlatma, saat değişimi, gecikme) olay tabanlı sensörlerin (sonraki/önceki evreler, apoj/perij, lunasyonlarda zodyak) periyodik olarak yenilenmesini zorlar. Daha düşük değerler daha sık yeniler; daha yüksek değerler CPU kullanımını azaltır.",
                 "data": {
                     "scan_interval": "Sensör güncelleme aralığı (saniye)",
                     "use_ha_timezone": "Home Assistant saat dilimini kullan",
-                    "high_precision": "Yüksek hassasiyet modu"
+                    "high_precision": "Yüksek hassasiyet modu",
+                    "events_refresh_fallback": "Olay yenileme yedek aralığı (saniye)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Ufkun üzerinde",
                 "state": {
                     "on": "Ufkun üzerinde",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Evre",
                 "state": {
                     "new_moon": "Yeni ay",
@@ -66,55 +67,55 @@
                     "unknown": "Bilinmiyor"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Yükseklik açısı"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Aydınlanma"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Mesafe"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaks"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Ekliptik boylam (toposantrik)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Ekliptik enlem (toposantrik)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Ekliptik boylam (jeosantrik)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Ekliptik enlem (jeosantrik)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Sıradaki doğuş"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Sıradaki batış"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Sıradaki apogee"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Sıradaki perigee"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Sıradaki yeni ay"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Sıradaki ilk dördün"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Sıradaki dolunay"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Bir sonraki dolunayın adı",
                 "state": {
                     "wolf_moon": "Kurt Dolunayı",
@@ -133,7 +134,7 @@
                     "unknown": "Bilinmiyor"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Bir sonraki dolunay için alternatif adlar",
                 "state": {
                     "wolf_moon_alt_names": "Yule Sonrası Ay, Evde Kal Ayı, Sakin Ay, Sert Ay, Merkez Ay",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Sıradaki son dördün"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Önceki doğuş"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Önceki batış"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Önceki apogee"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Önceki perigee"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Önceki yeni ay"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Önceki ilk dördün"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Önceki dolunay"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Önceki dolunayın adı",
                 "state": {
                     "wolf_moon": "Kurt Dolunayı",
@@ -195,7 +196,7 @@
                     "unknown": "Bilinmiyor"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Önceki dolunay için alternatif adlar",
                 "state": {
                     "wolf_moon_alt_names": "Yule Sonrası Ay, Evde Kal Ayı, Sakin Ay, Sert Ay, Merkez Ay",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Önceki son dördün"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Sıradaki dolunayda ekliptik boylam"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Sıradaki dolunayda ekliptik enlem"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Sıradaki yeni ayda ekliptik boylam"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Sıradaki yeni ayda ekliptik enlem"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Önceki dolunayda ekliptik boylam"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Önceki dolunayda ekliptik enlem"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Önceki yeni ayda ekliptik boylam"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Önceki yeni ayda ekliptik enlem"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Burç (mevcut)",
                 "state": {
                     "aries": "Koç",
@@ -259,7 +260,7 @@
                     "pisces": "Balık"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Sıradaki yeni ayda burç",
                 "state": {
                     "aries": "Koç",
@@ -276,7 +277,7 @@
                     "pisces": "Balık"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Sıradaki dolunayda burç",
                 "state": {
                     "aries": "Koç",
@@ -293,7 +294,7 @@
                     "pisces": "Balık"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Önceki yeni ayda burç",
                 "state": {
                     "aries": "Koç",
@@ -310,7 +311,7 @@
                     "pisces": "Balık"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Önceki dolunayda burç",
                 "state": {
                     "aries": "Koç",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Burç derecesi (mevcut)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Sıradaki yeni ayda burç derecesi"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Sıradaki dolunayda burç derecesi"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Önceki yeni ayda burç derecesi"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Önceki dolunayda burç derecesi"
             }
         }

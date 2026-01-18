@@ -5,7 +5,7 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
 - Topocentric elevation/azimuth from your configured location
 - Fully localized entities and state translations
-- Config flow with options for scan interval, time zone handling, and high-precision calculations
+- Config flow with options for scan interval, time zone handling, precision settings, and event refresh resilience
 
 ## Features
 
@@ -38,6 +38,36 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Binary sensor:
   - Moon above horizon (on/off)
 
+## Sensor update model
+
+Moon Astro uses two complementary calculation paths:
+
+- **Periodic sensors** (current position and related values) are updated on the configured scan interval.
+- **Event-based sensors** (lunation phases, apogee/perigee, and related zodiac and lon/lat-at-event sensors) are refreshed around astronomical event instants and updated shortly after the next relevant event boundary is reached.
+
+This approach keeps “current” values responsive while avoiding unnecessary recomputation of event timestamps between two events.
+
+### Startup behavior for event-based sensors
+
+To keep Home Assistant responsive during startup and reloads, event-based sensors are refreshed using a deferred startup refresh. The main (periodic) coordinator is refreshed first, then the event-based refresh is scheduled after a short startup delay.
+
+This avoids long-running computations from blocking the setup path, while still ensuring event-based sensors become available shortly after startup.
+
+### Scheduled refresh around the next event
+
+Event-based sensors are refreshed automatically shortly after the earliest upcoming astronomical event among:
+- next lunation phase boundary (new moon, quarters, full moon),
+- next apogee/perigee.
+
+A small safety offset is applied when scheduling the refresh to avoid edge instability exactly at the boundary.
+
+### Events refresh fallback interval
+
+Event-based sensors normally refresh automatically shortly after the next computed event time. The **Events refresh fallback interval (seconds)** acts as a safety net by forcing a periodic refresh of event-based sensors if the scheduled refresh is missed (for example after a restart, a time change, or a system delay).
+
+- Lower values refresh event-based sensors more often.
+- Higher values reduce CPU usage.
+
 ## Precision notes (raw values)
 
 Some intermediate computations use non-rounded (“raw”) values internally to avoid boundary artifacts, especially when values are close to zodiac sign cusps (0°, 30°, 60°…). The values exposed as sensor states remain rounded for readability, but zodiac sign/degree calculations can rely on raw longitudes for higher precision.
@@ -53,13 +83,17 @@ In this mode, additional refinement is applied to apsides computations (apogee/p
 
 **CPU note:** high precision mode requires more computations and can significantly increase CPU usage. It is generally not recommended on low-power hardware (for example Raspberry Pi models with limited resources). If you enable it, prefer using a longer scan interval and monitor system load.
 
+### Responsiveness and long computations
+
+Event-based calculations, especially in high precision mode, can be significantly heavier than periodic calculations. Moon Astro isolates these computations so the Home Assistant event loop remains responsive even when event-based refreshes take a long time. If multiple refresh requests happen close together, they are coalesced to avoid running overlapping long computations.
+
 ## Update frequency and minimum granularity
 
-To keep computations stable and avoid unnecessary CPU load, Moon Astro updates on a **minute-based** granularity. Update intervals shorter than one minute are not supported and are not useful for astronomical values that are typically consumed at human-scale cadence in Home Assistant.
+To keep computations stable and avoid unnecessary CPU load, Moon Astro updates sensor timestamps values on a **minute-based** granularity. Update intervals shorter than one minute are not supported and are not useful for astronomical values that are typically consumed at human-scale cadence in Home Assistant.
 
 When configuring the integration, choose an interval that matches your needs:
 - For dashboards and general automations: a few minutes is usually enough.
-- For time-sensitive automations (moonrise/set, phase boundaries): use a shorter interval while staying at **one minute or above**, and consider the CPU impact (especially in high precision mode).
+- For time-sensitive automations: use a shorter interval while staying at **one minute or above**, and consider the CPU impact (especially in high precision mode).
 
 ## Installation
 
@@ -84,15 +118,26 @@ During setup, the integration pre-fills your Home Assistant latitude, longitude,
 Options are available via **Configure** on the integration:
 
 - **Sensors update interval (seconds)**
+
   Default: 300 (min 60, max 21600)
 
 - **Use Home Assistant time zone**
+
   Default: true
+
   When enabled, the integration uses Home Assistant’s configured time zone for timestamps and event calculations.
 
 - **High precision mode**
+
   Default: false
+
   Reduces timestamp variability but increases CPU usage due to finer sampling and wider refinement.
+
+- **Events refresh fallback interval (seconds)**
+
+  Default: 86400 (24 hours)
+
+  Forces a periodic refresh of event-based sensors if the scheduled refresh around the next event is missed (restart, time change, delay). Lower values refresh more often; higher values reduce CPU usage.
 
 ## Localization
 
@@ -121,16 +166,22 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
   - Ensure your HA location and elevation are set.
   - Verify ephemeris download completed (see `<config>/.skyfield` content).
 
+- Event-based sensors are temporarily unavailable after startup:
+  - This is an expected behavior, because event-based sensors are refreshed after a startup delay.
+  - Check logs for “Deferring event-based sensors initial refresh…” messages and wait for the first scheduled refresh.
+
 - Time zone issues:
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
 
 - CPU usage is high:
   - Disable “High precision mode”.
   - Increase the sensors update interval.
+  - Don't set an event refresh fallback interval too low for event-based sensors (24 hours is more than enough!)
   - Avoid running with a one-minute interval on low-power hardware.
 
 - Data looks stale:
   - Reduce the scan interval (respect CPU usage and the one-minute minimum granularity).
+  - If only event-based sensors look stale, reduce the events refresh fallback interval.
   - Manually reload the integration from the UI.
 
 ## Known Notes

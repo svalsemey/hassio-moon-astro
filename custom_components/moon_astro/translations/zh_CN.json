@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "月相天文选项",
-                "description": "调整传感器更新间隔以及时区处理方式。\n\n高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更精细的采样步长和更宽的精炼范围。不建议在 Raspberry Pi 等低性能设备上启用此选项。",
+                "description": "调整传感器更新间隔和时区处理。\n\n高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更细的采样步长和更宽的优化区间。不建议在 Raspberry Pi 等低性能设备上启用。\n\n事件刷新回退间隔用于在错过围绕下一次事件的计划刷新时（重启、时间变更、延迟），强制周期性刷新基于事件的传感器（下一次/上一次月相、远地点/近地点、朔望时的黄道十二宫）。数值越小刷新越频繁；数值越大可降低 CPU 使用率。",
                 "data": {
                     "scan_interval": "传感器更新间隔（秒）",
                     "use_ha_timezone": "使用 Home Assistant 时区",
-                    "high_precision": "高精度模式"
+                    "high_precision": "高精度模式",
+                    "events_refresh_fallback": "事件刷新回退间隔（秒）"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "在地平线以上",
                 "state": {
                     "on": "在地平线以上",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "月相",
                 "state": {
                     "new_moon": "新月",
@@ -66,55 +67,55 @@
                     "unknown": "未知"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "方位角"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "高度角"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "照明度"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "距离"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "视差"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "黄经（地表观测）"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "黄纬（地表观测）"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "黄经（地心）"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "黄纬（地心）"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "下次月出"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "下次月落"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "下次远地点"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "下次近地点"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "下次新月"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "下次上弦月"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "下次满月"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "下次满月名称",
                 "state": {
                     "wolf_moon": "狼月",
@@ -133,7 +134,7 @@
                     "unknown": "未知"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "下次满月别名",
                 "state": {
                     "wolf_moon_alt_names": "Yule后月, 宅家月, 静月, 严寒月, 中心月",
@@ -151,31 +152,31 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "下次下弦月"
             },
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "上次月出"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "上次月落"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "上次远地点"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "上次近地点"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "上次新月"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "上次上弦月"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "上次满月"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "上次满月名称",
                 "state": {
                     "wolf_moon": "狼月",
@@ -194,7 +195,7 @@
                     "unknown": "未知"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "上次满月别名",
                 "state": {
                     "wolf_moon_alt_names": "Yule后月, 宅家月, 静月, 严寒月, 中心月",
@@ -212,34 +213,34 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "上次下弦月"
             },
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "下次满月时的黄经"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "下次满月时的黄纬"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "下次新月时的黄经"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "下次新月时的黄纬"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "上次满月时的黄经"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "上次满月时的黄纬"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "上次新月时的黄经"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "上次新月时的黄纬"
             },
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "当前所在星座",
                 "state": {
                     "aries": "白羊座",
@@ -256,7 +257,7 @@
                     "pisces": "双鱼座"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "下次新月所在星座",
                 "state": {
                     "aries": "白羊座",
@@ -273,7 +274,7 @@
                     "pisces": "双鱼座"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "下次满月所在星座",
                 "state": {
                     "aries": "白羊座",
@@ -290,7 +291,7 @@
                     "pisces": "双鱼座"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "上次新月所在星座",
                 "state": {
                     "aries": "白羊座",
@@ -307,7 +308,7 @@
                     "pisces": "双鱼座"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "上次满月所在星座",
                 "state": {
                     "aries": "白羊座",
@@ -324,19 +325,19 @@
                     "pisces": "双鱼座"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "当前星座度数"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "下次新月的星座度数"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "下次满月的星座度数"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "上次新月的星座度数"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "上次满月的星座度数"
             }
         }

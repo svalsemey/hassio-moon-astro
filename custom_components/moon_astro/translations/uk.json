@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Параметри «Місяць Астро»",
-                "description": "Налаштуйте інтервал оновлення датчиків і обробку часового поясу.\n\nРежим високої точності зменшує варіативність часових міток, але збільшує використання CPU, оскільки застосовує дрібніший крок вибірки та ширший діапазон уточнення. Не рекомендується вмикати цей параметр на малопотужних пристроях, таких як Raspberry Pi.",
+                "description": "Налаштуйте інтервал оновлення датчиків і обробку часового поясу.\n\nРежим високої точності зменшує варіативність часових міток, але збільшує використання CPU, оскільки використовує дрібніший крок вибірки та ширший діапазон уточнення. Не рекомендується на малопотужних пристроях, таких як Raspberry Pi.\n\nРезервний інтервал оновлення подій примусово виконує періодичне оновлення датчиків на основі подій (наступні/попередні фази, апогей/перигей, зодіак під час лунацій) на випадок, якщо заплановане оновлення навколо наступної події буде пропущено (перезапуск, зміна часу, затримка). Менші значення оновлюють частіше; більші значення зменшують використання CPU.",
                 "data": {
                     "scan_interval": "Інтервал оновлення датчиків (секунди)",
                     "use_ha_timezone": "Використовувати часовий пояс Home Assistant",
-                    "high_precision": "Режим високої точності"
+                    "high_precision": "Режим високої точності",
+                    "events_refresh_fallback": "Резервний інтервал оновлення подій (секунди)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Над горизонтом",
                 "state": {
                     "on": "Над горизонтом",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Фаза",
                 "state": {
                     "new_moon": "Молодик",
@@ -66,55 +67,55 @@
                     "unknown": "Невідомо"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Азимут"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Кут піднесення"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Освітленість"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Відстань"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Паралакс"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Екліптична довгота (топоцентрична)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Екліптична широта (топоцентрична)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Екліптична довгота (геоцентрична)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Екліптична широта (геоцентрична)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Наступний схід"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Наступний захід"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Наступний апогей"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Наступний перигей"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Наступний молодик"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Наступна перша чверть"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Наступна повня"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Назва наступного повного місяця",
                 "state": {
                     "wolf_moon": "Вовчий місяць",
@@ -133,7 +134,7 @@
                     "unknown": "Невідомо"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Альтернативні назви наступного повного місяця",
                 "state": {
                     "wolf_moon_alt_names": "Місяць після Йоля, Домашній місяць, Тихий місяць, Суворий місяць, Центральний місяць",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Наступна остання чверть"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Попередній схід"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Попередній захід"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Попередній апогей"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Попередній перигей"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Попередній молодик"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Попередня перша чверть"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Попередня повня"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Назва попереднього повного місяця",
                 "state": {
                     "wolf_moon": "Вовчий місяць",
@@ -195,7 +196,7 @@
                     "unknown": "Невідомо"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Альтернативні назви попереднього повного місяця",
                 "state": {
                     "wolf_moon_alt_names": "Місяць після Йоля, Домашній місяць, Тихий місяць, Суворий місяць, Центральний місяць",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Попередня остання чверть"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Екліптична довгота під час наступної повні"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Екліптична широта під час наступної повні"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Екліптична довгота під час наступного молодика"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Екліптична широта під час наступного молодика"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Екліптична довгота під час попередньої повні"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Екліптична широта під час попередньої повні"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Екліптична довгота під час попереднього молодика"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Екліптична широта під час попереднього молодика"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Знак зодіаку (поточний)",
                 "state": {
                     "aries": "Овен",
@@ -259,7 +260,7 @@
                     "pisces": "Риби"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Знак зодіаку під час наступного молодика",
                 "state": {
                     "aries": "Овен",
@@ -276,7 +277,7 @@
                     "pisces": "Риби"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Знак зодіаку під час наступної повні",
                 "state": {
                     "aries": "Овен",
@@ -293,7 +294,7 @@
                     "pisces": "Риби"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Знак зодіаку під час попереднього молодика",
                 "state": {
                     "aries": "Овен",
@@ -310,7 +311,7 @@
                     "pisces": "Риби"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Знак зодіаку під час попередньої повні",
                 "state": {
                     "aries": "Овен",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Градус зодіаку (поточний)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Градус зодіаку під час наступного молодика"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Градус зодіаку під час наступної повні"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Градус зодіаку під час попереднього молодика"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Градус зодіаку під час попередньої повні"
             }
         }

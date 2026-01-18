@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "ムーンアストロのオプション",
-                "description": "センサーの更新間隔とタイムゾーンの扱いを調整します。\n\n高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリングステップと広いリファインメント範囲を使用するため CPU 使用率が増加します。Raspberry Pi のような低消費電力デバイスでは有効化を推奨しません。",
+                "description": "センサーの更新間隔とタイムゾーン処理を調整します。\n\n高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリング間隔と広いリファイン範囲を使用するため CPU 使用率が増加します。Raspberry Pi などの低性能デバイスでは推奨されません。\n\nイベント更新フォールバック間隔は、次のイベント付近で予定されていた更新が失敗した場合（再起動、時刻変更、遅延）に備えて、イベントベースのセンサー（次/前のフェーズ、遠地点/近地点、朔望時の黄道十二宮）を定期的に更新します。小さい値ほど頻繁に更新され、大きい値ほど CPU 使用率が低くなります。",
                 "data": {
                     "scan_interval": "センサー更新間隔（秒）",
                     "use_ha_timezone": "Home Assistant のタイムゾーンを使用",
-                    "high_precision": "高精度モード"
+                    "high_precision": "高精度モード",
+                    "events_refresh_fallback": "イベント更新フォールバック間隔（秒）"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "地平線の上",
                 "state": {
                     "on": "地平線の上",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "位相",
                 "state": {
                     "new_moon": "新月",
@@ -66,55 +67,55 @@
                     "unknown": "不明"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "方位角"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "高度角"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "照度"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "距離"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "視差"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "黄経（地表視＝トポセントリック）"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "黄緯（地表視＝トポセントリック）"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "黄経（地心）"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "黄緯（地心）"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "次の月の出"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "次の月の入"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "次の遠地点"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "次の近地点"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "次の新月"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "次の上弦"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "次の満月"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "次の満月の名称",
                 "state": {
                     "wolf_moon": "ウルフムーン",
@@ -133,7 +134,7 @@
                     "unknown": "不明"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "次の満月の別名（一般的）",
                 "state": {
                     "wolf_moon_alt_names": "ユールの後の月, 家にいる月, 静かな月, 厳しい月, 中央の月",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "次の下弦"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "前回の月の出"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "前回の月の入"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "前回の遠地点"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "前回の近地点"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "前回の新月"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "前回の上弦"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "前回の満月"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "前回の満月の名称",
                 "state": {
                     "wolf_moon": "ウルフムーン",
@@ -195,7 +196,7 @@
                     "unknown": "不明"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "前回の満月の別名（一般的）",
                 "state": {
                     "wolf_moon_alt_names": "ユールの後の月, 家にいる月, 静かな月, 厳しい月, 中央の月",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "前回の下弦"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "次の満月時の黄経"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "次の満月時の黄緯"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "次の新月時の黄経"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "次の新月時の黄緯"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "前回の満月時の黄経"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "前回の満月時の黄緯"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "前回の新月時の黄経"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "前回の新月時の黄緯"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "黄道十二宮（現在）",
                 "state": {
                     "aries": "おひつじ座",
@@ -259,7 +260,7 @@
                     "pisces": "うお座"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "次の新月時の黄道十二宮",
                 "state": {
                     "aries": "おひつじ座",
@@ -276,7 +277,7 @@
                     "pisces": "うお座"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "次の満月時の黄道十二宮",
                 "state": {
                     "aries": "おひつじ座",
@@ -293,7 +294,7 @@
                     "pisces": "うお座"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "前回の新月時の黄道十二宮",
                 "state": {
                     "aries": "おひつじ座",
@@ -310,7 +311,7 @@
                     "pisces": "うお座"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "前回の満月時の黄道十二宮",
                 "state": {
                     "aries": "おひつじ座",
@@ -327,19 +328,19 @@
                     "pisces": "うお座"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "黄道度数（現在）"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "次の新月時の黄道度数"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "次の満月時の黄道度数"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "前回の新月時の黄道度数"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "前回の満月時の黄道度数"
             }
         }

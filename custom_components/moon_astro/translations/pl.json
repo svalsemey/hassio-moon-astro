@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Opcje Księżyc Astro",
-                "description": "Dostosuj interwał aktualizacji czujników oraz obsługę strefy czasowej.\n\nTryb wysokiej precyzji zmniejsza zmienność znaczników czasu, ale zwiększa użycie CPU, ponieważ wykorzystuje mniejszy krok próbkowania i szerszy zakres doprecyzowania. Nie zaleca się włączania tej opcji na urządzeniach o niskiej mocy, takich jak Raspberry Pi.",
+                "description": "Dostosuj interwał aktualizacji czujników i obsługę strefy czasowej.\n\nTryb wysokiej precyzji zmniejsza zmienność znaczników czasu, ale zwiększa użycie CPU, ponieważ używa mniejszego kroku próbkowania i szerszego zakresu doprecyzowania. Nie jest zalecany na urządzeniach o niskiej mocy, takich jak Raspberry Pi.\n\nZapasowy interwał odświeżania zdarzeń wymusza okresowe odświeżanie czujników opartych na zdarzeniach (następne/poprzednie fazy, apogeum/perygeum, zodiak przy lunacjach) w przypadku pominięcia zaplanowanego odświeżenia wokół następnego zdarzenia (restart, zmiana czasu, opóźnienie). Niższe wartości odświeżają częściej; wyższe wartości zmniejszają użycie CPU.",
                 "data": {
                     "scan_interval": "Interwał aktualizacji czujników (sekundy)",
                     "use_ha_timezone": "Użyj strefy czasowej Home Assistant",
-                    "high_precision": "Tryb wysokiej precyzji"
+                    "high_precision": "Tryb wysokiej precyzji",
+                    "events_refresh_fallback": "Zapasowy interwał odświeżania zdarzeń (sekundy)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Powyżej horyzontu",
                 "state": {
                     "on": "Powyżej horyzontu",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Faza",
                 "state": {
                     "new_moon": "Nów",
@@ -66,55 +67,55 @@
                     "unknown": "Nieznana"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azymut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Wysokość kątowa"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Oświetlenie"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Odległość"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaksa"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Długość ekliptyczna (topocentryczna)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Szerokość ekliptyczna (topocentryczna)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Długość ekliptyczna (geocentryczna)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Szerokość ekliptyczna (geocentryczna)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Następny wschód"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Następny zachód"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Następne apogeum"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Następne perygeum"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Następny nów"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Następna pierwsza kwadra"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Następna pełnia"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Nazwa następnej pełni",
                 "state": {
                     "wolf_moon": "Wilcza Pełnia",
@@ -133,7 +134,7 @@
                     "unknown": "Nieznana"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Alternatywne nazwy następnej pełni",
                 "state": {
                     "wolf_moon_alt_names": "Księżyc po Yule, Księżyc Zostań w Domu, Cichy Księżyc, Surowy Księżyc, Środkowy Księżyc",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Następna ostatnia kwadra"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Poprzedni wschód"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Poprzedni zachód"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Poprzednie apogeum"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Poprzednie perygeum"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Poprzedni nów"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Poprzednia pierwsza kwadra"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Poprzednia pełnia"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Nazwa poprzedniej pełni",
                 "state": {
                     "wolf_moon": "Wilcza Pełnia",
@@ -195,7 +196,7 @@
                     "unknown": "Nieznana"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Alternatywne nazwy poprzedniej pełni",
                 "state": {
                     "wolf_moon_alt_names": "Księżyc po Yule, Księżyc Zostań w Domu, Cichy Księżyc, Surowy Księżyc, Środkowy Księżyc",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Poprzednia ostatnia kwadra"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Długość ekliptyczna przy następnej pełni"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Szerokość ekliptyczna przy następnej pełni"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Długość ekliptyczna przy następnym nowiu"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Szerokość ekliptyczna przy następnym nowiu"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Długość ekliptyczna przy poprzedniej pełni"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Szerokość ekliptyczna przy poprzedniej pełni"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Długość ekliptyczna przy poprzednim nowiu"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Szerokość ekliptyczna przy poprzednim nowiu"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Znak zodiaku (aktualny)",
                 "state": {
                     "aries": "Baran",
@@ -259,7 +260,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Znak zodiaku przy następnym nowiu",
                 "state": {
                     "aries": "Baran",
@@ -276,7 +277,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Znak zodiaku przy następnej pełni",
                 "state": {
                     "aries": "Baran",
@@ -293,7 +294,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Znak zodiaku przy poprzednim nowiu",
                 "state": {
                     "aries": "Baran",
@@ -310,7 +311,7 @@
                     "pisces": "Ryby"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Znak zodiaku przy poprzedniej pełni",
                 "state": {
                     "aries": "Baran",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Stopień zodiaku (aktualny)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Stopień zodiaku przy następnym nowiu"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Stopień zodiaku przy następnej pełni"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Stopień zodiaku przy poprzednim nowiu"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Stopień zodiaku przy poprzedniej pełni"
             }
         }

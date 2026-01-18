@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Hold Asztro beállítások",
-                "description": "Állítsa be az érzékelők frissítési intervallumát és az időzóna kezelését.\n\nA nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-használatot, mivel finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott engedélyezni alacsony teljesítményű eszközökön, például Raspberry Pi-n.",
+                "description": "Állítsa be az érzékelők frissítési gyakoriságát és az időzóna-kezelést.\n\nA nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-terhelést, mert finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott alacsony teljesítményű eszközökön, például Raspberry Pi-n.\n\nAz eseményfrissítés tartalék időköze időszakos frissítést kényszerít ki az eseményalapú szenzoroknál (következő/előző fázisok, apogeum/perigeum, zodiákus a lunációknál) arra az esetre, ha a következő esemény körüli ütemezett frissítés kimarad (újraindítás, időváltozás, késés). Alacsonyabb értékek gyakrabban frissítenek; magasabb értékek csökkentik a CPU-terhelést.",
                 "data": {
                     "scan_interval": "Érzékelők frissítési intervalluma (másodperc)",
                     "use_ha_timezone": "Home Assistant időzónájának használata",
-                    "high_precision": "Nagy pontosságú mód"
+                    "high_precision": "Nagy pontosságú mód",
+                    "events_refresh_fallback": "Eseményfrissítés tartalék időköze (másodperc)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "A horizont felett",
                 "state": {
                     "on": "A horizont felett",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Fázis",
                 "state": {
                     "new_moon": "Újhold",
@@ -66,55 +67,55 @@
                     "unknown": "Ismeretlen"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Magassági szög"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Megvilágítás"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Távolság"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Parallaxis"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Ekliptikai hosszúság (topocentrikus)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Ekliptikai szélesség (topocentrikus)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Ekliptikai hosszúság (geocentrikus)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Ekliptikai szélesség (geocentrikus)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Következő felkelés"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Következő nyugvás"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Következő apogeum"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Következő perigeum"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Következő újhold"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Következő első negyed"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Következő telihold"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "A következő telihold neve",
                 "state": {
                     "wolf_moon": "Farkas Hold",
@@ -133,7 +134,7 @@
                     "unknown": "Ismeretlen"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "A következő telihold gyakori alternatív nevei",
                 "state": {
                     "wolf_moon_alt_names": "Yule utáni Hold, Maradj-otthon Hold, Csendes Hold, Szigorú Hold, Középső Hold",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Következő utolsó negyed"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Előző felkelés"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Előző nyugvás"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Előző apogeum"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Előző perigeum"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Előző újhold"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Előző első negyed"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Előző telihold"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Az előző telihold neve",
                 "state": {
                     "wolf_moon": "Farkas Hold",
@@ -195,7 +196,7 @@
                     "unknown": "Ismeretlen"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Az előző telihold gyakori alternatív nevei",
                 "state": {
                     "wolf_moon_alt_names": "Yule utáni Hold, Maradj-otthon Hold, Csendes Hold, Szigorú Hold, Középső Hold",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Előző utolsó negyed"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptikai hosszúság a következő teliholdkor"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Ekliptikai szélesség a következő teliholdkor"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Ekliptikai hosszúság a következő újholdkor"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptikai szélesség a következő újholdkor"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Ekliptikai hosszúság az előző teliholdkor"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Ekliptikai szélesség az előző teliholdkor"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Ekliptikai hosszúság az előző újholdkor"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptikai szélesség az előző újholdkor"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Állatövi jegy (aktuális)",
                 "state": {
                     "aries": "Kos",
@@ -259,7 +260,7 @@
                     "pisces": "Halak"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Állatövi jegy a következő újholdkor",
                 "state": {
                     "aries": "Kos",
@@ -276,7 +277,7 @@
                     "pisces": "Halak"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Állatövi jegy a következő teliholdkor",
                 "state": {
                     "aries": "Kos",
@@ -293,7 +294,7 @@
                     "pisces": "Halak"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Állatövi jegy az előző újholdkor",
                 "state": {
                     "aries": "Kos",
@@ -310,7 +311,7 @@
                     "pisces": "Halak"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Állatövi jegy az előző teliholdkor",
                 "state": {
                     "aries": "Kos",
@@ -327,19 +328,19 @@
                     "pisces": "Halak"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Zodiákus fok (aktuális)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Fok az állatövben a következő újholdkor"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Fok az állatövben a következő teliholdkor"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Fok az állatövben az előző újholdkor"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Fok az állatövben az előző teliholdkor"
             }
         }

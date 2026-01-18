@@ -9,23 +9,35 @@ downloads across flows and entry reloads.
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 import logging
 from pathlib import Path
 import time
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.event import async_track_point_in_time
+from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from .const import (
     CACHE_DIR_NAME,
+    CONF_EVENTS_REFRESH_FALLBACK,
     CONF_SCAN_INTERVAL,
+    DATA_COORDINATOR,
+    DATA_EVENTS_COORDINATOR,
     DE440_FILE,
+    DEFAULT_EVENTS_REFRESH_FALLBACK,
+    DEFAULT_EVENTS_STARTUP_DELAY,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .coordinator import MoonAstroCoordinator
+from .coordinator import (
+    _SHARED_EPHEMERIS_STORE_KEY,
+    MoonAstroCoordinator,
+    MoonAstroEventsCoordinator,
+)
 from .utils import (
     cleanup_cache_dir,
     ensure_valid_ephemeris,
@@ -37,6 +49,7 @@ from .utils import (
 PLATFORMS: list[str] = ["binary_sensor", "sensor"]
 
 _DATA_REFRESH_TASKS = "refresh_tasks"
+_STARTUP_EVENTS_TIMER = "startup_events_timer"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +68,22 @@ def _get_refresh_tasks(hass: HomeAssistant) -> dict[str, asyncio.Task[None]]:
         _DATA_REFRESH_TASKS, {}
     )
     return tasks
+
+
+def _get_startup_events_timers(hass: HomeAssistant) -> dict[str, Callable[[], None]]:
+    """Return the internal mapping of entry_id -> scheduled startup events refresh cancel callback.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        A dictionary mapping config entry IDs to cancellation callables.
+    """
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    timers: dict[str, Callable[[], None]] = domain_data.setdefault(
+        _STARTUP_EVENTS_TIMER, {}
+    )
+    return timers
 
 
 def _ephemeris_path(hass: HomeAssistant) -> Path:
@@ -200,25 +229,108 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """
     await _async_prepare_ephemeris(hass, reason="startup_or_reload")
 
-    scan_seconds = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    scan_seconds = entry.options.get(
+        CONF_SCAN_INTERVAL,
+        DEFAULT_SCAN_INTERVAL,
+    )
     coordinator = MoonAstroCoordinator.from_config_entry(
         hass,
         entry,
         timedelta(seconds=int(scan_seconds)),
     )
 
+    events_fallback_seconds = entry.options.get(
+        CONF_EVENTS_REFRESH_FALLBACK,
+        DEFAULT_EVENTS_REFRESH_FALLBACK,
+    )
+    events_coordinator = MoonAstroEventsCoordinator.from_config_entry(
+        hass,
+        entry,
+        timedelta(seconds=int(events_fallback_seconds)),
+    )
+
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entry.entry_id] = {
+        DATA_COORDINATOR: coordinator,
+        DATA_EVENTS_COORDINATOR: events_coordinator,
+    }
 
     entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    async def _async_deferred_initial_refresh() -> None:
+        """Run the initial refresh sequence without blocking the setup path.
+
+        The main coordinator is refreshed first to populate frequently changing sensors.
+        The events coordinator refresh is scheduled using the Home Assistant scheduler
+        to avoid long sleeps inside a task.
+        """
+        await asyncio.sleep(0)
+
+        try:
+            _LOGGER.debug(
+                "Initial refresh: starting main coordinator refresh (entry_id=%s)",
+                entry.entry_id,
+            )
+            await coordinator.async_refresh()
+        except asyncio.CancelledError:
+            raise
+        except UpdateFailed:
+            _LOGGER.debug(
+                "Initial refresh: main coordinator refresh failed (entry_id=%s)",
+                entry.entry_id,
+            )
+            return
+
+        @callback
+        def _events_cb(_: datetime) -> None:
+            """Refresh event-based data after the startup delay.
+
+            Args:
+                _: The trigger time provided by the scheduler.
+
+            Returns:
+                None.
+            """
+            _LOGGER.debug(
+                "Initial refresh: running scheduled events refresh (entry_id=%s)",
+                entry.entry_id,
+            )
+            timers = _get_startup_events_timers(hass)
+            timers.pop(entry.entry_id, None)
+
+            # Schedule the coroutine in a thread-safe way.
+            hass.create_task(events_coordinator.async_refresh())
+
+        # Cancel any previously scheduled timer for this entry_id.
+        timers = _get_startup_events_timers(hass)
+        cancel_prev = timers.pop(entry.entry_id, None)
+        if cancel_prev is not None:
+            cancel_prev()
+
+        # Schedule the events refresh after a startup delay.
+        _LOGGER.info(
+            "Deferring event-based sensors initial refresh by %s seconds; a periodic fallback refresh is also enabled via options",
+            DEFAULT_EVENTS_STARTUP_DELAY,
+        )
+        delay_seconds = DEFAULT_EVENTS_STARTUP_DELAY
+        when = datetime.now(UTC) + timedelta(seconds=delay_seconds)
+        _LOGGER.debug(
+            "Initial refresh: scheduling events refresh (entry_id=%s delay_seconds=%s when_utc=%s)",
+            entry.entry_id,
+            delay_seconds,
+            when.isoformat(),
+        )
+        timers[entry.entry_id] = async_track_point_in_time(hass, _events_cb, when)
+
     refresh_task = hass.async_create_task(
-        coordinator.async_refresh(),
+        _async_deferred_initial_refresh(),
         name=f"{DOMAIN}-{entry.entry_id}-initial_refresh",
     )
-    _get_refresh_tasks(hass)[entry.entry_id] = refresh_task
+
+    tasks = _get_refresh_tasks(hass)
+    tasks[entry.entry_id] = refresh_task
 
     return True
 
@@ -236,8 +348,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     Returns:
         True if unload succeeded.
     """
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if not unload_ok:
+    if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         return False
 
     tasks = _get_refresh_tasks(hass)
@@ -245,12 +356,28 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if task is not None:
         task.cancel()
 
+    timers = _get_startup_events_timers(hass)
+    cancel = timers.pop(entry.entry_id, None)
+    if cancel is not None:
+        cancel()
+        _LOGGER.debug(
+            "Unload: cancelled startup events refresh timer (entry_id=%s)",
+            entry.entry_id,
+        )
+
+    entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if isinstance(entry_data, dict):
+        events_coordinator = entry_data.get(DATA_EVENTS_COORDINATOR)
+        if isinstance(events_coordinator, MoonAstroEventsCoordinator):
+            await events_coordinator.async_shutdown()
+
     domain_data = hass.data.get(DOMAIN, {})
     domain_data.pop(entry.entry_id, None)
 
     if not tasks:
         domain_data.pop(_DATA_REFRESH_TASKS, None)
-
+    if not timers:
+        domain_data.pop(_STARTUP_EVENTS_TIMER, None)
     if not domain_data:
         hass.data.pop(DOMAIN, None)
 
@@ -284,6 +411,14 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         remove_ephemeris=True,
         remove_empty_dir=True,
     )
+
+    domain_data = hass.data.get(DOMAIN)
+    if isinstance(domain_data, dict):
+        entries = hass.config_entries.async_entries(DOMAIN)
+        if not entries:
+            domain_data.pop(_SHARED_EPHEMERIS_STORE_KEY, None)
+            if not domain_data:
+                hass.data.pop(DOMAIN, None)
 
 
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:

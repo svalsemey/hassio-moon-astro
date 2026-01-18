@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Možnosti Lunin Astro",
-                "description": "Prilagodite interval posodabljanja senzorjev in ravnanje s časovnim pasom.\n\nNačin visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja finejši korak vzorčenja in širši interval izboljšave. Vklop te možnosti ni priporočljiv na napravah z manjšo zmogljivostjo, kot je Raspberry Pi.",
+                "description": "Prilagodite interval posodabljanja senzorjev in upravljanje časovnega pasu.\n\nNačin visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja manjši korak vzorčenja in širši razpon izpopolnjevanja. Ni priporočljiv na napravah z nizko močjo, kot je Raspberry Pi.\n\nRezervni interval osveževanja dogodkov vsili periodično osveževanje senzorjev, ki temeljijo na dogodkih (naslednje/prejšnje faze, apogej/perigej, zodiak pri lunacijah), če se načrtovano osveževanje okoli naslednjega dogodka izpusti (ponovni zagon, sprememba časa, zamik). Nižje vrednosti osvežujejo pogosteje; višje vrednosti zmanjšajo porabo CPU.",
                 "data": {
                     "scan_interval": "Interval posodabljanja senzorjev (sekunde)",
                     "use_ha_timezone": "Uporabi časovni pas Home Assistant",
-                    "high_precision": "Način visoke natančnosti"
+                    "high_precision": "Način visoke natančnosti",
+                    "events_refresh_fallback": "Rezervni interval osveževanja dogodkov (sekunde)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Nad obzorjem",
                 "state": {
                     "on": "Nad obzorjem",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Faza",
                 "state": {
                     "new_moon": "Mlaj",
@@ -66,55 +67,55 @@
                     "unknown": "Neznano"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Višinski kot"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Osvetljenost"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Razdalja"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaksa"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Ekliptična dolžina (topocentrična)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Ekliptična širina (topocentrična)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Ekliptična dolžina (geocentrična)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Ekliptična širina (geocentrična)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Naslednji vzhod"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Naslednji zahod"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Naslednji apogej"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Naslednji perigej"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Naslednji mlaj"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Naslednji prvi krajec"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Naslednja polna luna"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Ime naslednje polne lune",
                 "state": {
                     "wolf_moon": "Volčja luna",
@@ -133,7 +134,7 @@
                     "unknown": "Neznano"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Alternativna imena naslednje polne lune",
                 "state": {
                     "wolf_moon_alt_names": "Luna po Yule, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Naslednji zadnji krajec"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Prejšnji vzhod"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Prejšnji zahod"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Prejšnji apogej"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Prejšnji perigej"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Prejšnji mlaj"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Prejšnji prvi krajec"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Prejšnja polna luna"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Ime prejšnje polne lune",
                 "state": {
                     "wolf_moon": "Volčja luna",
@@ -195,7 +196,7 @@
                     "unknown": "Neznano"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Alternativna imena prejšnje polne lune",
                 "state": {
                     "wolf_moon_alt_names": "Luna po Yule, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Prejšnji zadnji krajec"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptična dolžina ob naslednji polni luni"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Ekliptična širina ob naslednji polni luni"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Ekliptična dolžina ob naslednjem mlaju"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Ekliptična širina ob naslednjem mlaju"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Ekliptična dolžina ob prejšnji polni luni"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Ekliptična širina ob prejšnji polni luni"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Ekliptična dolžina ob prejšnjem mlaju"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptična širina ob prejšnjem mlaju"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Zodiakalno znamenje (trenutno)",
                 "state": {
                     "aries": "Oven",
@@ -259,7 +260,7 @@
                     "pisces": "Ribi"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Zodiakalno znamenje ob naslednjem mlaju",
                 "state": {
                     "aries": "Oven",
@@ -276,7 +277,7 @@
                     "pisces": "Ribi"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Zodiakalno znamenje ob naslednji polni luni",
                 "state": {
                     "aries": "Oven",
@@ -293,7 +294,7 @@
                     "pisces": "Ribi"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Zodiakalno znamenje ob prejšnjem mlaju",
                 "state": {
                     "aries": "Oven",
@@ -310,7 +311,7 @@
                     "pisces": "Ribi"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Zodiakalno znamenje ob prejšnji polni luni",
                 "state": {
                     "aries": "Oven",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Stopinja zodiaka (trenutna)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Stopinja zodiaka ob naslednjem mlaju"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Stopinja zodiaka ob naslednji polni luni"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Stopinja zodiaka ob prejšnjem mlaju"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Stopinja zodiaka ob prejšnji polni luni"
             }
         }

@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "문 아스트로 옵션",
-                "description": "센서 업데이트 간격과 시간대 처리 방식을 조정합니다.\n\n고정밀 모드는 타임스탬프 변동성을 줄이지만, 더 미세한 샘플링 단계와 더 넓은 정밀화 범위를 사용하므로 CPU 사용량이 증가합니다. Raspberry Pi와 같은 저사양 장치에서는 활성화를 권장하지 않습니다.",
+                "description": "센서 업데이트 간격과 시간대 처리를 조정합니다.\n\n고정밀 모드는 타임스탬프 변동성을 줄이지만, 더 미세한 샘플링 단계와 더 넓은 정밀화 범위를 사용하므로 CPU 사용량이 증가합니다. Raspberry Pi와 같은 저전력 장치에서는 권장되지 않습니다.\n\n이벤트 새로 고침 폴백 간격은 다음 이벤트 주변에서 예약된 새로 고침이 누락될 경우(재시작, 시간 변경, 지연)에 대비하여 이벤트 기반 센서(다음/이전 위상, 원지점/근지점, lunation 시의 황도대)를 주기적으로 새로 고칩니다. 값이 낮을수록 더 자주 새로 고치며, 값이 높을수록 CPU 사용량이 줄어듭니다.",
                 "data": {
                     "scan_interval": "센서 업데이트 간격(초)",
                     "use_ha_timezone": "Home Assistant 시간대 사용",
-                    "high_precision": "고정밀 모드"
+                    "high_precision": "고정밀 모드",
+                    "events_refresh_fallback": "이벤트 새로 고침 폴백 간격(초)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "지평선 위",
                 "state": {
                     "on": "지평선 위",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "위상",
                 "state": {
                     "new_moon": "삭",
@@ -66,55 +67,55 @@
                     "unknown": "알 수 없음"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "방위각"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "고도각"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "조도"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "거리"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "시차"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "황경 (지표관측, 토포센트릭)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "황위 (지표관측, 토포센트릭)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "황경 (지구중심)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "황위 (지구중심)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "다음 월출"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "다음 월몰"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "다음 원지점(아포지)"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "다음 근지점(페리지)"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "다음 삭(신월)"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "다음 상현"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "다음 보름달(만월)"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "다음 보름달 이름",
                 "state": {
                     "wolf_moon": "울프 문",
@@ -133,7 +134,7 @@
                     "unknown": "알 수 없음"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "다음 보름달의 대체 이름(일반적)",
                 "state": {
                     "wolf_moon_alt_names": "율(Yule) 이후의 달, 집에 머무는 달, 고요한 달, 혹독한 달, 중심의 달",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "다음 하현"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "이전 월출"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "이전 월몰"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "이전 원지점(아포지)"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "이전 근지점(페리지)"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "이전 삭(신월)"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "이전 상현"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "이전 보름달(만월)"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "이전 보름달 이름",
                 "state": {
                     "wolf_moon": "울프 문",
@@ -195,7 +196,7 @@
                     "unknown": "알 수 없음"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "이전 보름달의 대체 이름(일반적)",
                 "state": {
                     "wolf_moon_alt_names": "율(Yule) 이후의 달, 집에 머무는 달, 고요한 달, 혹독한 달, 중심의 달",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "이전 하현"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "다음 보름달 때의 황경"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "다음 보름달 때의 황위"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "다음 신월 때의 황경"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "다음 신월 때의 황위"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "이전 보름달 때의 황경"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "이전 보름달 때의 황위"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "이전 신월 때의 황경"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "이전 신월 때의 황위"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "황도대 별자리(현재)",
                 "state": {
                     "aries": "양자리",
@@ -259,7 +260,7 @@
                     "pisces": "물고기자리"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "다음 신월의 황도대 별자리",
                 "state": {
                     "aries": "양자리",
@@ -276,7 +277,7 @@
                     "pisces": "물고기자리"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "다음 보름달의 황도대 별자리",
                 "state": {
                     "aries": "양자리",
@@ -293,7 +294,7 @@
                     "pisces": "물고기자리"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "이전 신월의 황도대 별자리",
                 "state": {
                     "aries": "양자리",
@@ -310,7 +311,7 @@
                     "pisces": "물고기자리"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "이전 보름달의 황도대 별자리",
                 "state": {
                     "aries": "양자리",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "황도대 도수(현재)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "다음 신월의 황도대 도수"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "다음 보름달의 황도대 도수"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "이전 신월의 황도대 도수"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "이전 보름달의 황도대 도수"
             }
         }

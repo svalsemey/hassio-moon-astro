@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Opções do Lua Astro",
-                "description": "Ajuste o intervalo de atualização dos sensores e o tratamento do fuso horário.\n\nO modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso de CPU porque utiliza um passo de amostragem mais fino e um intervalo de refinamento mais amplo. Não é recomendável ativar esta opção em dispositivos de baixo desempenho, como o Raspberry Pi.",
+                "description": "Ajuste o intervalo de atualização dos sensores e o tratamento do fuso horário.\n\nO modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso da CPU porque utiliza um passo de amostragem mais fino e uma faixa de refinamento mais ampla. Não é recomendado em dispositivos de baixa potência como o Raspberry Pi.\n\nO intervalo de fallback de atualização de eventos força uma atualização periódica dos sensores baseados em eventos (fases seguintes/anteriores, apogeu/perigeu, zodíaco nas lunações) caso a atualização agendada em torno do próximo evento seja perdida (reinício, mudança de hora, atraso). Valores menores atualizam com mais frequência; valores maiores reduzem o uso da CPU.",
                 "data": {
                     "scan_interval": "Intervalo de atualização dos sensores (segundos)",
                     "use_ha_timezone": "Usar o fuso horário do Home Assistant",
-                    "high_precision": "Modo de alta precisão"
+                    "high_precision": "Modo de alta precisão",
+                    "events_refresh_fallback": "Intervalo de fallback de atualização de eventos (segundos)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Acima do horizonte",
                 "state": {
                     "on": "Acima do horizonte",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Fase",
                 "state": {
                     "new_moon": "Lua nova",
@@ -66,55 +67,55 @@
                     "unknown": "Desconhecida"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimute"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Ângulo de elevação"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Iluminação"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Distância"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaxe"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Longitude eclíptica (topocêntrica)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Latitude eclíptica (topocêntrica)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Longitude eclíptica (geocêntrica)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Latitude eclíptica (geocêntrica)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Próximo nascer"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Próximo pôr"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Próximo apogeu"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Próximo perigeu"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Próxima lua nova"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Próximo quarto crescente"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Próxima lua cheia"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Nome da próxima lua cheia",
                 "state": {
                     "wolf_moon": "Lua do Lobo",
@@ -133,7 +134,7 @@
                     "unknown": "Desconhecida"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Nomes alternativos da próxima lua cheia",
                 "state": {
                     "wolf_moon_alt_names": "Lua Após o Yule, Lua Fique em Casa, Lua Silenciosa, Lua Severa, Lua Central",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Próximo quarto minguante"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Nascer anterior"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Pôr anterior"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Apogeu anterior"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Perigeu anterior"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Lua nova anterior"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Quarto crescente anterior"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Lua cheia anterior"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Nome da lua cheia anterior",
                 "state": {
                     "wolf_moon": "Lua do Lobo",
@@ -195,7 +196,7 @@
                     "unknown": "Desconhecida"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Nomes alternativos da lua cheia anterior",
                 "state": {
                     "wolf_moon_alt_names": "Lua Após o Yule, Lua Fique em Casa, Lua Silenciosa, Lua Severa, Lua Central",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Quarto minguante anterior"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Longitude eclíptica na próxima lua cheia"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Latitude eclíptica na próxima lua cheia"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Longitude eclíptica na próxima lua nova"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Latitude eclíptica na próxima lua nova"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Longitude eclíptica na lua cheia anterior"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Latitude eclíptica na lua cheia anterior"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Longitude eclíptica na lua nova anterior"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Latitude eclíptica na lua nova anterior"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Signo do zodíaco (atual)",
                 "state": {
                     "aries": "Áries",
@@ -259,7 +260,7 @@
                     "pisces": "Peixes"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Signo do zodíaco na próxima lua nova",
                 "state": {
                     "aries": "Áries",
@@ -276,7 +277,7 @@
                     "pisces": "Peixes"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Signo do zodíaco na próxima lua cheia",
                 "state": {
                     "aries": "Áries",
@@ -293,7 +294,7 @@
                     "pisces": "Peixes"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Signo do zodíaco na lua nova anterior",
                 "state": {
                     "aries": "Áries",
@@ -310,7 +311,7 @@
                     "pisces": "Peixes"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Signo do zodíaco na lua cheia anterior",
                 "state": {
                     "aries": "Áries",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Grau do zodíaco (atual)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Grau do zodíaco na próxima lua nova"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Grau do zodíaco na próxima lua cheia"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Grau do zodíaco na lua nova anterior"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Grau do zodíaco na lua cheia anterior"
             }
         }

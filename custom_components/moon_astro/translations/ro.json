@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Opțiuni Lună Astro",
-                "description": "Ajustați intervalul de actualizare al senzorilor și gestionarea fusului orar.\n\nModul de înaltă precizie reduce variabilitatea marcajelor temporale, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat să activați această opțiune pe dispozitive cu putere redusă, precum Raspberry Pi.",
+                "description": "Ajustați intervalul de actualizare al senzorilor și gestionarea fusului orar.\n\nModul de înaltă precizie reduce variabilitatea marcajelor de timp, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat pe dispozitive cu putere redusă precum Raspberry Pi.\n\nIntervalul de reîmprospătare de rezervă pentru evenimente forțează o reîmprospătare periodică a senzorilor bazați pe evenimente (fazele următoare/anterioare, apogeu/perigeu, zodiac la lunații) în cazul în care reîmprospătarea programată în jurul următorului eveniment este ratată (repornire, schimbare de timp, întârziere). Valorile mai mici reîmprospătează mai des; valorile mai mari reduc utilizarea CPU.",
                 "data": {
                     "scan_interval": "Interval de actualizare a senzorilor (secunde)",
                     "use_ha_timezone": "Utilizați fusul orar Home Assistant",
-                    "high_precision": "Mod de înaltă precizie"
+                    "high_precision": "Mod de înaltă precizie",
+                    "events_refresh_fallback": "Interval de reîmprospătare de rezervă pentru evenimente (secunde)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Deasupra orizontului",
                 "state": {
                     "on": "Deasupra orizontului",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Fază",
                 "state": {
                     "new_moon": "Lună nouă",
@@ -66,55 +67,55 @@
                     "unknown": "Necunoscută"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimut"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Unghi de elevație"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Iluminare"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Distanță"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Paralaxă"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Longitudine ecliptică (topocentrică)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Latitudine ecliptică (topocentrică)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Longitudine ecliptică (geocentrică)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Latitudine ecliptică (geocentrică)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Următoarea răsărire"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Următorul apus"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Următorul apogeu"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Următorul perigeu"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Următoarea lună nouă"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Următorul prim pătrar"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Următoarea lună plină"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Numele următoarei luni pline",
                 "state": {
                     "wolf_moon": "Luna Lupului",
@@ -133,7 +134,7 @@
                     "unknown": "Necunoscută"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Nume alternative ale următoarei luni pline",
                 "state": {
                     "wolf_moon_alt_names": "Luna după Yule, Luna Stai Acasă, Luna Liniștită, Luna Aspră, Luna Centrală",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Următorul ultim pătrar"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Răsărirea anterioară"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Apusul anterior"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Apogeul anterior"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Perigeul anterior"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Luna nouă anterioară"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Primul pătrar anterior"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Luna plină anterioară"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Numele lunii pline anterioare",
                 "state": {
                     "wolf_moon": "Luna Lupului",
@@ -195,7 +196,7 @@
                     "unknown": "Necunoscută"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Nume alternative ale lunii pline anterioare",
                 "state": {
                     "wolf_moon_alt_names": "Luna după Yule, Luna Stai Acasă, Luna Liniștită, Luna Aspră, Luna Centrală",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Ultimul pătrar anterior"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Longitudine ecliptică la următoarea lună plină"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Latitudine ecliptică la următoarea lună plină"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Longitudine ecliptică la următoarea lună nouă"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Latitudine ecliptică la următoarea lună nouă"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Longitudine ecliptică la luna plină anterioară"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Latitudine ecliptică la luna plină anterioară"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Longitudine ecliptică la luna nouă anterioară"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Latitudine ecliptică la luna nouă anterioară"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Semn zodiacal (curent)",
                 "state": {
                     "aries": "Berbec",
@@ -259,7 +260,7 @@
                     "pisces": "Pești"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Semn zodiacal la următoarea lună nouă",
                 "state": {
                     "aries": "Berbec",
@@ -276,7 +277,7 @@
                     "pisces": "Pești"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Semn zodiacal la următoarea lună plină",
                 "state": {
                     "aries": "Berbec",
@@ -293,7 +294,7 @@
                     "pisces": "Pești"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Semn zodiacal la luna nouă anterioară",
                 "state": {
                     "aries": "Berbec",
@@ -310,7 +311,7 @@
                     "pisces": "Pești"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Semn zodiacal la luna plină anterioară",
                 "state": {
                     "aries": "Berbec",
@@ -328,19 +329,19 @@
                 }
             },
 
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Grad zodiacal (curent)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Grad zodiacal la următoarea lună nouă"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Grad zodiacal la următoarea lună plină"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Grad zodiacal la luna nouă anterioară"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Grad zodiacal la luna plină anterioară"
             }
         }

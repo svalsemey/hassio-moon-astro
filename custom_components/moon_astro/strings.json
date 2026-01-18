@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "Moon Astro options",
-                "description": "Adjust the sensors update interval and time zone handling.\n\nHigh precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.",
+                "description": "Adjust the sensors update interval and time zone handling.\n\nHigh precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.\n\nThe events refresh fallback interval forces a periodic refresh of event-based sensors (next/previous phases, apogee/perigee, zodiac at lunations) in case the scheduled refresh around the next event is missed (restart, time change, delay). Lower values refresh more often; higher values reduce CPU usage.",
                 "data": {
                     "scan_interval": "Sensors update interval (seconds)",
                     "use_ha_timezone": "Use Home Assistant time zone",
-                    "high_precision": "High precision mode"
+                    "high_precision": "High precision mode",
+                    "events_refresh_fallback": "Events refresh fallback interval (seconds)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "Above horizon",
                 "state": {
                     "on": "Above horizon",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "Phase",
                 "state": {
                     "new_moon": "New moon",
@@ -66,55 +67,55 @@
                     "unknown": "Unknown"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "Azimuth"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "Elevation"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "Illumination"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "Distance"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "Parallax"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "Ecliptic longitude (topocentric)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "Ecliptic latitude (topocentric)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "Ecliptic longitude (geocentric)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "Ecliptic latitude (geocentric)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "Next rise"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "Next set"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "Next apogee"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "Next perigee"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "Next new moon"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "Next first quarter"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "Next full moon"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "Next full moon name",
                 "state": {
                     "wolf_moon": "Wolf Moon",
@@ -133,7 +134,7 @@
                     "unknown": "Unknown"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "Next full moon alternative names",
                 "state": {
                     "wolf_moon_alt_names": "Moon After Yule, Stay Home Moon, Quiet Moon, Severe Moon, Center Moon",
@@ -151,31 +152,31 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "Next last quarter"
             },
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "Previous rise"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "Previous set"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "Previous apogee"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "Previous perigee"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "Previous new moon"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "Previous first quarter"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "Previous full moon"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "Previous full moon name",
                 "state": {
                     "wolf_moon": "Wolf Moon",
@@ -194,7 +195,7 @@
                     "unknown": "Unknown"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "Previous full moon alternative names",
                 "state": {
                     "wolf_moon_alt_names": "Moon After Yule, Stay Home Moon, Quiet Moon, Severe Moon, Center Moon",
@@ -212,34 +213,34 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "Previous last quarter"
             },
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "Ecliptic longitude at next full moon"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "Ecliptic latitude at next full moon"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "Ecliptic longitude at next new moon"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "Ecliptic latitude at next new moon"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "Ecliptic longitude at previous full moon"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "Ecliptic latitude at previous full moon"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "Ecliptic longitude at previous new moon"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "Ecliptic latitude at previous new moon"
             },
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "Zodiac sign (current)",
                 "state": {
                     "aries": "Aries",
@@ -256,7 +257,7 @@
                     "pisces": "Pisces"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "Zodiac sign at next new moon",
                 "state": {
                     "aries": "Aries",
@@ -273,7 +274,7 @@
                     "pisces": "Pisces"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "Zodiac sign at next full moon",
                 "state": {
                     "aries": "Aries",
@@ -290,7 +291,7 @@
                     "pisces": "Pisces"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "Zodiac sign at previous new moon",
                 "state": {
                     "aries": "Aries",
@@ -307,7 +308,7 @@
                     "pisces": "Pisces"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "Zodiac sign at previous full moon",
                 "state": {
                     "aries": "Aries",
@@ -324,19 +325,19 @@
                     "pisces": "Pisces"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "Zodiac degree (current)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "Zodiac degree at next new moon"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "Zodiac degree at next full moon"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "Zodiac degree at previous new moon"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "Zodiac degree at previous full moon"
             }
         }

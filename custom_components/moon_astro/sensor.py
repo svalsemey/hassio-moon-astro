@@ -6,6 +6,7 @@ Each sensor reads a single computed value from the coordinator data dictionary.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import UTC, datetime
 import logging
 import math
@@ -19,7 +20,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN,
     KEY_AZIMUTH,
     KEY_DISTANCE,
     KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
@@ -77,411 +77,447 @@ from .const import (
     PRECISION_PARALLAX,
     PRECISION_ZODIAC_DEGREE,
 )
-from .coordinator import MoonAstroCoordinator
+from .coordinator import MoonAstroCoordinator, MoonAstroEventsCoordinator
+from .utils import get_entry_coordinators, get_entry_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
 
-# key, translation_key, unit, device_class, suggested_display_precision
-SENSORS: list[tuple[str, str, str | None, SensorDeviceClass | None, int | None]] = [
-    (
-        KEY_PHASE,
-        "sensor_phase",
-        None,
-        None,
-        None,
+@dataclass(frozen=True)
+class SensorDescription:
+    """Describe a sensor entity created by the integration.
+
+    Args:
+        key: Coordinator dictionary key.
+        slug: Stable non-localized slug used for entity_id suggestion and translation.
+        is_event_based: True when the value changes only on event boundaries.
+        unit: Unit of measurement if applicable.
+        device_class: Sensor device class if applicable.
+        suggested_display_precision: Suggested display precision for UI rendering.
+    """
+
+    key: str
+    slug: str
+    is_event_based: bool
+    unit: str | None
+    device_class: SensorDeviceClass | None
+    suggested_display_precision: int | None
+
+
+SENSORS: list[SensorDescription] = [
+    SensorDescription(
+        key=KEY_PHASE,
+        slug="phase",
+        is_event_based=False,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_AZIMUTH,
-        "sensor_azimuth",
-        "°",
-        None,
-        PRECISION_AZIMUTH,
+    SensorDescription(
+        key=KEY_AZIMUTH,
+        slug="azimuth",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_AZIMUTH,
     ),
-    (
-        KEY_ELEVATION,
-        "sensor_elevation",
-        "°",
-        None,
-        PRECISION_ELEVATION,
+    SensorDescription(
+        key=KEY_ELEVATION,
+        slug="elevation",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ELEVATION,
     ),
-    (
-        KEY_ILLUMINATION,
-        "sensor_illumination",
-        "%",
-        None,
-        PRECISION_ILLUMINATION,
+    SensorDescription(
+        key=KEY_ILLUMINATION,
+        slug="illumination",
+        is_event_based=False,
+        unit="%",
+        device_class=None,
+        suggested_display_precision=PRECISION_ILLUMINATION,
     ),
-    (
-        KEY_DISTANCE,
-        "sensor_distance",
-        "km",
-        None,
-        PRECISION_DISTANCE,
+    SensorDescription(
+        key=KEY_DISTANCE,
+        slug="distance",
+        is_event_based=False,
+        unit="km",
+        device_class=None,
+        suggested_display_precision=PRECISION_DISTANCE,
     ),
-    (
-        KEY_PARALLAX,
-        "sensor_parallax",
-        "°",
-        None,
-        PRECISION_PARALLAX,
+    SensorDescription(
+        key=KEY_PARALLAX,
+        slug="parallax",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_PARALLAX,
     ),
-    # Topocentric ecliptic coordinates (current)
-    (
-        KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
-        "sensor_ecliptic_longitude_topocentric",
-        "°",
-        None,
-        PRECISION_ECL_TOPO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC,
+        slug="ecliptic_longitude_topocentric",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_TOPO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
-        "sensor_ecliptic_latitude_topocentric",
-        "°",
-        None,
-        PRECISION_ECL_TOPO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC,
+        slug="ecliptic_latitude_topocentric",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_TOPO,
     ),
-    # Geocentric ecliptic coordinates (current)
-    (
-        KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
-        "sensor_ecliptic_longitude_geocentric",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC,
+        slug="ecliptic_longitude_geocentric",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
-        "sensor_ecliptic_latitude_geocentric",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_GEOCENTRIC,
+        slug="ecliptic_latitude_geocentric",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    # Time sensors (next)
-    (
-        KEY_NEXT_RISE,
-        "sensor_next_rise",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_RISE,
+        slug="next_rise",
+        is_event_based=False,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_SET,
-        "sensor_next_set",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_SET,
+        slug="next_set",
+        is_event_based=False,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_APOGEE,
-        "sensor_next_apogee",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_APOGEE,
+        slug="next_apogee",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_PERIGEE,
-        "sensor_next_perigee",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_PERIGEE,
+        slug="next_perigee",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_FIRST_QUARTER,
-        "sensor_next_first_quarter",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_FIRST_QUARTER,
+        slug="next_first_quarter",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_FULL_MOON,
-        "sensor_next_full_moon",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_FULL_MOON,
+        slug="next_full_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_LAST_QUARTER,
-        "sensor_next_last_quarter",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_LAST_QUARTER,
+        slug="next_last_quarter",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_NEW_MOON,
-        "sensor_next_new_moon",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_NEW_MOON,
+        slug="next_new_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    # Time sensors (previous)
-    (
-        KEY_PREVIOUS_RISE,
-        "sensor_previous_rise",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_RISE,
+        slug="previous_rise",
+        is_event_based=False,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_SET,
-        "sensor_previous_set",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_SET,
+        slug="previous_set",
+        is_event_based=False,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_APOGEE,
-        "sensor_previous_apogee",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_APOGEE,
+        slug="previous_apogee",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_PERIGEE,
-        "sensor_previous_perigee",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_PERIGEE,
+        slug="previous_perigee",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_FIRST_QUARTER,
-        "sensor_previous_first_quarter",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_FIRST_QUARTER,
+        slug="previous_first_quarter",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_FULL_MOON,
-        "sensor_previous_full_moon",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_FULL_MOON,
+        slug="previous_full_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_LAST_QUARTER,
-        "sensor_previous_last_quarter",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_LAST_QUARTER,
+        slug="previous_last_quarter",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_NEW_MOON,
-        "sensor_previous_new_moon",
-        None,
-        SensorDeviceClass.TIMESTAMP,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_NEW_MOON,
+        slug="previous_new_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        suggested_display_precision=None,
     ),
-    # Full moon names
-    (
-        KEY_PREVIOUS_FULL_MOON_NAME,
-        "sensor_previous_full_moon_name",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_FULL_MOON_NAME,
+        slug="previous_full_moon_name",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
-        "sensor_previous_full_moon_alt_names",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
+        slug="previous_full_moon_alt_names",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_FULL_MOON_NAME,
-        "sensor_next_full_moon_name",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_FULL_MOON_NAME,
+        slug="next_full_moon_name",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_NEXT_FULL_MOON_ALT_NAMES,
-        "sensor_next_full_moon_alt_names",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_NEXT_FULL_MOON_ALT_NAMES,
+        slug="next_full_moon_alt_names",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    # Ecliptic coordinates at next lunations (geocentric, true-of-date)
-    (
-        KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
-        "sensor_ecliptic_longitude_next_full_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
+        slug="ecliptic_longitude_next_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
-        "sensor_ecliptic_latitude_next_full_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
+        slug="ecliptic_latitude_next_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
-        "sensor_ecliptic_longitude_next_new_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+        slug="ecliptic_longitude_next_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
-        "sensor_ecliptic_latitude_next_new_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+        slug="ecliptic_latitude_next_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    # Ecliptic coordinates at previous lunations (geocentric, true-of-date)
-    (
-        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
-        "sensor_ecliptic_longitude_previous_full_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+        slug="ecliptic_longitude_previous_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
-        "sensor_ecliptic_latitude_previous_full_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+        slug="ecliptic_latitude_previous_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
-        "sensor_ecliptic_longitude_previous_new_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
+        slug="ecliptic_longitude_previous_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    (
-        KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
-        "sensor_ecliptic_latitude_previous_new_moon",
-        "°",
-        None,
-        PRECISION_ECL_GEO,
+    SensorDescription(
+        key=KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
+        slug="ecliptic_latitude_previous_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ECL_GEO,
     ),
-    # Zodiac sign sensors (string states)
-    (
-        KEY_ZODIAC_SIGN_CURRENT_MOON,
-        "sensor_zodiac_sign_current_moon",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_ZODIAC_SIGN_CURRENT_MOON,
+        slug="zodiac_sign_current_moon",
+        is_event_based=False,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
-        "sensor_zodiac_sign_next_full_moon",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
+        slug="zodiac_sign_next_full_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
-        "sensor_zodiac_sign_next_new_moon",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
+        slug="zodiac_sign_next_new_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
-        "sensor_zodiac_sign_previous_full_moon",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+        slug="zodiac_sign_previous_full_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    (
-        KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
-        "sensor_zodiac_sign_previous_new_moon",
-        None,
-        None,
-        None,
+    SensorDescription(
+        key=KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
+        slug="zodiac_sign_previous_new_moon",
+        is_event_based=True,
+        unit=None,
+        device_class=None,
+        suggested_display_precision=None,
     ),
-    # Zodiac degree sensors (floats 0..30)
-    (
-        KEY_ZODIAC_DEGREE_CURRENT_MOON,
-        "sensor_zodiac_degree_current_moon",
-        "°",
-        None,
-        PRECISION_ZODIAC_DEGREE,
+    SensorDescription(
+        key=KEY_ZODIAC_DEGREE_CURRENT_MOON,
+        slug="zodiac_degree_current_moon",
+        is_event_based=False,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ZODIAC_DEGREE,
     ),
-    (
-        KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
-        "sensor_zodiac_degree_next_full_moon",
-        "°",
-        None,
-        PRECISION_ZODIAC_DEGREE,
+    SensorDescription(
+        key=KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+        slug="zodiac_degree_next_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ZODIAC_DEGREE,
     ),
-    (
-        KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
-        "sensor_zodiac_degree_next_new_moon",
-        "°",
-        None,
-        PRECISION_ZODIAC_DEGREE,
+    SensorDescription(
+        key=KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+        slug="zodiac_degree_next_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ZODIAC_DEGREE,
     ),
-    (
-        KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
-        "sensor_zodiac_degree_previous_new_moon",
-        "°",
-        None,
-        PRECISION_ZODIAC_DEGREE,
+    SensorDescription(
+        key=KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
+        slug="zodiac_degree_previous_new_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ZODIAC_DEGREE,
     ),
-    (
-        KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
-        "sensor_zodiac_degree_previous_full_moon",
-        "°",
-        None,
-        PRECISION_ZODIAC_DEGREE,
+    SensorDescription(
+        key=KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+        slug="zodiac_degree_previous_full_moon",
+        is_event_based=True,
+        unit="°",
+        device_class=None,
+        suggested_display_precision=PRECISION_ZODIAC_DEGREE,
     ),
 ]
 
-# Stable, non-localized slugs for initial entity_id creation
-SUGGESTED_SLUGS: dict[str, str] = {
-    KEY_PHASE: "phase",
-    KEY_AZIMUTH: "azimuth",
-    KEY_ELEVATION: "elevation",
-    KEY_ILLUMINATION: "illumination",
-    KEY_DISTANCE: "distance",
-    KEY_PARALLAX: "parallax",
-    KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC: "ecliptic_longitude_topocentric",
-    KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC: "ecliptic_latitude_topocentric",
-    KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC: "ecliptic_longitude_geocentric",
-    KEY_ECLIPTIC_LATITUDE_GEOCENTRIC: "ecliptic_latitude_geocentric",
-    KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON: "ecliptic_longitude_next_full_moon",
-    KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON: "ecliptic_latitude_next_full_moon",
-    KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON: "ecliptic_longitude_next_new_moon",
-    KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON: "ecliptic_latitude_next_new_moon",
-    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON: "ecliptic_longitude_previous_full_moon",
-    KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON: "ecliptic_latitude_previous_full_moon",
-    KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON: "ecliptic_longitude_previous_new_moon",
-    KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON: "ecliptic_latitude_previous_new_moon",
-    KEY_NEXT_APOGEE: "next_apogee",
-    KEY_NEXT_FIRST_QUARTER: "next_first_quarter",
-    KEY_NEXT_FULL_MOON: "next_full_moon",
-    KEY_NEXT_FULL_MOON_NAME: "next_full_moon_name",
-    KEY_NEXT_FULL_MOON_ALT_NAMES: "next_full_moon_alt_names",
-    KEY_NEXT_LAST_QUARTER: "next_last_quarter",
-    KEY_NEXT_NEW_MOON: "next_new_moon",
-    KEY_NEXT_PERIGEE: "next_perigee",
-    KEY_NEXT_RISE: "next_rise",
-    KEY_NEXT_SET: "next_set",
-    KEY_PREVIOUS_APOGEE: "previous_apogee",
-    KEY_PREVIOUS_FIRST_QUARTER: "previous_first_quarter",
-    KEY_PREVIOUS_FULL_MOON: "previous_full_moon",
-    KEY_PREVIOUS_FULL_MOON_NAME: "previous_full_moon_name",
-    KEY_PREVIOUS_FULL_MOON_ALT_NAMES: "previous_full_moon_alt_names",
-    KEY_PREVIOUS_LAST_QUARTER: "previous_last_quarter",
-    KEY_PREVIOUS_NEW_MOON: "previous_new_moon",
-    KEY_PREVIOUS_PERIGEE: "previous_perigee",
-    KEY_PREVIOUS_RISE: "previous_rise",
-    KEY_PREVIOUS_SET: "previous_set",
-    KEY_ZODIAC_SIGN_CURRENT_MOON: "zodiac_sign_current_moon",
-    KEY_ZODIAC_SIGN_NEXT_FULL_MOON: "zodiac_sign_next_full_moon",
-    KEY_ZODIAC_SIGN_NEXT_NEW_MOON: "zodiac_sign_next_new_moon",
-    KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON: "zodiac_sign_previous_full_moon",
-    KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON: "zodiac_sign_previous_new_moon",
-    KEY_ZODIAC_DEGREE_CURRENT_MOON: "zodiac_degree_current_moon",
-    KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: "zodiac_degree_next_new_moon",
-    KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: "zodiac_degree_next_full_moon",
-    KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON: "zodiac_degree_previous_full_moon",
-    KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON: "zodiac_degree_previous_new_moon",
-}
+
+def _validate_sensors() -> None:
+    """Validate sensor descriptions for basic consistency.
+
+    Returns:
+        None.
+    """
+    seen_keys: set[str] = set()
+    seen_slugs: set[str] = set()
+
+    for desc in SENSORS:
+        if not desc.key or not isinstance(desc.key, str):
+            _LOGGER.debug("Invalid sensor key: %r", desc.key)
+            continue
+        if not desc.slug or not isinstance(desc.slug, str):
+            _LOGGER.debug("Invalid sensor slug for key=%s: %r", desc.key, desc.slug)
+            continue
+
+        if desc.key in seen_keys:
+            _LOGGER.debug("Duplicate sensor key: %s", desc.key)
+        else:
+            seen_keys.add(desc.key)
+
+        if desc.slug in seen_slugs:
+            _LOGGER.debug("Duplicate sensor slug: %s", desc.slug)
+        else:
+            seen_slugs.add(desc.slug)
 
 
 def _parse_timestamp_to_utc(value: Any) -> datetime | None:
@@ -552,35 +588,39 @@ async def async_setup_entry(
     Returns:
         None.
     """
-    coordinator: MoonAstroCoordinator = hass.data[DOMAIN][entry.entry_id]
-    device_info = DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer="Moon Astro",
-        model="Skyfield DE440",
-        name="Moon Astro",
-    )
+    coordinator, events_coordinator = get_entry_coordinators(hass, entry)
+    if coordinator is None:
+        return
 
+    device_info = get_entry_device_info(entry)
+
+    _validate_sensors()
     entities: list[MoonAstroSensor] = []
-    for key, name_key, unit, device_class, precision in SENSORS:
-        suggested_slug = SUGGESTED_SLUGS.get(key, key)
+    for desc in SENSORS:
+        selected = coordinator
+        if events_coordinator is not None and desc.is_event_based:
+            selected = events_coordinator
+
         entities.append(
             MoonAstroSensor(
-                coordinator=coordinator,
+                coordinator=selected,
                 entry_id=entry.entry_id,
-                key=key,
-                name_key=name_key,
-                unit=unit,
-                device_class=device_class,
-                suggested_display_precision=precision,
+                key=desc.key,
+                name_key=desc.slug,
+                unit=desc.unit,
+                device_class=desc.device_class,
+                suggested_display_precision=desc.suggested_display_precision,
                 device_info=device_info,
-                suggested_object_id=suggested_slug,
+                suggested_object_id=desc.slug,
             )
         )
 
     async_add_entities(entities, update_before_add=False)
 
 
-class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
+class MoonAstroSensor(
+    CoordinatorEntity[MoonAstroCoordinator | MoonAstroEventsCoordinator], SensorEntity
+):
     """Generic sensor bound to a coordinator value.
 
     This entity avoids unnecessary state writes by only writing when the computed value
@@ -591,7 +631,7 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
 
     def __init__(
         self,
-        coordinator: MoonAstroCoordinator,
+        coordinator: MoonAstroCoordinator | MoonAstroEventsCoordinator,
         entry_id: str,
         key: str,
         name_key: str,
@@ -676,6 +716,13 @@ class MoonAstroSensor(CoordinatorEntity[MoonAstroCoordinator], SensorEntity):
         """
         data = self.coordinator.data or {}
         value = data.get(self._key)
+        if value is None:
+            _LOGGER.debug(
+                "Sensor value missing: key=%s coordinator=%s has_data=%s",
+                self._key,
+                type(self.coordinator).__name__,
+                bool(self.coordinator.data),
+            )
 
         if self.device_class == SensorDeviceClass.TIMESTAMP:
             return _parse_timestamp_to_utc(value)

@@ -8,22 +8,36 @@ from __future__ import annotations
 
 # Domain and basic config
 DOMAIN = "moon_astro"
+MANUFACTURER = "Moon Astro"
+MODEL = "Skyfield DE440"
+NAME = "Moon Astro"
 DEFAULT_SCAN_INTERVAL = 300  # seconds
+DEFAULT_USE_HA_TZ = True
 DEFAULT_HIGH_PRECISION = False
+DEFAULT_EVENTS_REFRESH_FALLBACK = 86400  # seconds (24h)
+DEFAULT_EVENTS_STARTUP_DELAY = 180  # seconds
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_LAT = "latitude"
 CONF_LON = "longitude"
 CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
 CONF_HIGH_PRECISION = "high_precision"
+CONF_EVENTS_REFRESH_FALLBACK = "events_refresh_fallback"
 
-# High precision computation parameters
+# Precision computation parameters
 HIGH_PRECISION_STEP_HOURS = 1.0
 HIGH_PRECISION_BRACKET_EXPAND = 2
+HIGH_PRECISION_BRACKETS_TO_REFINE = 6
+STANDARD_PRECISION_STEP_HOURS = 2.0
+STANDARD_PRECISION_BRACKET_EXPAND = 1
 
 # Files and external resources
 CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
+
+# Internal hass.data keys used by the integration to store entry runtime objects.
+DATA_COORDINATOR = "coordinator"
+DATA_EVENTS_COORDINATOR = "events_coordinator"
 
 # Moon phase codes from Skyfield almanac (integers)
 DARK_MOON = 0

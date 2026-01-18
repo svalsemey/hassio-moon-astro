@@ -32,18 +32,19 @@
         "step": {
             "init": {
                 "title": "خيارات قمر أسترو",
-                "description": "اضبط فترة تحديث المستشعرات وطريقة التعامل مع المنطقة الزمنية.\n\nيقلّل وضع الدقّة العالية من تذبذب الطوابع الزمنية، لكنه يزيد من استخدام وحدة المعالجة المركزية لأنه يستخدم خطوة أخذ عينات أدق ونطاق تحسين أوسع. لا يُنصح بتفعيل هذا الخيار على الأجهزة منخفضة القدرة مثل Raspberry Pi.",
+                "description": "اضبط فترة تحديث المستشعرات ومعالجة المنطقة الزمنية.\n\nيقلّل وضع الدقة العالية من تذبذب الطوابع الزمنية، لكنه يزيد من استخدام المعالج لأنه يستخدم خطوة أخذ عينات أدق ونطاق تحسين أوسع. لا يُنصح به على الأجهزة منخفضة الطاقة مثل Raspberry Pi.\n\nتفرض فترة التحديث الاحتياطية للأحداث تحديثًا دوريًا للمستشعرات المعتمدة على الأحداث (الأطوار التالية/السابقة، الأوج/الحضيض، الأبراج عند الاقترانات القمرية) في حال فُقد التحديث المجدول حول الحدث التالي (إعادة تشغيل، تغيير الوقت، تأخير). القيم الأقل تُحدّث بشكل أكثر تكرارًا؛ القيم الأعلى تقلّل استخدام المعالج.",
                 "data": {
                     "scan_interval": "فاصل تحديث المستشعرات (بالثواني)",
                     "use_ha_timezone": "استخدام المنطقة الزمنية لـ Home Assistant",
-                    "high_precision": "وضع الدقّة العالية"
+                    "high_precision": "وضع الدقّة العالية",
+                    "events_refresh_fallback": "فترة التحديث الاحتياطية للأحداث (ثوانٍ)"
                 }
             }
         }
     },
     "entity": {
         "binary_sensor": {
-            "binary_above_horizon": {
+            "above_horizon": {
                 "name": "فوق الأفق",
                 "state": {
                     "on": "فوق الأفق",
@@ -52,7 +53,7 @@
             }
         },
         "sensor": {
-            "sensor_phase": {
+            "phase": {
                 "name": "الطور",
                 "state": {
                     "new_moon": "المحاق",
@@ -66,55 +67,55 @@
                     "unknown": "غير معروف"
                 }
             },
-            "sensor_azimuth": {
+            "azimuth": {
                 "name": "السمت"
             },
-            "sensor_elevation": {
+            "elevation": {
                 "name": "الارتفاع الزاوي"
             },
-            "sensor_illumination": {
+            "illumination": {
                 "name": "الإضاءة"
             },
-            "sensor_distance": {
+            "distance": {
                 "name": "المسافة"
             },
-            "sensor_parallax": {
+            "parallax": {
                 "name": "اختلاف المنظر"
             },
-            "sensor_ecliptic_longitude_topocentric": {
+            "ecliptic_longitude_topocentric": {
                 "name": "خط الطول الكسوفي (موضعي)"
             },
-            "sensor_ecliptic_latitude_topocentric": {
+            "ecliptic_latitude_topocentric": {
                 "name": "خط العرض الكسوفي (موضعي)"
             },
-            "sensor_ecliptic_longitude_geocentric": {
+            "ecliptic_longitude_geocentric": {
                 "name": "خط الطول الكسوفي (مركزي أرضي)"
             },
-            "sensor_ecliptic_latitude_geocentric": {
+            "ecliptic_latitude_geocentric": {
                 "name": "خط العرض الكسوفي (مركزي أرضي)"
             },
-            "sensor_next_rise": {
+            "next_rise": {
                 "name": "موعد الشروق التالي"
             },
-            "sensor_next_set": {
+            "next_set": {
                 "name": "موعد الغروب التالي"
             },
-            "sensor_next_apogee": {
+            "next_apogee": {
                 "name": "الأوج التالي"
             },
-            "sensor_next_perigee": {
+            "next_perigee": {
                 "name": "الحضيض التالي"
             },
-            "sensor_next_new_moon": {
+            "next_new_moon": {
                 "name": "المحاق التالي"
             },
-            "sensor_next_first_quarter": {
+            "next_first_quarter": {
                 "name": "التربيع الأول التالي"
             },
-            "sensor_next_full_moon": {
+            "next_full_moon": {
                 "name": "البدر التالي"
             },
-            "sensor_next_full_moon_name": {
+            "next_full_moon_name": {
                 "name": "اسم البدر القادم",
                 "state": {
                     "wolf_moon": "قمر الذئب",
@@ -133,7 +134,7 @@
                     "unknown": "غير معروف"
                 }
             },
-            "sensor_next_full_moon_alt_names": {
+            "next_full_moon_alt_names": {
                 "name": "أسماء بديلة للبدر القادم",
                 "state": {
                     "wolf_moon_alt_names": "قمر ما بعد يول, قمر البقاء في المنزل, القمر الهادئ, القمر القاسي, القمر المركزي",
@@ -151,32 +152,32 @@
                     "unknown": ""
                 }
             },
-            "sensor_next_last_quarter": {
+            "next_last_quarter": {
                 "name": "التربيع الأخير التالي"
             },
 
-            "sensor_previous_rise": {
+            "previous_rise": {
                 "name": "موعد الشروق السابق"
             },
-            "sensor_previous_set": {
+            "previous_set": {
                 "name": "موعد الغروب السابق"
             },
-            "sensor_previous_apogee": {
+            "previous_apogee": {
                 "name": "الأوج السابق"
             },
-            "sensor_previous_perigee": {
+            "previous_perigee": {
                 "name": "الحضيض السابق"
             },
-            "sensor_previous_new_moon": {
+            "previous_new_moon": {
                 "name": "المحاق السابق"
             },
-            "sensor_previous_first_quarter": {
+            "previous_first_quarter": {
                 "name": "التربيع الأول السابق"
             },
-            "sensor_previous_full_moon": {
+            "previous_full_moon": {
                 "name": "البدر السابق"
             },
-            "sensor_previous_full_moon_name": {
+            "previous_full_moon_name": {
                 "name": "اسم البدر السابق",
                 "state": {
                     "wolf_moon": "قمر الذئب",
@@ -195,7 +196,7 @@
                     "unknown": "غير معروف"
                 }
             },
-            "sensor_previous_full_moon_alt_names": {
+            "previous_full_moon_alt_names": {
                 "name": "أسماء بديلة للبدر السابق",
                 "state": {
                     "wolf_moon_alt_names": "قمر ما بعد يول, قمر البقاء في المنزل, القمر الهادئ, القمر القاسي, القمر المركزي",
@@ -213,36 +214,36 @@
                     "unknown": ""
                 }
             },
-            "sensor_previous_last_quarter": {
+            "previous_last_quarter": {
                 "name": "التربيع الأخير السابق"
             },
 
-            "sensor_ecliptic_longitude_next_full_moon": {
+            "ecliptic_longitude_next_full_moon": {
                 "name": "خط الطول الكسوفي عند البدر التالي"
             },
-            "sensor_ecliptic_latitude_next_full_moon": {
+            "ecliptic_latitude_next_full_moon": {
                 "name": "خط العرض الكسوفي عند البدر التالي"
             },
-            "sensor_ecliptic_longitude_next_new_moon": {
+            "ecliptic_longitude_next_new_moon": {
                 "name": "خط الطول الكسوفي عند المحاق التالي"
             },
-            "sensor_ecliptic_latitude_next_new_moon": {
+            "ecliptic_latitude_next_new_moon": {
                 "name": "خط العرض الكسوفي عند المحاق التالي"
             },
-            "sensor_ecliptic_longitude_previous_full_moon": {
+            "ecliptic_longitude_previous_full_moon": {
                 "name": "خط الطول الكسوفي عند البدر السابق"
             },
-            "sensor_ecliptic_latitude_previous_full_moon": {
+            "ecliptic_latitude_previous_full_moon": {
                 "name": "خط العرض الكسوفي عند البدر السابق"
             },
-            "sensor_ecliptic_longitude_previous_new_moon": {
+            "ecliptic_longitude_previous_new_moon": {
                 "name": "خط الطول الكسوفي عند المحاق السابق"
             },
-            "sensor_ecliptic_latitude_previous_new_moon": {
+            "ecliptic_latitude_previous_new_moon": {
                 "name": "خط العرض الكسوفي عند المحاق السابق"
             },
 
-            "sensor_zodiac_sign_current_moon": {
+            "zodiac_sign_current_moon": {
                 "name": "برج البروج (الحالي)",
                 "state": {
                     "aries": "الحمل",
@@ -259,7 +260,7 @@
                     "pisces": "الحوت"
                 }
             },
-            "sensor_zodiac_sign_next_new_moon": {
+            "zodiac_sign_next_new_moon": {
                 "name": "برج البروج عند المحاق التالي",
                 "state": {
                     "aries": "الحمل",
@@ -276,7 +277,7 @@
                     "pisces": "الحوت"
                 }
             },
-            "sensor_zodiac_sign_next_full_moon": {
+            "zodiac_sign_next_full_moon": {
                 "name": "برج البروج عند البدر التالي",
                 "state": {
                     "aries": "الحمل",
@@ -293,7 +294,7 @@
                     "pisces": "الحوت"
                 }
             },
-            "sensor_zodiac_sign_previous_new_moon": {
+            "zodiac_sign_previous_new_moon": {
                 "name": "برج البروج عند المحاق السابق",
                 "state": {
                     "aries": "الحمل",
@@ -310,7 +311,7 @@
                     "pisces": "الحوت"
                 }
             },
-            "sensor_zodiac_sign_previous_full_moon": {
+            "zodiac_sign_previous_full_moon": {
                 "name": "برج البروج عند البدر السابق",
                 "state": {
                     "aries": "الحمل",
@@ -327,19 +328,19 @@
                     "pisces": "الحوت"
                 }
             },
-            "sensor_zodiac_degree_current_moon": {
+            "zodiac_degree_current_moon": {
                 "name": "درجة البروج (الحالية)"
             },
-            "sensor_zodiac_degree_next_new_moon": {
+            "zodiac_degree_next_new_moon": {
                 "name": "درجة البروج عند المحاق التالي"
             },
-            "sensor_zodiac_degree_next_full_moon": {
+            "zodiac_degree_next_full_moon": {
                 "name": "درجة البروج عند البدر التالي"
             },
-            "sensor_zodiac_degree_previous_new_moon": {
+            "zodiac_degree_previous_new_moon": {
                 "name": "درجة البروج عند المحاق السابق"
             },
-            "sensor_zodiac_degree_previous_full_moon": {
+            "zodiac_degree_previous_full_moon": {
                 "name": "درجة البروج عند البدر السابق"
             }
         }
