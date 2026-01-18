@@ -91,7 +91,7 @@ Options are available via **Configure** on the integration:
   When enabled, the integration uses Home Assistant’s configured time zone for timestamps and event calculations.
 
 - **High precision mode**
-  Default: true
+  Default: false
   Reduces timestamp variability but increases CPU usage due to finer sampling and wider refinement.
 
 ## Localization
