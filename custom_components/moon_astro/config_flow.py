@@ -21,6 +21,7 @@ from .const import (
     CONF_LON,
     CONF_SCAN_INTERVAL,
     CONF_USE_HA_TZ,
+    DEFAULT_HIGH_PRECISION,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
@@ -230,7 +231,7 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema = vol.Schema(
             {
-                vol.Optional(CONF_HIGH_PRECISION, default=True): bool,
+                vol.Optional(CONF_HIGH_PRECISION, default=DEFAULT_HIGH_PRECISION): bool,
             }
         )
         return self.async_show_form(step_id="precision", data_schema=schema)
