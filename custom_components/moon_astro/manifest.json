@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/svalsemey/hassio-moon-astro/issues",
   "loggers": ["custom_components.moon_astro", "skyfield", "timezonefinder"],
   "requirements": ["skyfield>=1.53", "timezonefinder>=5.2.0,<6.0.0"],
-  "version": "0.2.8"
+  "version": "0.2.9"
 }

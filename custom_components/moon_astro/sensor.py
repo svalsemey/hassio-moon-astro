@@ -12,7 +12,11 @@ import logging
 import math
 from typing import Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    RestoreSensor,
+    SensorDeviceClass,
+    SensorEntity,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -81,6 +85,27 @@ from .coordinator import MoonAstroCoordinator, MoonAstroEventsCoordinator
 from .utils import get_entry_coordinators, get_entry_device_info
 
 _LOGGER = logging.getLogger(__name__)
+_UNSET: Any = object()
+
+
+def _debug_value(value: Any) -> str:
+    """Return a compact debug representation for logs.
+
+    Args:
+        value: Any Python value.
+
+    Returns:
+        A compact string representation suitable for debug logs.
+    """
+    if value is None:
+        return "None"
+    if isinstance(value, datetime):
+        return f"datetime({value.isoformat()})"
+    if isinstance(value, float):
+        if math.isnan(value):
+            return "float(nan)"
+        return f"float({value})"
+    return f"{type(value).__name__}({value!r})"
 
 
 @dataclass(frozen=True)
@@ -619,7 +644,9 @@ async def async_setup_entry(
 
 
 class MoonAstroSensor(
-    CoordinatorEntity[MoonAstroCoordinator | MoonAstroEventsCoordinator], SensorEntity
+    CoordinatorEntity[MoonAstroCoordinator | MoonAstroEventsCoordinator],
+    RestoreSensor,
+    SensorEntity,
 ):
     """Generic sensor bound to a coordinator value.
 
@@ -667,7 +694,9 @@ class MoonAstroSensor(
         self._attr_suggested_display_precision = suggested_display_precision
         self._attr_suggested_object_id = suggested_object_id
 
-        self._last_written_native_value: Any = object()
+        self._last_written_native_value: Any = _UNSET
+        self._is_event_based: bool = isinstance(coordinator, MoonAstroEventsCoordinator)
+        self._has_written_state: bool = False
 
     @property
     def translation_key(self) -> str | None:
@@ -711,22 +740,101 @@ class MoonAstroSensor(
     def _compute_native_value(self) -> Any:
         """Compute the current native value without triggering a state write.
 
+        For event-based sensors, this method preserves the last written value when the
+        coordinator has no data yet (startup/reload) or when the expected key is missing.
+        This prevents overwriting a valid restored state with an unknown value.
+
         Returns:
             The computed native value, already normalized for the entity device class.
         """
-        data = self.coordinator.data or {}
-        value = data.get(self._key)
-        if value is None:
-            _LOGGER.debug(
-                "Sensor value missing: key=%s coordinator=%s has_data=%s",
-                self._key,
-                type(self.coordinator).__name__,
-                bool(self.coordinator.data),
+        data = self.coordinator.data
+        if data is None:
+            fallback = (
+                None
+                if not self._is_event_based
+                else (
+                    None
+                    if self._last_written_native_value is _UNSET
+                    else self._last_written_native_value
+                )
             )
+            _LOGGER.debug(
+                "Sensor compute: key=%s event_based=%s coordinator=%s data=None fallback=%s",
+                self._key,
+                self._is_event_based,
+                type(self.coordinator).__name__,
+                _debug_value(fallback),
+            )
+            return fallback
+
+        if self._key not in data and self._is_event_based:
+            fallback = (
+                None
+                if self._last_written_native_value is _UNSET
+                else self._last_written_native_value
+            )
+            _LOGGER.debug(
+                "Sensor compute: key=%s event_based=%s coordinator=%s key_missing fallback=%s data_keys_count=%s",
+                self._key,
+                self._is_event_based,
+                type(self.coordinator).__name__,
+                _debug_value(fallback),
+                len(data),
+            )
+            return fallback
+
+        value = data.get(self._key)
+
+        if value is None and self._is_event_based:
+            fallback = (
+                None
+                if self._last_written_native_value is _UNSET
+                else self._last_written_native_value
+            )
+            _LOGGER.debug(
+                "Sensor compute: key=%s event_based=%s coordinator=%s value=None fallback=%s",
+                self._key,
+                self._is_event_based,
+                type(self.coordinator).__name__,
+                _debug_value(fallback),
+            )
+            return fallback
 
         if self.device_class == SensorDeviceClass.TIMESTAMP:
-            return _parse_timestamp_to_utc(value)
+            parsed = _parse_timestamp_to_utc(value)
+            if parsed is None and self._is_event_based:
+                fallback = (
+                    None
+                    if self._last_written_native_value is _UNSET
+                    else self._last_written_native_value
+                )
+                _LOGGER.debug(
+                    "Sensor compute: key=%s event_based=%s coordinator=%s timestamp_parse_failed raw=%s fallback=%s",
+                    self._key,
+                    self._is_event_based,
+                    type(self.coordinator).__name__,
+                    _debug_value(value),
+                    _debug_value(fallback),
+                )
+                return fallback
 
+            _LOGGER.debug(
+                "Sensor compute: key=%s event_based=%s coordinator=%s timestamp_ok raw=%s parsed=%s",
+                self._key,
+                self._is_event_based,
+                type(self.coordinator).__name__,
+                _debug_value(value),
+                _debug_value(parsed),
+            )
+            return parsed
+
+        _LOGGER.debug(
+            "Sensor compute: key=%s event_based=%s coordinator=%s value=%s",
+            self._key,
+            self._is_event_based,
+            type(self.coordinator).__name__,
+            _debug_value(value),
+        )
         return value
 
     @property
@@ -738,6 +846,78 @@ class MoonAstroSensor(
         """
         return self._compute_native_value()
 
+    def _compute_native_value_from_state(self, state: str) -> Any:
+        """Convert a restored state string into the entity native type.
+
+        Args:
+            state: Stored state string from the recorder.
+
+        Returns:
+            A native value matching the entity device_class, or None if conversion fails.
+        """
+        if self.device_class == SensorDeviceClass.TIMESTAMP:
+            return _parse_timestamp_to_utc(state)
+
+        # Try to restore numeric values as floats when it is safe to do so.
+        try:
+            return float(state)
+        except (TypeError, ValueError):
+            return state
+
+    async def async_added_to_hass(self) -> None:
+        """Handle entity which will be added to Home Assistant.
+
+        Event-based sensors restore their last known value on startup so they do not
+        temporarily show unknown while waiting for the first coordinator refresh.
+
+        Returns:
+            None.
+        """
+        await super().async_added_to_hass()
+
+        if not self._is_event_based:
+            _LOGGER.debug(
+                "Sensor added: key=%s event_based=%s coordinator=%s (no restore path)",
+                self._key,
+                self._is_event_based,
+                type(self.coordinator).__name__,
+            )
+            return
+
+        last_state = await self.async_get_last_state()
+        if last_state is None:
+            _LOGGER.debug(
+                "Sensor restore: key=%s coordinator=%s last_state=None",
+                self._key,
+                type(self.coordinator).__name__,
+            )
+            return
+
+        restored = self._compute_native_value_from_state(last_state.state)
+        if restored is None:
+            _LOGGER.debug(
+                "Sensor restore: key=%s coordinator=%s raw_state=%r restored=None",
+                self._key,
+                type(self.coordinator).__name__,
+                last_state.state,
+            )
+            return
+
+        self._last_written_native_value = restored
+        self._has_written_state = True
+
+        _LOGGER.debug(
+            "Sensor restore: key=%s coordinator=%s raw_state=%r restored=%s (writing state)",
+            self._key,
+            type(self.coordinator).__name__,
+            last_state.state,
+            _debug_value(restored),
+        )
+
+        # Ensure the restored state is published immediately to avoid a startup race
+        # where Home Assistant reads native_value before restoration completes.
+        self.async_write_ha_state()
+
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator.
 
@@ -746,16 +926,41 @@ class MoonAstroSensor(
         """
         new_value = self._compute_native_value()
 
+        if new_value is None and self._has_written_state:
+            _LOGGER.debug(
+                "Sensor update: key=%s coordinator=%s new=None preserved_last=%s",
+                self._key,
+                type(self.coordinator).__name__,
+                _debug_value(self._last_written_native_value),
+            )
+            return
+
+        _LOGGER.debug(
+            "Sensor update: key=%s coordinator=%s old=%s new=%s",
+            self._key,
+            type(self.coordinator).__name__,
+            _debug_value(self._last_written_native_value)
+            if self._last_written_native_value is not _UNSET
+            else "sentinel",
+            _debug_value(new_value),
+        )
+
         tol: float | None = None
         if isinstance(new_value, float) and isinstance(
             self._last_written_native_value, float
         ):
             tol = self._float_write_tolerance()
+            _LOGGER.debug(
+                "Sensor update: key=%s float_tolerance=%s",
+                self._key,
+                tol,
+            )
 
         if _values_equal(self._last_written_native_value, new_value, tol=tol):
             return
 
         self._last_written_native_value = new_value
+        self._has_written_state = new_value is not None
         self.async_write_ha_state()
 
     def _icon_for_phase(self) -> str | None:
