@@ -2983,6 +2983,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._high_precision: bool = DEFAULT_HIGH_PRECISION
 
         self._unsub_next_event: Callable[[], None] | None = None
+        self._next_refresh_utc: datetime | None = None
 
         # Dedicated executor to avoid monopolizing Home Assistant's shared thread pool.
         # A single worker enforces determinism and prevents concurrent heavy computations.
@@ -3082,6 +3083,18 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(self._executor, func)
 
+    @property
+    def next_refresh_utc(self) -> datetime | None:
+        """Return the next scheduled refresh time in UTC.
+
+        This timestamp represents when the coordinator expects to refresh event-based
+        values next (either after the next event boundary or via the periodic fallback).
+
+        Returns:
+            A timezone-aware UTC datetime, or None if not scheduled.
+        """
+        return self._next_refresh_utc
+
     def _cancel_next_event_timer(self) -> None:
         """Cancel the scheduled next event refresh timer.
 
@@ -3091,6 +3104,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if self._unsub_next_event is not None:
             self._unsub_next_event()
             self._unsub_next_event = None
+        self._next_refresh_utc = None
 
     def _schedule_next_event_refresh(self, data: dict[str, Any]) -> None:
         """Schedule a refresh shortly after the next computed astronomical event.
@@ -3118,6 +3132,11 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             candidates.append(dt)
 
         if not candidates:
+            interval = self.update_interval
+            if interval is not None:
+                self._next_refresh_utc = datetime.now(UTC) + interval
+            else:
+                self._next_refresh_utc = None
             return
 
         next_dt = min(candidates)
@@ -3134,6 +3153,8 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         now = datetime.now(UTC)
         if when <= now:
             when = now + timedelta(seconds=30)
+
+        self._next_refresh_utc = when.astimezone(UTC)
 
         def _cb(_: datetime) -> None:
             """Callback scheduled at the next event boundary.
@@ -3270,6 +3291,10 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._async_run_refresh_job(),
             name=f"{DOMAIN}-events-refresh",
         )
+
+        interval = self.update_interval
+        if interval is not None and self._next_refresh_utc is None:
+            self._next_refresh_utc = datetime.now(UTC) + interval
 
         return self.data or {}
 

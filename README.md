@@ -61,6 +61,16 @@ Event-based sensors are refreshed automatically shortly after the earliest upcom
 
 A small safety offset is applied when scheduling the refresh to avoid edge instability exactly at the boundary.
 
+### `next_update` attribute for event-based sensors
+
+All **event-based sensors** expose an extra state attribute named `next_update`.
+
+- `next_update` is a UTC timestamp indicating the **scheduled time of the next event-based refresh**.
+- When an event-boundary refresh is scheduled (for example after the next phase boundary or apsis), `next_update` reflects that planned refresh time.
+- If no event-boundary refresh can be determined, `next_update` falls back to the next refresh time derived from the configured **Events refresh fallback interval**.
+
+This attribute can be used in automations to anticipate the next time event-based values will be recalculated.
+
 ### Events refresh fallback interval
 
 Event-based sensors normally refresh automatically shortly after the next computed event time. The **Events refresh fallback interval (seconds)** acts as a safety net by forcing a periodic refresh of event-based sensors if the scheduled refresh is missed (for example after a restart, a time change, or a system delay).
@@ -165,10 +175,6 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
   - Check Logs → “Moon Astro” for errors.
   - Ensure your HA location and elevation are set.
   - Verify ephemeris download completed (see `<config>/.skyfield` content).
-
-- Event-based sensors are temporarily unavailable after startup:
-  - This is an expected behavior, because event-based sensors are refreshed after a startup delay.
-  - Check logs for “Deferring event-based sensors initial refresh…” messages and wait for the first scheduled refresh.
 
 - Time zone issues:
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
