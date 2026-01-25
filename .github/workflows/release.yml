@@ -19,7 +19,7 @@ jobs:
       - name: Adjust version number
         shell: bash
         run: |
-          yq -i -o json '.version="${{ github.ref_name }}" | sub("^v"; "")' \
+          yq -i -o json '.version = "${{ github.ref_name }}" | .version |= sub("^v"; "")' \
             "${{ github.workspace }}/custom_components/moon_astro/manifest.json"
 
       - name: Create ZIP archive
