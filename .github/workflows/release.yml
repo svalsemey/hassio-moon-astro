@@ -33,3 +33,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: custom_components/moon_astro.zip
+          overwrite: true
