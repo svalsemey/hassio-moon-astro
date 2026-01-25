@@ -9,6 +9,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: release-${{ github.ref_name }}
+      cancel-in-progress: true
+
     permissions:
       contents: write
 
@@ -33,4 +37,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: custom_components/moon_astro.zip
-          overwrite: true
+          overwrite_files: true
