@@ -846,6 +846,34 @@ class MoonAstroSensor(
         """
         return self._compute_native_value()
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        """Return extra attributes for the entity.
+
+        Returns:
+            A dict of extra attributes, or None when no extra attributes are exposed.
+        """
+        next_update = self._next_update_attr()
+        if next_update is None:
+            return None
+
+        return {"next_update": next_update}
+
+    def _next_update_attr(self) -> datetime | None:
+        """Return the next scheduled update time for event-based sensors.
+
+        Returns:
+            A timezone-aware UTC datetime, or None if not available or not event-based.
+        """
+        if not self._is_event_based:
+            return None
+
+        coordinator = self.coordinator
+        if isinstance(coordinator, MoonAstroEventsCoordinator):
+            return coordinator.next_refresh_utc
+
+        return None
+
     def _compute_native_value_from_state(self, state: str) -> Any:
         """Convert a restored state string into the entity native type.
 
