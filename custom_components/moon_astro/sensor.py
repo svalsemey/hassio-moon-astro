@@ -1121,8 +1121,7 @@ class MoonAstroSensor(
         ):
             return None
 
-        data = self.coordinator.data or {}
-        raw = data.get(self._key)
+        raw = self.native_value
         sign = str(raw).strip().lower() if raw is not None else ""
 
         zodiac_icons: dict[str, str] = {
@@ -1140,7 +1139,7 @@ class MoonAstroSensor(
             "pisces": "mdi:zodiac-pisces",
         }
 
-        return zodiac_icons.get(sign, "mdi:zodiac-aquarius")
+        return zodiac_icons.get(sign)
 
     @property
     def icon(self) -> str | None:
