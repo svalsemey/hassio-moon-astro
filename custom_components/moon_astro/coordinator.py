@@ -3093,7 +3093,14 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Returns:
             A timezone-aware UTC datetime, or None if not scheduled.
         """
-        return self._next_refresh_utc
+        if self._next_refresh_utc is not None:
+            return self._next_refresh_utc
+
+        interval = self.update_interval
+        if interval is None:
+            return None
+
+        return datetime.now(UTC) + interval
 
     def _cancel_next_event_timer(self) -> None:
         """Cancel the scheduled next event refresh timer.

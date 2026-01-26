@@ -853,11 +853,10 @@ class MoonAstroSensor(
         Returns:
             A dict of extra attributes, or None when no extra attributes are exposed.
         """
-        next_update = self._next_update_attr()
-        if next_update is None:
+        if not self._is_event_based:
             return None
 
-        return {"next_update": next_update}
+        return {"next_update": self._next_update_attr()}
 
     def _next_update_attr(self) -> datetime | None:
         """Return the next scheduled update time for event-based sensors.
