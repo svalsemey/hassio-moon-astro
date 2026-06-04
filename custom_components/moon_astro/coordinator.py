@@ -274,7 +274,7 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
     else:
         try:
             dt_utc = dt_utc_raw.item() if hasattr(dt_utc_raw, "item") else dt_utc_raw[0]
-        except (IndexError, TypeError, AttributeError):
+        except IndexError, TypeError, AttributeError:
             dt_utc = datetime.fromisoformat(str(dt_utc_raw))
 
     if dt_utc.tzinfo is None:
@@ -300,7 +300,7 @@ def _parse_iso_to_utc(value: Any) -> datetime | None:
     else:
         try:
             dt = datetime.fromisoformat(str(value))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return None
 
     if dt.tzinfo is None:
@@ -377,7 +377,7 @@ def _geocentric_vector(eph: Ephemeris, t: Time) -> Apparent:
 # ---------- High-accuracy nutation (IAU 1980: full 106-term) and ecliptic-of-date ----------
 
 
-def _julian_centuries_TT_from_tt(tt: float) -> float:
+def _julian_centuries_tt_from_tt(tt: float) -> float:
     """Convert TT Julian Date to Julian centuries since J2000.0.
 
     Args:
@@ -642,7 +642,7 @@ def _true_obliquity_rad(tt: float) -> float:
     Returns:
         True obliquity in radians (mean + nutation in obliquity).
     """
-    T = _julian_centuries_TT_from_tt(tt)
+    T = _julian_centuries_tt_from_tt(tt)
     Lm, Ls, F, D, Om = _fundamental_arguments_deg(T)
     _dpsi_as, deps_as = _nutation_iau1980(T, Lm, Ls, F, D, Om)
     eps0_as = _mean_obliquity_arcsec(T)
@@ -3174,7 +3174,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             """
             _LOGGER.debug("Events scheduler: triggering refresh task")
             self._unsub_next_event = None
-            self._hass.async_create_task(self.async_request_refresh())
+            self._hass.create_task(self.async_request_refresh())
 
         _LOGGER.debug(
             "Events scheduler: scheduling refresh at when_utc=%s (now_utc=%s)",
