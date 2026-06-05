@@ -160,7 +160,7 @@ If you notice that a translation is incomplete or inaccurate, contributions are 
 - Home Assistant 2024.4+ (implies Python 3.12)
 - Python dependencies are installed automatically by HA:
   - skyfield>=1.53
-  - timezonefinder>=6.2.0
+  - timezonefinder>=8.2.4,<8.3.0
 
 Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on first run. These files are cached for later use.
 
