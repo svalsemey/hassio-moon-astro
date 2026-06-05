@@ -1,4 +1,8 @@
-![Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/total)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-blue?style=flat&logo=homeassistantcommunitystore&logoSize=auto)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svalsemey&repository=hassio-moon-astro&category=plugin)
+[![HACS Passing](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml/badge.svg)](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml)
+[![Total Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases)
+[![Latest Release Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/latest/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases/latest)
+
 # Moon Astro
 
 High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, lunation timestamps (next and previous), apogee/perigee, and zodiac information.
@@ -109,6 +113,9 @@ When configuring the integration, choose an interval that matches your needs:
 ## Installation
 
 HACS (recommended):
+
+[![Add this integration to Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svalsemey&repository=hassio-moon-astro&category=integration)
+
 1. In HACS → Integrations → Custom repositories, add `https://github.com/svalsemey/hassio-moon-astro/` as type “Integration”.
 2. Install “Moon Astro”.
 3. Restart Home Assistant and add the integration from Devices & Services.
