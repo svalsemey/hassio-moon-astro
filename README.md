@@ -1,3 +1,4 @@
+![Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/total)
 # Moon Astro
 
 High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, lunation timestamps (next and previous), apogee/perigee, and zodiac information.
