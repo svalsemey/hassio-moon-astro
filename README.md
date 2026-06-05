@@ -112,15 +112,19 @@ When configuring the integration, choose an interval that matches your needs:
 
 ## Installation
 
-HACS (recommended):
+### HACS (recommended)
+
+Use this link to directly go to the repository in HACS
 
 [![Add this integration to Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svalsemey&repository=hassio-moon-astro&category=integration)
+
+or
 
 1. In HACS → Integrations → Custom repositories, add `https://github.com/svalsemey/hassio-moon-astro/` as type “Integration”.
 2. Install “Moon Astro”.
 3. Restart Home Assistant and add the integration from Devices & Services.
 
-Manual install:
+### Manual install
 1. Download or clone the repository.
 2. Copy the folder `custom_components/moon_astro` to your Home Assistant config directory:
    - Final path: `<config>/custom_components/moon_astro`
