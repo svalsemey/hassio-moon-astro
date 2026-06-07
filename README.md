@@ -170,9 +170,12 @@ If you notice that a translation is incomplete or inaccurate, contributions are 
 ## Requirements
 
 - Home Assistant 2024.4+ (implies Python 3.12)
-- Python dependencies are installed automatically by HA:
-  - skyfield>=1.53
-  - timezonefinder>=8.2.4,<8.3.0
+- Python dependencies are installed automatically by Home Assistant:
+  - `skyfield>=1.53`
+  - `timezonefinder>=8.2.4,<8.3.0` on supported desktop/server platforms such as `x86_64`, `AMD64`, and `arm64`
+  - `timezonefinder>=5.2.0,<6.0.0` on Raspberry Pi / Linux ARM platforms such as `aarch64`, `armv8l`, `armv7l`, and `armv6l`
+
+Moon Astro keeps `timezonefinder` available on Raspberry Pi by using the older compatible 5.x branch on Linux ARM platforms, while using the newer 8.x branch where compatible wheels are available.
 
 Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on first run. These files are cached for later use.
 
@@ -190,6 +193,12 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
 
 - Time zone issues:
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
+
+- Dependency installation fails on Raspberry Pi:
+  - Make sure you are running the latest Moon Astro release.
+  - Raspberry Pi / Linux ARM platforms use `timezonefinder>=5.2.0,<6.0.0` for compatibility.
+  - Desktop/server platforms such as `x86_64`, `AMD64`, and `arm64` use `timezonefinder>=8.2.4,<8.3.0`.
+  - If the issue persists after updating, restart Home Assistant and check the logs for the exact `platform_machine` value reported by your environment.
 
 - CPU usage is high:
   - Disable “High precision mode”.
