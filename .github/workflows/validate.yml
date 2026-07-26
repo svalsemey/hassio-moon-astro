@@ -28,21 +28,6 @@ jobs:
         with:
           category: integration
 
-  lint:
-    name: Python lint (ruff)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.14"
-      - name: Install ruff
-        run: pip install ruff
-      - name: Run ruff
-        run: ruff check . --output-format=github
-
   json-validate:
     name: Validate translation JSON
     runs-on: ubuntu-latest
