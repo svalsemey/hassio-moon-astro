@@ -274,7 +274,7 @@ def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
     else:
         try:
             dt_utc = dt_utc_raw.item() if hasattr(dt_utc_raw, "item") else dt_utc_raw[0]
-        except IndexError, TypeError, AttributeError:
+        except (IndexError, TypeError, AttributeError):
             dt_utc = datetime.fromisoformat(str(dt_utc_raw))
 
     if dt_utc.tzinfo is None:
@@ -300,7 +300,7 @@ def _parse_iso_to_utc(value: Any) -> datetime | None:
     else:
         try:
             dt = datetime.fromisoformat(str(value))
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return None
 
     if dt.tzinfo is None:
