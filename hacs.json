@@ -1,4 +1,6 @@
 {
     "name": "Moon Astro",
-    "render_readme": true
+    "zip_release": true,
+    "render_readme": true,
+    "filename": "moon_astro.zip"
 }
