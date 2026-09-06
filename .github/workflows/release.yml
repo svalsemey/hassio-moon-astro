@@ -1,0 +1,156 @@
+name: Release (validated, HACS zip_release)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  INTEGRATION_PATH: custom_components/moon_astro
+  ZIP_NAME: moon_astro.zip
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate tag / manifest / hacs.json
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          tag = os.environ.get("GITHUB_REF_NAME", "")
+          integration_path = Path(os.environ["INTEGRATION_PATH"])
+          zip_name = os.environ["ZIP_NAME"]
+
+          # 1) Tag format
+          # Accepts: v1.2.3, v1.2.3-beta1, v1.2.3-rc.1
+          if not re.fullmatch(r"v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", tag):
+              print(f"❌ Invalid tag format: {tag}")
+              print("Expected: vX.Y.Z or vX.Y.Z-suffix")
+              sys.exit(1)
+
+          expected_version = tag[1:]  # strip leading "v"
+
+          # 2) manifest.json version check
+          manifest_path = integration_path / "manifest.json"
+          if not manifest_path.exists():
+              print(f"❌ Missing manifest.json: {manifest_path}")
+              sys.exit(1)
+
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          manifest_version = str(manifest.get("version", "")).strip()
+          if manifest_version != expected_version:
+              print("❌ Version mismatch")
+              print(f"   Tag version      : {expected_version}")
+              print(f"   manifest version : {manifest_version}")
+              sys.exit(1)
+
+          # 3) hacs.json coherence
+          hacs_path = Path("hacs.json")
+          if not hacs_path.exists():
+              print("❌ Missing hacs.json at repository root")
+              sys.exit(1)
+
+          hacs = json.loads(hacs_path.read_text(encoding="utf-8"))
+          if hacs.get("zip_release") is not True:
+              print('❌ hacs.json must contain: "zip_release": true')
+              sys.exit(1)
+
+          hacs_filename = hacs.get("filename")
+          if hacs_filename != zip_name:
+              print("❌ hacs.json filename mismatch")
+              print(f"   Expected filename: {zip_name}")
+              print(f"   hacs.json value  : {hacs_filename}")
+              sys.exit(1)
+
+          # Basic source checks
+          required_files = [
+              integration_path / "__init__.py",
+              integration_path / "manifest.json",
+          ]
+          missing = [str(p) for p in required_files if not p.exists()]
+          if missing:
+              print("❌ Missing required files in integration folder:")
+              for m in missing:
+                  print(f"   - {m}")
+              sys.exit(1)
+
+          print("✅ Tag / manifest / hacs.json checks passed")
+          PY
+
+      - name: Build HACS release zip (flat root)
+        shell: bash
+        run: |
+            mkdir -p "${GITHUB_WORKSPACE}/dist"
+            cd "${INTEGRATION_PATH}"
+            zip -r "${GITHUB_WORKSPACE}/dist/${ZIP_NAME}" .
+
+      - name: Validate zip structure for HACS
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import sys
+          import zipfile
+
+          zip_path = f"dist/{os.environ['ZIP_NAME']}"
+
+          required_root_entries = {"__init__.py", "manifest.json"}
+
+          forbidden_prefixes = (
+              "custom_components/",
+              "./custom_components/",
+          )
+
+          with zipfile.ZipFile(zip_path, "r") as zf:
+              names = zf.namelist()
+
+          if not names:
+              print("❌ Zip is empty")
+              sys.exit(1)
+
+          # Must NOT embed custom_components/... in zip_release package
+          bad = [n for n in names if n.startswith(forbidden_prefixes)]
+          if bad:
+              print("❌ Zip contains forbidden prefixed paths for HACS zip_release:")
+              for n in bad[:20]:
+                  print("   -", n)
+              print("Expected files at archive root, e.g. __init__.py, manifest.json")
+              sys.exit(1)
+
+          # Required files at root
+          root_files = {n for n in names if "/" not in n.strip("/")}
+          missing = sorted(required_root_entries - root_files)
+          if missing:
+              print("❌ Required root files missing in zip:")
+              for m in missing:
+                  print("   -", m)
+              sys.exit(1)
+
+          print("✅ Zip structure valid for HACS zip_release")
+          PY
+
+      - name: Show artifact details
+        run: |
+          ls -lh dist
+          sha256sum "dist/${ZIP_NAME}"
+
+      - name: Create/Update GitHub Release with asset
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/${{ env.ZIP_NAME }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
