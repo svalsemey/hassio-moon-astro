@@ -20,7 +20,7 @@ jobs:
         platform: ["linux/amd64", "linux/arm64"]
     steps:
       - uses: actions/checkout@v7
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
 
       - name: Extract requirements from the manifest
         run: jq -r '.requirements[]' custom_components/moon_astro/manifest.json > requirements_manifest.txt
