@@ -4,10 +4,11 @@
   "codeowners": ["@svalsemey"],
   "config_flow": true,
   "documentation": "https://github.com/svalsemey/hassio-moon-astro",
-  "integration_type": "device",
+  "integration_type": "service",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/svalsemey/hassio-moon-astro/issues",
   "loggers": ["skyfield"],
   "requirements": ["skyfield==1.55"],
-  "version": "0.4.4"
+  "single_config_entry": true,
+  "version": "0.4.5"
 }

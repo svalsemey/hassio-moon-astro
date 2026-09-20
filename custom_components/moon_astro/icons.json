@@ -1,0 +1,155 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "above_horizon": {
+        "default": "mdi:chevron-down-circle-outline",
+        "state": {
+          "on": "mdi:chevron-up-circle",
+          "off": "mdi:chevron-down-circle-outline"
+        }
+      }
+    },
+    "sensor": {
+      "phase": {
+        "default": "mdi:moon-new",
+        "state": {
+          "new_moon": "mdi:moon-new",
+          "waxing_crescent": "mdi:moon-waxing-crescent",
+          "first_quarter": "mdi:moon-first-quarter",
+          "waxing_gibbous": "mdi:moon-waxing-gibbous",
+          "full_moon": "mdi:moon-full",
+          "waning_gibbous": "mdi:moon-waning-gibbous",
+          "last_quarter": "mdi:moon-last-quarter",
+          "waning_crescent": "mdi:moon-waning-crescent"
+        }
+      },
+      "azimuth": { "default": "mdi:angle-obtuse" },
+      "elevation": { "default": "mdi:angle-acute" },
+      "illumination": { "default": "mdi:weather-night" },
+      "distance": { "default": "mdi:ruler" },
+      "parallax": { "default": "mdi:circle-multiple" },
+      "ecliptic_longitude_topocentric": { "default": "mdi:longitude" },
+      "ecliptic_latitude_topocentric": { "default": "mdi:latitude" },
+      "ecliptic_longitude_geocentric": { "default": "mdi:longitude" },
+      "ecliptic_latitude_geocentric": { "default": "mdi:latitude" },
+      "next_rise": { "default": "mdi:arrow-up-circle" },
+      "next_set": { "default": "mdi:arrow-down-circle" },
+      "next_apogee": { "default": "mdi:orbit" },
+      "next_perigee": { "default": "mdi:orbit" },
+      "next_new_moon": { "default": "mdi:moon-new" },
+      "next_first_quarter": { "default": "mdi:moon-first-quarter" },
+      "next_full_moon": { "default": "mdi:moon-full" },
+      "next_last_quarter": { "default": "mdi:moon-last-quarter" },
+      "next_full_moon_name": { "default": "mdi:calendar-badge" },
+      "next_full_moon_alt_names": { "default": "mdi:calendar-badge" },
+      "previous_rise": { "default": "mdi:arrow-up-circle" },
+      "previous_set": { "default": "mdi:arrow-down-circle" },
+      "previous_apogee": { "default": "mdi:orbit" },
+      "previous_perigee": { "default": "mdi:orbit" },
+      "previous_new_moon": { "default": "mdi:moon-new" },
+      "previous_first_quarter": { "default": "mdi:moon-first-quarter" },
+      "previous_full_moon": { "default": "mdi:moon-full" },
+      "previous_last_quarter": { "default": "mdi:moon-last-quarter" },
+      "previous_full_moon_name": { "default": "mdi:calendar-badge" },
+      "previous_full_moon_alt_names": { "default": "mdi:calendar-badge" },
+      "ecliptic_longitude_next_full_moon": { "default": "mdi:longitude" },
+      "ecliptic_latitude_next_full_moon": { "default": "mdi:latitude" },
+      "ecliptic_longitude_next_new_moon": { "default": "mdi:longitude" },
+      "ecliptic_latitude_next_new_moon": { "default": "mdi:latitude" },
+      "ecliptic_longitude_previous_full_moon": { "default": "mdi:longitude" },
+      "ecliptic_latitude_previous_full_moon": { "default": "mdi:latitude" },
+      "ecliptic_longitude_previous_new_moon": { "default": "mdi:longitude" },
+      "ecliptic_latitude_previous_new_moon": { "default": "mdi:latitude" },
+      "zodiac_sign_current_moon": {
+        "default": "mdi:star-four-points-outline",
+        "state": {
+          "aries": "mdi:zodiac-aries",
+          "taurus": "mdi:zodiac-taurus",
+          "gemini": "mdi:zodiac-gemini",
+          "cancer": "mdi:zodiac-cancer",
+          "leo": "mdi:zodiac-leo",
+          "virgo": "mdi:zodiac-virgo",
+          "libra": "mdi:zodiac-libra",
+          "scorpio": "mdi:zodiac-scorpio",
+          "sagittarius": "mdi:zodiac-sagittarius",
+          "capricorn": "mdi:zodiac-capricorn",
+          "aquarius": "mdi:zodiac-aquarius",
+          "pisces": "mdi:zodiac-pisces"
+        }
+      },
+      "zodiac_sign_next_new_moon": {
+        "default": "mdi:star-four-points-outline",
+        "state": {
+          "aries": "mdi:zodiac-aries",
+          "taurus": "mdi:zodiac-taurus",
+          "gemini": "mdi:zodiac-gemini",
+          "cancer": "mdi:zodiac-cancer",
+          "leo": "mdi:zodiac-leo",
+          "virgo": "mdi:zodiac-virgo",
+          "libra": "mdi:zodiac-libra",
+          "scorpio": "mdi:zodiac-scorpio",
+          "sagittarius": "mdi:zodiac-sagittarius",
+          "capricorn": "mdi:zodiac-capricorn",
+          "aquarius": "mdi:zodiac-aquarius",
+          "pisces": "mdi:zodiac-pisces"
+        }
+      },
+      "zodiac_sign_next_full_moon": {
+        "default": "mdi:star-four-points-outline",
+        "state": {
+          "aries": "mdi:zodiac-aries",
+          "taurus": "mdi:zodiac-taurus",
+          "gemini": "mdi:zodiac-gemini",
+          "cancer": "mdi:zodiac-cancer",
+          "leo": "mdi:zodiac-leo",
+          "virgo": "mdi:zodiac-virgo",
+          "libra": "mdi:zodiac-libra",
+          "scorpio": "mdi:zodiac-scorpio",
+          "sagittarius": "mdi:zodiac-sagittarius",
+          "capricorn": "mdi:zodiac-capricorn",
+          "aquarius": "mdi:zodiac-aquarius",
+          "pisces": "mdi:zodiac-pisces"
+        }
+      },
+      "zodiac_sign_previous_new_moon": {
+        "default": "mdi:star-four-points-outline",
+        "state": {
+          "aries": "mdi:zodiac-aries",
+          "taurus": "mdi:zodiac-taurus",
+          "gemini": "mdi:zodiac-gemini",
+          "cancer": "mdi:zodiac-cancer",
+          "leo": "mdi:zodiac-leo",
+          "virgo": "mdi:zodiac-virgo",
+          "libra": "mdi:zodiac-libra",
+          "scorpio": "mdi:zodiac-scorpio",
+          "sagittarius": "mdi:zodiac-sagittarius",
+          "capricorn": "mdi:zodiac-capricorn",
+          "aquarius": "mdi:zodiac-aquarius",
+          "pisces": "mdi:zodiac-pisces"
+        }
+      },
+      "zodiac_sign_previous_full_moon": {
+        "default": "mdi:star-four-points-outline",
+        "state": {
+          "aries": "mdi:zodiac-aries",
+          "taurus": "mdi:zodiac-taurus",
+          "gemini": "mdi:zodiac-gemini",
+          "cancer": "mdi:zodiac-cancer",
+          "leo": "mdi:zodiac-leo",
+          "virgo": "mdi:zodiac-virgo",
+          "libra": "mdi:zodiac-libra",
+          "scorpio": "mdi:zodiac-scorpio",
+          "sagittarius": "mdi:zodiac-sagittarius",
+          "capricorn": "mdi:zodiac-capricorn",
+          "aquarius": "mdi:zodiac-aquarius",
+          "pisces": "mdi:zodiac-pisces"
+        }
+      },
+      "zodiac_degree_current_moon": { "default": "mdi:angle-acute" },
+      "zodiac_degree_next_new_moon": { "default": "mdi:angle-acute" },
+      "zodiac_degree_next_full_moon": { "default": "mdi:angle-acute" },
+      "zodiac_degree_previous_new_moon": { "default": "mdi:angle-acute" },
+      "zodiac_degree_previous_full_moon": { "default": "mdi:angle-acute" }
+    }
+  }
+}

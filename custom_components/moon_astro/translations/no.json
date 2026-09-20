@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Breddegrad",
                     "longitude": "Lengdegrad",
-                    "altitude": "Høyde (m)"
+                    "elevation": "Høyde (m)"
                 }
             },
             "precision": {

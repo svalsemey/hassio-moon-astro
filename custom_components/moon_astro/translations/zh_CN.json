@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "纬度",
                     "longitude": "经度",
-                    "altitude": "海拔（米）"
+                    "elevation": "海拔（米）"
                 }
             },
             "precision": {

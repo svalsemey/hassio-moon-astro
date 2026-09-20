@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Zemepisná šírka",
                     "longitude": "Zemepisná dĺžka",
-                    "altitude": "Nadmorská výška (m)"
+                    "elevation": "Nadmorská výška (m)"
                 }
             },
             "precision": {

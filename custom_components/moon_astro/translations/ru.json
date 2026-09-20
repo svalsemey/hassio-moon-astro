@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Широта",
                     "longitude": "Долгота",
-                    "altitude": "Высота (м)"
+                    "elevation": "Высота (м)"
                 }
             },
             "precision": {

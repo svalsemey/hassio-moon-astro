@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Zemljepisna širina",
                     "longitude": "Zemljepisna dolžina",
-                    "altitude": "Nadmorska višina (m)"
+                    "elevation": "Nadmorska višina (m)"
                 }
             },
             "precision": {

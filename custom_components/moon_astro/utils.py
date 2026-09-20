@@ -16,7 +16,6 @@ import zoneinfo
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
@@ -27,9 +26,6 @@ from .const import (
     DE440_FILE,
     DEFAULT_USE_HA_TZ,
     DOMAIN,
-    MANUFACTURER,
-    MODEL,
-    NAME,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -321,45 +317,3 @@ async def async_resolve_time_zone(entry: ConfigEntry) -> tzinfo:
         name,
     )
     return dt_util.get_default_time_zone()
-
-
-def get_entry_device_info(entry: ConfigEntry) -> DeviceInfo:
-    """Return the DeviceInfo shared by all entities of a config entry.
-
-    Args:
-        entry: Config entry.
-
-    Returns:
-        A DeviceInfo instance using stable identifiers and human-friendly metadata.
-    """
-    return DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer=MANUFACTURER,
-        model=MODEL,
-        name=NAME,
-    )
-
-
-def make_unique_id(entry_id: str, suffix: str) -> str:
-    """Build a stable unique_id for an entity.
-
-    Args:
-        entry_id: Home Assistant config entry ID.
-        suffix: Entity-specific suffix (stable identifier).
-
-    Returns:
-        A stable unique_id string.
-    """
-    return f"moon_astro_{entry_id}_{suffix}"
-
-
-def make_suggested_object_id(slug: str) -> str:
-    """Return a stable suggested object_id for entity_id creation.
-
-    Args:
-        slug: Stable non-localized slug.
-
-    Returns:
-        A suggested object_id string.
-    """
-    return slug

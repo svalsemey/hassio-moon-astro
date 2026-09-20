@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "קו רוחב",
                     "longitude": "קו אורך",
-                    "altitude": "גובה (מ׳)"
+                    "elevation": "גובה (מ׳)"
                 }
             },
             "precision": {

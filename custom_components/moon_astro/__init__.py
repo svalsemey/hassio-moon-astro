@@ -336,7 +336,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: MoonAstroConfigEntry) -
         hass.data.pop(EPHEMERIS_LOCK_KEY, None)
 
 
-async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def async_update_options(hass: HomeAssistant, entry: MoonAstroConfigEntry) -> None:
     """Handle options update by reloading the entry.
 
     Args:

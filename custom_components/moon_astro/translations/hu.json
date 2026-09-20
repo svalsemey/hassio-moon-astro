@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Szélesség",
                     "longitude": "Hosszúság",
-                    "altitude": "Magasság (m)"
+                    "elevation": "Magasság (m)"
                 }
             },
             "precision": {
