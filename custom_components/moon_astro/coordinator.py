@@ -15,18 +15,16 @@ import asyncio
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, tzinfo
+from itertools import pairwise
 import logging
 import math
 from pathlib import Path
 from typing import Any
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import numpy as np
 from skyfield import almanac
 from skyfield.api import Loader, wgs84
 from skyfield.timelib import Time
-from timezonefinder import TimezoneFinder
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -39,7 +37,6 @@ from .const import (
     CONF_HIGH_PRECISION,
     CONF_LAT,
     CONF_LON,
-    CONF_USE_HA_TZ,
     DARK_MOON,
     DE440_FILE,
     DEFAULT_HIGH_PRECISION,
@@ -118,7 +115,6 @@ type Timescale = Any
 type Apparent = Any
 
 # Centralize recoverable exception sets to avoid broad-except patterns.
-_RECOVERABLE_TZ_ERRORS: tuple[type[Exception], ...] = (ZoneInfoNotFoundError,)
 _RECOVERABLE_SKYFIELD_ERRORS: tuple[type[Exception], ...] = (
     ValueError,
     RuntimeError,
@@ -159,39 +155,6 @@ _SHARED_EPHEMERIS_ITEM_KEY = "eph_ts"
 # -----------------------------------------------------------------------------
 
 
-def _detect_timezone(lat: float, lon: float) -> ZoneInfo:
-    """Return a best-effort ZoneInfo for given coordinates.
-
-    Args:
-        lat: Latitude in decimal degrees.
-        lon: Longitude in decimal degrees.
-
-    Returns:
-        A ZoneInfo instance representing the local timezone or UTC as fallback.
-    """
-    tzname: str | None = TimezoneFinder().timezone_at(lat=lat, lng=lon)
-    try:
-        return ZoneInfo(tzname) if tzname else ZoneInfo("UTC")
-    except ZoneInfoNotFoundError:
-        return ZoneInfo("UTC")
-
-
-def _tz_for_hass(hass: HomeAssistant) -> ZoneInfo:
-    """Return ZoneInfo from Home Assistant configuration with UTC fallback.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        The configured ZoneInfo or UTC if missing/invalid.
-    """
-    tzname = hass.config.time_zone
-    try:
-        return ZoneInfo(tzname) if tzname else ZoneInfo("UTC")
-    except _RECOVERABLE_TZ_ERRORS:
-        return ZoneInfo("UTC")
-
-
 def _round_datetime_to_nearest_minute(dt: datetime) -> datetime:
     """Round a timezone-aware datetime to the nearest minute.
 
@@ -224,7 +187,7 @@ def _round_utc_datetime_to_nearest_minute(dt_utc: datetime) -> datetime:
     return _round_datetime_to_nearest_minute(dt_utc).astimezone(UTC)
 
 
-def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
+def _to_local_iso(dt_utc: datetime | None, tz: tzinfo | None) -> str | None:
     """Convert a UTC datetime to an ISO 8601 string in the provided timezone.
 
     This conversion rounds the instant to the nearest minute to maximize stability
@@ -241,7 +204,7 @@ def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
     if dt_utc is None:
         return None
 
-    tz = tz or ZoneInfo("UTC")
+    tz = tz or UTC
 
     if dt_utc.tzinfo is None:
         dt_utc = dt_utc.replace(tzinfo=UTC)
@@ -251,7 +214,7 @@ def _to_local_iso(dt_utc: datetime | None, tz: ZoneInfo | None) -> str | None:
     return dt_utc_rounded.astimezone(tz).isoformat()
 
 
-def _safe_time_iso(t_obj: Time | None, tz: ZoneInfo | None) -> str | None:
+def _safe_time_iso(t_obj: Time | None, tz: tzinfo | None) -> str | None:
     """Convert a Skyfield Time to a localized ISO 8601 string safely.
 
     The conversion rounds the resulting datetime to the nearest minute through
@@ -1370,20 +1333,19 @@ def _refine_brackets(
     if len(t_list) < 3 or len(y_list) < 3:
         return []
 
-    y = np.asarray(y_list, dtype=float)
-    slopes = np.diff(y)
-
-    y_scale = float(np.nanmax(np.abs(y))) if np.isfinite(y).any() else 0.0
-    eps = max(1e-12, y_scale * 1e-12)
-
-    sgn = np.zeros_like(slopes, dtype=int)
-    sgn[slopes > eps] = 1
-    sgn[slopes < -eps] = -1
+    eps = max(
+        1e-12,
+        1e-12 * max((abs(v) for v in y_list if math.isfinite(v)), default=0.0),
+    )
+    sgn = [
+        1 if b - a > eps else -1 if b - a < -eps else 0
+        for a, b in pairwise(y_list)
+    ]
 
     want_left = 1 if kind == "max" else -1
     want_right = -1 if kind == "max" else 1
 
-    n = len(y)
+    n = len(y_list)
     candidates: list[int] = []
 
     for i in range(1, n - 1):
@@ -2004,7 +1966,7 @@ def _extract_phase_events_from_discrete(
     )
 
 
-def _time_to_local_datetime(t_obj: Time, tz: ZoneInfo) -> datetime:
+def _time_to_local_datetime(t_obj: Time, tz: tzinfo) -> datetime:
     """Convert a Skyfield Time to a timezone-aware datetime in a given timezone.
 
     Args:
@@ -2031,7 +1993,7 @@ def _time_to_local_datetime(t_obj: Time, tz: ZoneInfo) -> datetime:
 def _is_second_full_moon_in_same_month_local(
     first_full: Time | None,
     second_full: Time | None,
-    tz: ZoneInfo,
+    tz: tzinfo,
 ) -> bool:
     """Return True if second_full is the second full moon within the same local calendar month.
 
@@ -2102,7 +2064,7 @@ def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | No
 
 
 def _previous_full_moon_name_code_from_events(
-    tz: ZoneInfo, *, prev_full: Time | None
+    tz: tzinfo, *, prev_full: Time | None
 ) -> str | None:
     """Compute previous full moon name code from a previous full moon event.
 
@@ -2121,7 +2083,7 @@ def _previous_full_moon_name_code_from_events(
 
 
 def _next_full_moon_name_code_from_events(
-    tz: ZoneInfo, *, next_full: Time | None, prev_full: Time | None
+    tz: tzinfo, *, next_full: Time | None, prev_full: Time | None
 ) -> str | None:
     """Compute next full moon name code using next_full and prev_full.
 
@@ -2313,7 +2275,7 @@ class _Calc:
     def rise_set(
         eph: Ephemeris,
         t: Time,
-        tz: ZoneInfo | None,
+        tz: tzinfo | None,
         *,
         lat: float,
         lon: float,
@@ -2354,7 +2316,7 @@ class _Calc:
         eph: Ephemeris,
         ts: Timescale,
         t: Time,
-        tz: ZoneInfo | None,
+        tz: tzinfo | None,
         *,
         high_precision: bool,
     ) -> dict[str, Any]:
@@ -2442,7 +2404,7 @@ class _Calc:
         eph: Ephemeris,
         ts: Timescale,
         t: Time,
-        tz: ZoneInfo | None,
+        tz: tzinfo | None,
     ) -> tuple[dict[str, Any], dict[str, Time | None]]:
         """Compute phase event timestamps and full moon name codes.
 
@@ -2460,7 +2422,7 @@ class _Calc:
               - payload dictionary fragment for phase-related keys
               - raw event times dictionary used downstream (ecliptic/zodiac)
         """
-        tz_effective = tz or ZoneInfo("UTC")
+        tz_effective = tz or UTC
 
         try:
             f = almanac.moon_phases(eph)
@@ -2726,6 +2688,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         lon: float,
         elev: float,
         interval: timedelta,
+        tz: tzinfo,
     ) -> None:
         """Initialize the coordinator with observer and scheduling settings.
 
@@ -2735,10 +2698,11 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             lon: Observer longitude in degrees.
             elev: Observer elevation in meters.
             interval: Update interval for the coordinator.
+            tz: Time zone used to localize event timestamps.
         """
         super().__init__(
             hass,
-            logger=logging.getLogger(__name__),
+            logger=_LOGGER,
             name="Moon Astro",
             update_interval=interval,
         )
@@ -2747,14 +2711,16 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._elev: float = float(elev)
         self._eph: Ephemeris | None = None
         self._ts: Timescale | None = None
-        self._tz: ZoneInfo | None = None
-        self._use_ha_tz: bool = False
-        self._high_precision: bool = DEFAULT_HIGH_PRECISION
+        self._tz: tzinfo = tz
         self._hass: HomeAssistant = hass
 
     @classmethod
     def from_config_entry(
-        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta
+        cls,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        interval: timedelta,
+        tz: tzinfo,
     ) -> MoonAstroCoordinator:
         """Build the coordinator from a ConfigEntry.
 
@@ -2762,22 +2728,20 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hass: Home Assistant instance.
             entry: Config entry containing coordinates and options.
             interval: Update interval for the coordinator.
+            tz: Time zone used to localize event timestamps.
 
         Returns:
             A fully configured MoonAstroCoordinator instance.
         """
         data = entry.data
-        c = cls(
+        return cls(
             hass=hass,
             lat=float(data.get(CONF_LAT, hass.config.latitude)),
             lon=float(data.get(CONF_LON, hass.config.longitude)),
             elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
             interval=interval,
+            tz=tz,
         )
-        c._use_ha_tz = entry.options.get(CONF_USE_HA_TZ, True)
-        c._tz = _tz_for_hass(hass) if c._use_ha_tz else _detect_timezone(c._lat, c._lon)
-        c._high_precision = entry.options.get(CONF_HIGH_PRECISION, True)
-        return c
 
     async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
         """Load ephemerides and timescale asynchronously with caching.
@@ -2952,6 +2916,9 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         lon: float,
         elev: float,
         interval: timedelta,
+        tz: tzinfo,
+        *,
+        high_precision: bool = DEFAULT_HIGH_PRECISION
     ) -> None:
         """Initialize the coordinator with observer and scheduling settings.
 
@@ -2978,9 +2945,8 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         self._eph: Ephemeris | None = None
         self._ts: Timescale | None = None
-        self._tz: ZoneInfo | None = None
-        self._use_ha_tz: bool = False
-        self._high_precision: bool = DEFAULT_HIGH_PRECISION
+        self._tz: tzinfo = tz
+        self._high_precision: bool = high_precision
 
         self._unsub_next_event: Callable[[], None] | None = None
         self._next_refresh_utc: datetime | None = None
@@ -3001,7 +2967,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     @classmethod
     def from_config_entry(
-        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta
+        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta, tz: tzinfo
     ) -> MoonAstroEventsCoordinator:
         """Build the coordinator from a ConfigEntry.
 
@@ -3009,22 +2975,23 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hass: Home Assistant instance.
             entry: Config entry containing coordinates and options.
             interval: Fallback update interval.
+            tz: Time zone for event calculations.
 
         Returns:
             A fully configured MoonAstroEventsCoordinator instance.
         """
         data = entry.data
-        c = cls(
+        return cls(
             hass=hass,
             lat=float(data.get(CONF_LAT, hass.config.latitude)),
             lon=float(data.get(CONF_LON, hass.config.longitude)),
             elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
             interval=interval,
+            tz=tz,
+            high_precision=bool(
+                entry.options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION)
+            ),
         )
-        c._use_ha_tz = entry.options.get(CONF_USE_HA_TZ, True)
-        c._tz = _tz_for_hass(hass) if c._use_ha_tz else _detect_timezone(c._lat, c._lon)
-        c._high_precision = entry.options.get(CONF_HIGH_PRECISION, True)
-        return c
 
     async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
         """Load ephemerides and timescale asynchronously with caching.

@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "सेंसर अपडेट अंतराल (सेकंड)",
                     "use_ha_timezone": "Home Assistant का टाइम ज़ोन उपयोग करें",
+                    "time_zone": "टाइम ज़ोन",
                     "high_precision": "हाई प्रिसिजन मोड",
                     "events_refresh_fallback": "इवेंट्स रिफ्रेश फ़ॉलबैक अंतराल (सेकंड)"
+                },
+                "data_description": {
+                    "time_zone": "IANA टाइम ज़ोन का उपयोग किया जाता है जब Home Assistant का टाइम ज़ोन उपयोग नहीं किया जाता है।"
                 }
             }
         }

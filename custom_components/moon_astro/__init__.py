@@ -39,6 +39,7 @@ from .coordinator import (
     MoonAstroEventsCoordinator,
 )
 from .utils import (
+    async_resolve_time_zone,
     cleanup_cache_dir,
     ensure_valid_ephemeris,
     get_ephemeris_lock,
@@ -228,6 +229,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ConfigEntryNotReady: If required resources cannot be prepared yet.
     """
     await _async_prepare_ephemeris(hass, reason="startup_or_reload")
+    time_zone = await async_resolve_time_zone(entry)
 
     scan_seconds = entry.options.get(
         CONF_SCAN_INTERVAL,
@@ -237,6 +239,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         entry,
         timedelta(seconds=int(scan_seconds)),
+        time_zone
     )
 
     events_fallback_seconds = entry.options.get(
@@ -247,6 +250,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         entry,
         timedelta(seconds=int(events_fallback_seconds)),
+        time_zone
     )
 
     hass.data.setdefault(DOMAIN, {})

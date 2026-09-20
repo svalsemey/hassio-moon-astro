@@ -9,18 +9,24 @@ from __future__ import annotations
 
 import asyncio
 from contextlib import suppress
+from datetime import tzinfo
 import logging
 from pathlib import Path
+import zoneinfo
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CACHE_DIR_NAME,
+    CONF_TIME_ZONE,
+    CONF_USE_HA_TZ,
     DATA_COORDINATOR,
     DATA_EVENTS_COORDINATOR,
     DE440_FILE,
+    DEFAULT_USE_HA_TZ,
     DOMAIN,
     MANUFACTURER,
     MODEL,
@@ -280,6 +286,45 @@ async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
         return False
 
     return await validate_ephemeris_file(hass, remove_on_invalid=False)
+
+
+def available_time_zones() -> list[str]:
+    """Return the sorted IANA time zone names available on this system.
+
+    The lookup walks the tzdata directories on disk and must be executed in an
+    executor.
+
+    Returns:
+        Sorted list of IANA time zone names.
+    """
+    return sorted(zoneinfo.available_timezones())
+
+
+async def async_resolve_time_zone(entry: ConfigEntry) -> tzinfo:
+    """Return the time zone used to localize event timestamps for a config entry.
+
+    The Home Assistant time zone is used unless the entry explicitly opts out and
+    provides a valid IANA time zone name. An unresolvable name falls back to the
+    Home Assistant time zone so that entities never end up without a zone.
+
+    Args:
+        entry: Config entry providing the time zone options.
+
+    Returns:
+        A tzinfo instance.
+    """
+    if entry.options.get(CONF_USE_HA_TZ, DEFAULT_USE_HA_TZ):
+        return dt_util.get_default_time_zone()
+
+    name = entry.options.get(CONF_TIME_ZONE)
+    if name and (tz := await dt_util.async_get_time_zone(name)) is not None:
+        return tz
+
+    _LOGGER.warning(
+        "Time zone %r is not available on this system; using the Home Assistant time zone",
+        name,
+    )
+    return dt_util.get_default_time_zone()
 
 
 def get_entry_coordinators(

@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Interval de actualizare a senzorilor (secunde)",
                     "use_ha_timezone": "Utilizați fusul orar Home Assistant",
+                    "time_zone": "Fus orar",
                     "high_precision": "Mod de înaltă precizie",
                     "events_refresh_fallback": "Interval de reîmprospătare de rezervă pentru evenimente (secunde)"
+                },
+                "data_description": {
+                    "time_zone": "Fus orar IANA utilizat pentru localizarea marcajelor temporale ale evenimentelor atunci când fusul orar Home Assistant nu este utilizat."
                 }
             }
         }

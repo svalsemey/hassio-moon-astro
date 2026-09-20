@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Interwał aktualizacji czujników (sekundy)",
                     "use_ha_timezone": "Użyj strefy czasowej Home Assistant",
+                    "time_zone": "Strefa czasowa",
                     "high_precision": "Tryb wysokiej precyzji",
                     "events_refresh_fallback": "Zapasowy interwał odświeżania zdarzeń (sekundy)"
+                },
+                "data_description": {
+                    "time_zone": "Strefa czasowa IANA używana do lokalizowania znaczników czasu zdarzeń, gdy nie jest używana strefa czasowa Home Assistant."
                 }
             }
         }

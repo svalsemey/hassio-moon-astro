@@ -1,0 +1,40 @@
+name: Requirements installability
+
+on:
+  pull_request:
+    paths:
+      - "custom_components/moon_astro/manifest.json"
+      - ".github/workflows/requirements.yml"
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  install:
+    name: ${{ matrix.ha }} / ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ha: ["stable", "beta"]
+        platform: ["linux/amd64", "linux/arm64"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+
+      - name: Extract requirements from the manifest
+        run: jq -r '.requirements[]' custom_components/moon_astro/manifest.json > requirements_manifest.txt
+
+      - name: Install and import inside the official Home Assistant image
+        run: |
+          docker run --rm --platform "${{ matrix.platform }}" \
+            -v "${PWD}/requirements_manifest.txt:/tmp/requirements.txt:ro" \
+            -v "${PWD}/custom_components:/config/custom_components:ro" \
+            "ghcr.io/home-assistant/home-assistant:${{ matrix.ha }}" \
+            sh -ec '
+              python3 --version
+              python3 -m uv pip install --index-strategy unsafe-first-match --upgrade \
+                --constraint /usr/src/homeassistant/homeassistant/package_constraints.txt \
+                --requirement /tmp/requirements.txt
+              cd /config && python3 -c "import custom_components.moon_astro.coordinator"
+            '

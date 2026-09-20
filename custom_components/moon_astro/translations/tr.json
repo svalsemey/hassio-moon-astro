@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Sensör güncelleme aralığı (saniye)",
                     "use_ha_timezone": "Home Assistant saat dilimini kullan",
+                    "time_zone": "Saat dilimi",
                     "high_precision": "Yüksek hassasiyet modu",
                     "events_refresh_fallback": "Olay yenileme yedek aralığı (saniye)"
+                },
+                "data_description": {
+                    "time_zone": "Home Assistant saat dilimi kullanılmadığında olayların zaman damgalarını yerelleştirmek için kullanılan IANA saat dilimi."
                 }
             }
         }

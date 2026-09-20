@@ -13,6 +13,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
 
 from .const import (
     CONF_ALT,
@@ -21,6 +22,7 @@ from .const import (
     CONF_LAT,
     CONF_LON,
     CONF_SCAN_INTERVAL,
+    CONF_TIME_ZONE,
     CONF_USE_HA_TZ,
     DEFAULT_EVENTS_REFRESH_FALLBACK,
     DEFAULT_HIGH_PRECISION,
@@ -29,6 +31,7 @@ from .const import (
     DOMAIN,
 )
 from .utils import (
+    available_time_zones,
     cleanup_cache_dir,
     ensure_valid_ephemeris,
     get_ephemeris_lock,
@@ -314,24 +317,16 @@ class MoonAstroConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         Returns:
             An instance of MoonAstroOptionsFlow.
         """
-        return MoonAstroOptionsFlow(config_entry)
+        return MoonAstroOptionsFlow()
 
 
 class MoonAstroOptionsFlow(config_entries.OptionsFlow):
     """Handle options for Moon Astro."""
 
-    def __init__(self, entry: config_entries.ConfigEntry) -> None:
-        """Initialize Moon Astro options flow.
-
-        Args:
-            entry: The config entry to configure options for.
-        """
-        self._entry = entry
-
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """First step of options flow.
+        """Manage the integration options.
 
         Args:
             user_input: User-provided option values.
@@ -340,37 +335,36 @@ class MoonAstroOptionsFlow(config_entries.OptionsFlow):
             A ConfigFlowResult creating the options entry or showing the form.
         """
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            return self.async_create_entry(data=user_input)
 
-        options = self._entry.options
+        options = self.config_entry.options
+        time_zones = await self.hass.async_add_executor_job(available_time_zones)
         schema = vol.Schema(
             {
                 vol.Optional(
                     CONF_SCAN_INTERVAL,
-                    default=options.get(
-                        CONF_SCAN_INTERVAL,
-                        DEFAULT_SCAN_INTERVAL,
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=30, max=21600)),
+                    default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                ): vol.All(vol.Coerce(int), vol.Range(min=60, max=21600)),
                 vol.Optional(
                     CONF_USE_HA_TZ,
-                    default=options.get(
-                        CONF_USE_HA_TZ,
-                        DEFAULT_USE_HA_TZ,
-                    ),
+                    default=options.get(CONF_USE_HA_TZ, DEFAULT_USE_HA_TZ),
                 ): bool,
                 vol.Optional(
+                    CONF_TIME_ZONE,
+                    default=options.get(CONF_TIME_ZONE, self.hass.config.time_zone),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=time_zones, mode=SelectSelectorMode.DROPDOWN
+                    )
+                ),
+                vol.Optional(
                     CONF_HIGH_PRECISION,
-                    default=options.get(
-                        CONF_HIGH_PRECISION,
-                        DEFAULT_HIGH_PRECISION,
-                    ),
+                    default=options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION),
                 ): bool,
                 vol.Optional(
                     CONF_EVENTS_REFRESH_FALLBACK,
                     default=options.get(
-                        CONF_EVENTS_REFRESH_FALLBACK,
-                        DEFAULT_EVENTS_REFRESH_FALLBACK,
+                        CONF_EVENTS_REFRESH_FALLBACK, DEFAULT_EVENTS_REFRESH_FALLBACK
                     ),
                 ): vol.All(vol.Coerce(int), vol.Range(min=3600, max=604800)),
             }

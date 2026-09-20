@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Opdateringsinterval for sensorer (sekunder)",
                     "use_ha_timezone": "Brug Home Assistants tidszone",
+                    "time_zone": "Tidszone",
                     "high_precision": "Højpræcisionstilstand",
                     "events_refresh_fallback": "Reserveopdateringsinterval for hændelser (sekunder)"
+                },
+                "data_description": {
+                    "time_zone": "IANA-tidszone, der bruges til at lokalisere hændelsestidsstempler, når Home Assistants tidszone ikke bruges."
                 }
             }
         }

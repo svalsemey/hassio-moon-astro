@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "מרווח עדכון החיישנים (שניות)",
                     "use_ha_timezone": "השתמש באזור הזמן של Home Assistant",
+                    "time_zone": "אזור זמן",
                     "high_precision": "מצב דיוק גבוה",
                     "events_refresh_fallback": "מרווח רענון גיבוי לאירועים (שניות)"
+                },
+                "data_description": {
+                    "time_zone": "אזור זמן IANA המשמש למיקום חותמות הזמן של האירועים כאשר לא משתמשים באזור הזמן של Home Assistant."
                 }
             }
         }

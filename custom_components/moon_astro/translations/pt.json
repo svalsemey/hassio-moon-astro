@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Intervalo de atualização dos sensores (segundos)",
                     "use_ha_timezone": "Usar o fuso horário do Home Assistant",
+                    "time_zone": "Fuso horário",
                     "high_precision": "Modo de alta precisão",
                     "events_refresh_fallback": "Intervalo de fallback de atualização de eventos (segundos)"
+                },
+                "data_description": {
+                    "time_zone": "Fuso horário IANA usado para localizar carimbos de data/hora de eventos quando o fuso horário do Home Assistant não é usado."
                 }
             }
         }

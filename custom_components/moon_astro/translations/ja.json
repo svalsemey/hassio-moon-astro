@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "センサー更新間隔（秒）",
                     "use_ha_timezone": "Home Assistant のタイムゾーンを使用",
+                    "time_zone": "タイムゾーン",
                     "high_precision": "高精度モード",
                     "events_refresh_fallback": "イベント更新フォールバック間隔（秒）"
+                },
+                "data_description": {
+                    "time_zone": "Home Assistant のタイムゾーンが使用されていない場合に、イベントのタイムスタンプをローカライズするために使用される IANA タイムゾーン。"
                 }
             }
         }

@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Interval posodabljanja senzorjev (sekunde)",
                     "use_ha_timezone": "Uporabi časovni pas Home Assistant",
+                    "time_zone": "Časovni pas",
                     "high_precision": "Način visoke natančnosti",
                     "events_refresh_fallback": "Rezervni interval osveževanja dogodkov (sekunde)"
+                },
+                "data_description": {
+                    "time_zone": "IANA časovni pas, uporabljen za lokalizacijo časovnih žigov dogodkov, kadar se ne uporablja časovni pas Home Assistant."
                 }
             }
         }

@@ -21,6 +21,7 @@ CONF_LAT = "latitude"
 CONF_LON = "longitude"
 CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
+CONF_TIME_ZONE = "time_zone"
 CONF_HIGH_PRECISION = "high_precision"
 CONF_EVENTS_REFRESH_FALLBACK = "events_refresh_fallback"
 

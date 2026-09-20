@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Sensors update interval (seconds)",
                     "use_ha_timezone": "Use Home Assistant time zone",
+                    "time_zone": "Time zone",
                     "high_precision": "High precision mode",
                     "events_refresh_fallback": "Events refresh fallback interval (seconds)"
+                },
+                "data_description": {
+                    "time_zone": "IANA time zone used to localize event timestamps when the Home Assistant time zone is not used."
                 }
             }
         }

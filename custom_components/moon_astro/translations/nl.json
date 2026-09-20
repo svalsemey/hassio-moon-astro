@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Update-interval van sensoren (seconden)",
                     "use_ha_timezone": "Tijdzone van Home Assistant gebruiken",
+                    "time_zone": "Tijdzone",
                     "high_precision": "Modus hoge precisie",
                     "events_refresh_fallback": "Fallback-interval voor het verversen van gebeurtenissen (seconden)"
+                },
+                "data_description": {
+                    "time_zone": "De IANA-tijdzone die wordt gebruikt om tijdstempels van gebeurtenissen te lokaliseren wanneer de tijdzone van Home Assistant niet wordt gebruikt."
                 }
             }
         }

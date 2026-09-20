@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Intervalle de mise à jour des capteurs (secondes)",
                     "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant",
+                    "time_zone": "Fuseau horaire",
                     "high_precision": "Mode haute précision",
                     "events_refresh_fallback": "Intervalle de secours de rafraîchissement des événements (secondes)"
+                },
+                "data_description": {
+                    "time_zone": "Fuseau horaire IANA utilisé pour localiser les horodatages des événements lorsque le fuseau horaire de Home Assistant n'est pas utilisé."
                 }
             }
         }

@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Antureiden päivitysväli (sekuntia)",
                     "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä",
+                    "time_zone": "Aikavyöhyke",
                     "high_precision": "Korkean tarkkuuden tila",
                     "events_refresh_fallback": "Tapahtumien varapäivitysväli (sekuntia)"
+                },
+                "data_description": {
+                    "time_zone": "IANA-aikavyöhyke, jota käytetään tapahtumien aikaleimojen paikallistamiseen, kun Home Assistantin aikavyöhykettä ei käytetä."
                 }
             }
         }

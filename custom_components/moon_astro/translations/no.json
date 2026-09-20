@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Oppdateringsintervall for sensorer (sekunder)",
                     "use_ha_timezone": "Bruk Home Assistant-tidssone",
+                    "time_zone": "Tidssone",
                     "high_precision": "Høypresisjonsmodus",
                     "events_refresh_fallback": "Fallback-intervall for hendelsesoppdatering (sekunder)"
+                },
+                "data_description": {
+                    "time_zone": "IANA-tidssonen som brukes til å lokalisere tidsstempler for hendelser når Home Assistant-tidssonen ikke brukes."
                 }
             }
         }

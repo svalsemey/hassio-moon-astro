@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Interval aktualizácie senzorov (sekundy)",
                     "use_ha_timezone": "Použiť časové pásmo Home Assistant",
+                    "time_zone": "Časové pásmo",
                     "high_precision": "Režim vysokej presnosti",
                     "events_refresh_fallback": "Záložný interval obnovovania udalostí (sekundy)"
+                },
+                "data_description": {
+                    "time_zone": "IANA časové pásmo používané na lokalizáciu časových pečiatok udalostí, keď sa nepoužíva časové pásmo Home Assistant."
                 }
             }
         }

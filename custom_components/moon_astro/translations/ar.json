@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "فاصل تحديث المستشعرات (بالثواني)",
                     "use_ha_timezone": "استخدام المنطقة الزمنية لـ Home Assistant",
+                    "time_zone": "المنطقة الزمنية",
                     "high_precision": "وضع الدقّة العالية",
                     "events_refresh_fallback": "فترة التحديث الاحتياطية للأحداث (ثوانٍ)"
+                },
+                "data_description": {
+                    "time_zone": "منطقة زمنية IANA تُستخدم لتحديد الطوابع الزمنية للأحداث عندما لا يتم استخدام المنطقة الزمنية لـ Home Assistant."
                 }
             }
         }

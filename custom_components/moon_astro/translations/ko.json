@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "센서 업데이트 간격(초)",
                     "use_ha_timezone": "Home Assistant 시간대 사용",
+                    "time_zone": "시간대",
                     "high_precision": "고정밀 모드",
                     "events_refresh_fallback": "이벤트 새로 고침 폴백 간격(초)"
+                },
+                "data_description": {
+                    "time_zone": "Home Assistant 시간대가 사용되지 않을 경우 이벤트 타임스탬프를 현지화하는 데 사용되는 IANA 시간대입니다."
                 }
             }
         }

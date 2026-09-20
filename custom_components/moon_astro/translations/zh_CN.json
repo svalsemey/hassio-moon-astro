@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "传感器更新间隔（秒）",
                     "use_ha_timezone": "使用 Home Assistant 时区",
+                    "time_zone": "时区",
                     "high_precision": "高精度模式",
                     "events_refresh_fallback": "事件刷新回退间隔（秒）"
+                },
+                "data_description": {
+                    "time_zone": "当不使用 Home Assistant 时区时，用于本地化事件时间戳的 IANA 时区。"
                 }
             }
         }

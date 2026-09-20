@@ -36,8 +36,12 @@
                 "data": {
                     "scan_interval": "Uppdateringsintervall för sensorer (sekunder)",
                     "use_ha_timezone": "Använd Home Assistants tidszon",
+                    "time_zone": "Tidszon",
                     "high_precision": "Högprecisionsläge",
                     "events_refresh_fallback": "Fallback-intervall för händelseuppdatering (sekunder)"
+                },
+                "data_description": {
+                    "time_zone": "IANA-tidszon som används för att lokalisera tidsstämplar för händelser när Home Assistants tidszon inte används."
                 }
             }
         }
