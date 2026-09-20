@@ -36,10 +36,6 @@ STANDARD_PRECISION_BRACKET_EXPAND = 1
 CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
 
-# Internal hass.data keys used by the integration to store entry runtime objects.
-DATA_COORDINATOR = "coordinator"
-DATA_EVENTS_COORDINATOR = "events_coordinator"
-
 # Moon phase codes from Skyfield almanac (integers)
 DARK_MOON = 0
 FIRST_QUARTER = 1

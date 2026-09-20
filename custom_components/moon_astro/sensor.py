@@ -17,10 +17,9 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
@@ -81,8 +80,14 @@ from .const import (
     PRECISION_PARALLAX,
     PRECISION_ZODIAC_DEGREE,
 )
-from .coordinator import MoonAstroCoordinator, MoonAstroEventsCoordinator
-from .utils import get_entry_coordinators, get_entry_device_info
+from .coordinator import (
+    MoonAstroConfigEntry,
+    MoonAstroCoordinator,
+    MoonAstroEventsCoordinator,
+)
+from .utils import get_entry_device_info
+
+PARALLEL_UPDATES = 0
 
 _LOGGER = logging.getLogger(__name__)
 _UNSET: Any = object()
@@ -601,9 +606,14 @@ def _values_equal(old: Any, new: Any, *, tol: float | None = None) -> bool:
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MoonAstroConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up sensor entities from a config entry.
+
+    Event-based sensors are bound to the events coordinator, all other sensors to
+    the main coordinator.
 
     Args:
         hass: Home Assistant instance.
@@ -613,34 +623,28 @@ async def async_setup_entry(
     Returns:
         None.
     """
-    coordinator, events_coordinator = get_entry_coordinators(hass, entry)
-    if coordinator is None:
-        return
-
+    runtime = entry.runtime_data
     device_info = get_entry_device_info(entry)
 
     _validate_sensors()
-    entities: list[MoonAstroSensor] = []
-    for desc in SENSORS:
-        selected = coordinator
-        if events_coordinator is not None and desc.is_event_based:
-            selected = events_coordinator
-
-        entities.append(
-            MoonAstroSensor(
-                coordinator=selected,
-                entry_id=entry.entry_id,
-                key=desc.key,
-                name_key=desc.slug,
-                unit=desc.unit,
-                device_class=desc.device_class,
-                suggested_display_precision=desc.suggested_display_precision,
-                device_info=device_info,
-                suggested_object_id=desc.slug,
-            )
+    async_add_entities(
+        MoonAstroSensor(
+            coordinator=(
+                runtime.events_coordinator
+                if desc.is_event_based
+                else runtime.coordinator
+            ),
+            entry_id=entry.entry_id,
+            key=desc.key,
+            name_key=desc.slug,
+            unit=desc.unit,
+            device_class=desc.device_class,
+            suggested_display_precision=desc.suggested_display_precision,
+            device_info=device_info,
+            suggested_object_id=desc.slug,
         )
-
-    async_add_entities(entities, update_before_add=False)
+        for desc in SENSORS
+    )
 
 
 class MoonAstroSensor(

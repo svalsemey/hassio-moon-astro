@@ -3,19 +3,21 @@
 from __future__ import annotations
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import KEY_ABOVE_HORIZON
-from .coordinator import MoonAstroCoordinator
-from .utils import get_entry_coordinators, get_entry_device_info
+from .coordinator import MoonAstroConfigEntry, MoonAstroCoordinator
+from .utils import get_entry_device_info
 
+PARALLEL_UPDATES = 0
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MoonAstroConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up binary sensor entities.
 
@@ -27,15 +29,14 @@ async def async_setup_entry(
     Returns:
         None.
     """
-    coordinator, _events_coordinator = get_entry_coordinators(hass, entry)
-    if coordinator is None:
-        return
-
-    device_info = get_entry_device_info(entry)
-
     async_add_entities(
-        [MoonAboveHorizonBinary(coordinator, entry.entry_id, device_info)],
-        update_before_add=False,
+        [
+            MoonAboveHorizonBinary(
+                entry.runtime_data.coordinator,
+                entry.entry_id,
+                get_entry_device_info(entry),
+            )
+        ]
     )
 
 

@@ -8,6 +8,6 @@
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/svalsemey/hassio-moon-astro/issues",
   "loggers": ["skyfield"],
-  "requirements": ["skyfield==1.53"],
-  "version": "0.4.3"
+  "requirements": ["skyfield==1.55"],
+  "version": "0.4.4"
 }

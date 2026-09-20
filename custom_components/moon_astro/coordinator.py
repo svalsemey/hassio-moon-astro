@@ -19,7 +19,6 @@ from datetime import UTC, datetime, timedelta, tzinfo
 from itertools import pairwise
 import logging
 import math
-from pathlib import Path
 from typing import Any
 
 from skyfield import almanac
@@ -30,9 +29,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util.hass_dict import HassKey
 
 from .const import (
-    CACHE_DIR_NAME,
     CONF_ALT,
     CONF_HIGH_PRECISION,
     CONF_LAT,
@@ -108,6 +107,7 @@ from .const import (
     STANDARD_PRECISION_BRACKET_EXPAND,
     STANDARD_PRECISION_STEP_HOURS,
 )
+from .utils import get_cache_dir
 
 # Type aliases to improve readability where the 3rd-party library does not expose stable typing.
 type Ephemeris = Any
@@ -147,8 +147,9 @@ _PHASE_VALUES: tuple[int, int, int, int] = (
     LAST_QUARTER,
 )
 
-_SHARED_EPHEMERIS_STORE_KEY = "shared_ephemeris_store"
-_SHARED_EPHEMERIS_ITEM_KEY = "eph_ts"
+SHARED_EPHEMERIS_KEY: HassKey[tuple[Ephemeris, Timescale]] = HassKey(
+    f"{DOMAIN}_shared_ephemeris"
+)
 
 # -----------------------------------------------------------------------------
 # Timezone and datetime formatting helpers
@@ -2632,45 +2633,31 @@ class _Calc:
         }
 
 
-def _get_shared_ephemeris_store(hass: HomeAssistant) -> dict[str, Any]:
-    """Return the shared store used to reuse loaded ephemeris objects.
+async def async_get_shared_ephemeris(
+    hass: HomeAssistant,
+) -> tuple[Ephemeris, Timescale]:
+    """Return the ephemeris and timescale shared by all coordinators.
+
+    The Skyfield objects are loaded once per Home Assistant instance and cached in
+    hass.data so that entry reloads and both coordinators reuse the same kernel.
 
     Args:
         hass: Home Assistant instance.
 
     Returns:
-        A dictionary stored in hass.data used to share heavy Skyfield objects.
+        A tuple (ephemeris, timescale).
     """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    raw = domain_data.get(_SHARED_EPHEMERIS_STORE_KEY)
-    if isinstance(raw, dict):
-        return raw
+    if (shared := hass.data.get(SHARED_EPHEMERIS_KEY)) is not None:
+        return shared
 
-    store: dict[str, Any] = {}
-    domain_data[_SHARED_EPHEMERIS_STORE_KEY] = store
-    return store
+    def _load() -> tuple[Ephemeris, Timescale]:
+        """Load the ephemeris kernel and timescale from the cache directory."""
+        loader = Loader(str(get_cache_dir(hass)))
+        return loader(DE440_FILE), loader.timescale()
 
-
-def _get_cached_ephemeris_tuple(
-    store: dict[str, Any],
-) -> tuple[Ephemeris, Timescale] | None:
-    """Return a cached (ephemeris, timescale) tuple from the shared store.
-
-    Args:
-        store: Shared store dictionary.
-
-    Returns:
-        A (ephemeris, timescale) tuple or None if not available/invalid.
-    """
-    cached = store.get(_SHARED_EPHEMERIS_ITEM_KEY)
-    if not (isinstance(cached, tuple) and len(cached) == 2):
-        return None
-
-    eph, ts = cached
-    if eph is None or ts is None:
-        return None
-
-    return eph, ts
+    shared = await hass.async_add_executor_job(_load)
+    hass.data[SHARED_EPHEMERIS_KEY] = shared
+    return shared
 
 
 # -----------------------------------------------------------------------------
@@ -2684,9 +2671,10 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
-        lat: float,
-        lon: float,
-        elev: float,
+        entry: MoonAstroConfigEntry,
+        *,
+        eph: Ephemeris,
+        ts: Timescale,
         interval: timedelta,
         tz: tzinfo,
     ) -> None:
@@ -2694,96 +2682,25 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         Args:
             hass: Home Assistant instance.
-            lat: Observer latitude in degrees.
-            lon: Observer longitude in degrees.
-            elev: Observer elevation in meters.
+            entry: Config entry providing the observer coordinates.
+            eph: Loaded ephemeris shared with the other coordinators.
+            ts: Loaded timescale shared with the other coordinators.
             interval: Update interval for the coordinator.
             tz: Time zone used to localize event timestamps.
         """
         super().__init__(
             hass,
             logger=_LOGGER,
+            config_entry=entry,
             name="Moon Astro",
             update_interval=interval,
         )
-        self._lat: float = float(lat)
-        self._lon: float = float(lon)
-        self._elev: float = float(elev)
-        self._eph: Ephemeris | None = None
-        self._ts: Timescale | None = None
-        self._tz: tzinfo = tz
-        self._hass: HomeAssistant = hass
-
-    @classmethod
-    def from_config_entry(
-        cls,
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        interval: timedelta,
-        tz: tzinfo,
-    ) -> MoonAstroCoordinator:
-        """Build the coordinator from a ConfigEntry.
-
-        Args:
-            hass: Home Assistant instance.
-            entry: Config entry containing coordinates and options.
-            interval: Update interval for the coordinator.
-            tz: Time zone used to localize event timestamps.
-
-        Returns:
-            A fully configured MoonAstroCoordinator instance.
-        """
-        data = entry.data
-        return cls(
-            hass=hass,
-            lat=float(data.get(CONF_LAT, hass.config.latitude)),
-            lon=float(data.get(CONF_LON, hass.config.longitude)),
-            elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
-            interval=interval,
-            tz=tz,
-        )
-
-    async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
-        """Load ephemerides and timescale asynchronously with caching.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        store = _get_shared_ephemeris_store(self._hass)
-
-        cached_tuple = _get_cached_ephemeris_tuple(store)
-        if cached_tuple is not None:
-            return cached_tuple
-
-        def _load() -> tuple[Ephemeris, Timescale]:
-            """Blocking loader executed in the executor.
-
-            Returns:
-                A tuple (ephemeris, timescale).
-            """
-            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
-            Path(cache_dir).mkdir(parents=True, exist_ok=True)
-            load = Loader(cache_dir)
-            eph: Ephemeris = load(DE440_FILE)
-            ts: Timescale = load.timescale()
-            return eph, ts
-
-        eph, ts = await self._hass.async_add_executor_job(_load)
-        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
-        return eph, ts
-
-    async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
-        """Ensure ephemeris and timescale are loaded and return them.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        if self._eph is None or self._ts is None:
-            self._eph, self._ts = await self._async_load_ephemeris()
-
-        assert self._eph is not None, "Ephemeris must be loaded"
-        assert self._ts is not None, "Timescale must be loaded"
-        return self._eph, self._ts
+        self._lat = float(entry.data.get(CONF_LAT, hass.config.latitude))
+        self._lon = float(entry.data.get(CONF_LON, hass.config.longitude))
+        self._elev = float(entry.data.get(CONF_ALT, hass.config.elevation))
+        self._eph = eph
+        self._ts = ts
+        self._tz = tz
 
     async def _async_exec(self, func: Callable[[], Any]) -> Any:
         """Run a blocking callable in Home Assistant executor.
@@ -2794,7 +2711,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Returns:
             The callable return value.
         """
-        return await self._hass.async_add_executor_job(func)
+        return await self.hass.async_add_executor_job(func)
 
     async def _async_compute_payload(
         self, eph: Ephemeris, ts: Timescale
@@ -2848,8 +2765,8 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
 
         # Launch independent computations concurrently.
-        current_task = self._hass.async_create_task(self._async_exec(_calc_current))
-        rise_set_task = self._hass.async_create_task(self._async_exec(_calc_rise_set))
+        current_task = self.hass.async_create_task(self._async_exec(_calc_current))
+        rise_set_task = self.hass.async_create_task(self._async_exec(_calc_rise_set))
 
         # Await the independent results.
         current_payload, current_raw = await current_task
@@ -2890,8 +2807,7 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             UpdateFailed: If an unexpected error occurs during calculations.
         """
         try:
-            eph, ts = await self._async_ensure_ephemeris_loaded()
-            return await self._async_compute_payload(eph, ts)
+            return await self._async_compute_payload(self._eph, self._ts)
         except _RECOVERABLE_UPDATE_ERRORS as err:
             raise UpdateFailed(str(err)) from err
 
@@ -2912,115 +2828,53 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
-        lat: float,
-        lon: float,
-        elev: float,
+        entry: MoonAstroConfigEntry,
+        *,
+        eph: Ephemeris,
+        ts: Timescale,
         interval: timedelta,
         tz: tzinfo,
-        *,
-        high_precision: bool = DEFAULT_HIGH_PRECISION
     ) -> None:
-        """Initialize the coordinator with observer and scheduling settings.
+        """Initialize the coordinator with computation and scheduling settings.
 
         Args:
             hass: Home Assistant instance.
-            lat: Observer latitude in degrees.
-            lon: Observer longitude in degrees.
-            elev: Observer elevation in meters.
+            entry: Config entry providing the precision options.
+            eph: Loaded ephemeris shared with the other coordinators.
+            ts: Loaded timescale shared with the other coordinators.
             interval: Fallback update interval.
-
-        Returns:
-            None.
+            tz: Time zone used to localize event timestamps.
         """
         super().__init__(
             hass,
-            logger=logging.getLogger(__name__),
+            logger=_LOGGER,
+            config_entry=entry,
             name="Moon Astro Events",
             update_interval=interval,
         )
-        self._lat: float = float(lat)
-        self._lon: float = float(lon)
-        self._elev: float = float(elev)
-        self._hass: HomeAssistant = hass
-
-        self._eph: Ephemeris | None = None
-        self._ts: Timescale | None = None
-        self._tz: tzinfo = tz
-        self._high_precision: bool = high_precision
+        self._eph = eph
+        self._ts = ts
+        self._tz = tz
+        self._high_precision = bool(
+            entry.options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION)
+        )
 
         self._unsub_next_event: Callable[[], None] | None = None
         self._next_refresh_utc: datetime | None = None
 
         # Dedicated executor to avoid monopolizing Home Assistant's shared thread pool.
         # A single worker enforces determinism and prevents concurrent heavy computations.
-        self._executor: ThreadPoolExecutor = ThreadPoolExecutor(
+        self._executor = ThreadPoolExecutor(
             max_workers=1,
             thread_name_prefix="moon_astro_events",
         )
 
         # Lock used to prevent concurrent event-based computations.
-        self._compute_lock: asyncio.Lock = asyncio.Lock()
+        self._compute_lock = asyncio.Lock()
 
         # Track an in-flight refresh task to avoid spawning multiple long-running
         # computations when many refresh requests happen close together.
         self._inflight_task: asyncio.Task[None] | None = None
-
-    @classmethod
-    def from_config_entry(
-        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta, tz: tzinfo
-    ) -> MoonAstroEventsCoordinator:
-        """Build the coordinator from a ConfigEntry.
-
-        Args:
-            hass: Home Assistant instance.
-            entry: Config entry containing coordinates and options.
-            interval: Fallback update interval.
-            tz: Time zone for event calculations.
-
-        Returns:
-            A fully configured MoonAstroEventsCoordinator instance.
-        """
-        data = entry.data
-        return cls(
-            hass=hass,
-            lat=float(data.get(CONF_LAT, hass.config.latitude)),
-            lon=float(data.get(CONF_LON, hass.config.longitude)),
-            elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
-            interval=interval,
-            tz=tz,
-            high_precision=bool(
-                entry.options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION)
-            ),
-        )
-
-    async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
-        """Load ephemerides and timescale asynchronously with caching.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        store = _get_shared_ephemeris_store(self._hass)
-
-        cached_tuple = _get_cached_ephemeris_tuple(store)
-        if cached_tuple is not None:
-            return cached_tuple
-
-        def _load() -> tuple[Ephemeris, Timescale]:
-            """Blocking loader executed in the executor.
-
-            Returns:
-                A tuple (ephemeris, timescale).
-            """
-            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
-            Path(cache_dir).mkdir(parents=True, exist_ok=True)
-            load = Loader(cache_dir)
-            eph: Ephemeris = load(DE440_FILE)
-            ts: Timescale = load.timescale()
-            return eph, ts
-
-        eph, ts = await self._hass.async_add_executor_job(_load)
-        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
-        return eph, ts
 
     async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
         """Ensure ephemeris and timescale are loaded and return them.
@@ -3141,14 +2995,14 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             """
             _LOGGER.debug("Events scheduler: triggering refresh task")
             self._unsub_next_event = None
-            self._hass.create_task(self.async_request_refresh())
+            self.hass.create_task(self.async_request_refresh())
 
         _LOGGER.debug(
             "Events scheduler: scheduling refresh at when_utc=%s (now_utc=%s)",
             when.isoformat(),
             datetime.now(UTC).isoformat(),
         )
-        self._unsub_next_event = async_track_point_in_time(self._hass, _cb, when)
+        self._unsub_next_event = async_track_point_in_time(self.hass, _cb, when)
 
     async def _async_compute_events_payload(
         self, eph: Ephemeris, ts: Timescale
@@ -3229,8 +3083,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         async with self._compute_lock:
             try:
-                eph, ts = await self._async_ensure_ephemeris_loaded()
-                data = await self._async_compute_events_payload(eph, ts)
+                data = await self._async_compute_events_payload(self._eph, self._ts)
 
                 # Store and notify listeners.
                 self.async_set_updated_data(data)
@@ -3261,7 +3114,7 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return self.data or {}
 
         # Start a background refresh job and immediately return the last data.
-        self._inflight_task = self._hass.async_create_task(
+        self._inflight_task = self.hass.async_create_task(
             self._async_run_refresh_job(),
             name=f"{DOMAIN}-events-refresh",
         )
@@ -3273,21 +3126,36 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return self.data or {}
 
     async def async_shutdown(self) -> None:
-        """Release scheduled callbacks and executor resources held by this coordinator.
+        """Stop scheduled refreshes and release the dedicated executor.
+
+        Home Assistant calls this method through the unload callback registered on
+        the config entry; it may run more than once and stays idempotent.
 
         Returns:
             None.
         """
+        await super().async_shutdown()
         self._cancel_next_event_timer()
 
-        task = self._inflight_task
-        if task is not None and not task.done():
+        if (task := self._inflight_task) is not None and not task.done():
             task.cancel()
 
-        executor = self._executor
+        # Non-blocking: pending jobs are dropped and the worker exits after the
+        # currently running job, if any.
+        self._executor.shutdown(wait=False, cancel_futures=True)
 
-        def _shutdown() -> None:
-            """Shutdown the dedicated executor."""
-            executor.shutdown(wait=True, cancel_futures=True)
 
-        await self._hass.async_add_executor_job(_shutdown)
+# -----------------------------------------------------------------------------
+# Config entry runtime data
+# -----------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class MoonAstroRuntimeData:
+    """Runtime objects attached to a loaded config entry."""
+
+    coordinator: MoonAstroCoordinator
+    events_coordinator: MoonAstroEventsCoordinator
+
+
+type MoonAstroConfigEntry = ConfigEntry[MoonAstroRuntimeData]

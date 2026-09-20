@@ -173,7 +173,7 @@ If you notice that a translation is incomplete or inaccurate, contributions are 
 
 ## Requirements
 
-- Home Assistant 2024.12+
+- Home Assistant 2025.1+
 - Python dependencies are installed automatically by Home Assistant:
   - `skyfield==1.53`
 
