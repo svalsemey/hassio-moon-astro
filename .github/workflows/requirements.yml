@@ -19,7 +19,7 @@ jobs:
         ha: ["stable", "beta"]
         platform: ["linux/amd64", "linux/arm64"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: docker/setup-qemu-action@v3
 
       - name: Extract requirements from the manifest
