@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "위도",
                     "longitude": "경도",
-                    "altitude": "고도 (m)"
+                    "elevation": "고도 (m)"
                 }
             },
             "precision": {

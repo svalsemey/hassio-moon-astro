@@ -16,27 +16,21 @@ import zoneinfo
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.util import dt as dt_util
+from homeassistant.util.hass_dict import HassKey
 
 from .const import (
     CACHE_DIR_NAME,
     CONF_TIME_ZONE,
     CONF_USE_HA_TZ,
-    DATA_COORDINATOR,
-    DATA_EVENTS_COORDINATOR,
     DE440_FILE,
     DEFAULT_USE_HA_TZ,
     DOMAIN,
-    MANUFACTURER,
-    MODEL,
-    NAME,
 )
-from .coordinator import MoonAstroCoordinator, MoonAstroEventsCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-_EPHEMERIS_LOCK = "ephemeris_lock"
+EPHEMERIS_LOCK_KEY: HassKey[asyncio.Lock] = HassKey(f"{DOMAIN}_ephemeris_lock")
 
 try:
     from skyfield.api import Loader
@@ -50,19 +44,17 @@ except ImportError:  # pragma: no cover
 def get_ephemeris_lock(hass: HomeAssistant) -> asyncio.Lock:
     """Return the shared lock used to prevent concurrent ephemeris downloads.
 
+    The lock is created on first use and kept in hass.data so that config flows and
+    entry setups running concurrently serialize their downloads.
+
     Args:
         hass: Home Assistant instance.
 
     Returns:
-        A shared asyncio.Lock instance stored in hass.data.
+        The shared asyncio.Lock instance.
     """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    lock = domain_data.get(_EPHEMERIS_LOCK)
-    if isinstance(lock, asyncio.Lock):
-        return lock
-
-    lock = asyncio.Lock()
-    domain_data[_EPHEMERIS_LOCK] = lock
+    if (lock := hass.data.get(EPHEMERIS_LOCK_KEY)) is None:
+        lock = hass.data[EPHEMERIS_LOCK_KEY] = asyncio.Lock()
     return lock
 
 
@@ -325,78 +317,3 @@ async def async_resolve_time_zone(entry: ConfigEntry) -> tzinfo:
         name,
     )
     return dt_util.get_default_time_zone()
-
-
-def get_entry_coordinators(
-    hass: HomeAssistant, entry: ConfigEntry
-) -> tuple[MoonAstroCoordinator | None, MoonAstroEventsCoordinator | None]:
-    """Return the main and events coordinators for a config entry.
-
-    This helper centralizes hass.data access and ensures runtime objects are validated
-    before use by platforms.
-
-    Args:
-        hass: Home Assistant instance.
-        entry: Config entry.
-
-    Returns:
-        A tuple (main_coordinator, events_coordinator). Each item may be None if the
-        corresponding object cannot be resolved.
-    """
-    domain_data = hass.data.get(DOMAIN)
-    if not isinstance(domain_data, dict):
-        return None, None
-
-    entry_data = domain_data.get(entry.entry_id)
-    if not isinstance(entry_data, dict):
-        return None, None
-
-    main_raw = entry_data.get(DATA_COORDINATOR)
-    main = main_raw if isinstance(main_raw, MoonAstroCoordinator) else None
-
-    events_raw = entry_data.get(DATA_EVENTS_COORDINATOR)
-    events = events_raw if isinstance(events_raw, MoonAstroEventsCoordinator) else None
-
-    return main, events
-
-
-def get_entry_device_info(entry: ConfigEntry) -> DeviceInfo:
-    """Return the DeviceInfo shared by all entities of a config entry.
-
-    Args:
-        entry: Config entry.
-
-    Returns:
-        A DeviceInfo instance using stable identifiers and human-friendly metadata.
-    """
-    return DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer=MANUFACTURER,
-        model=MODEL,
-        name=NAME,
-    )
-
-
-def make_unique_id(entry_id: str, suffix: str) -> str:
-    """Build a stable unique_id for an entity.
-
-    Args:
-        entry_id: Home Assistant config entry ID.
-        suffix: Entity-specific suffix (stable identifier).
-
-    Returns:
-        A stable unique_id string.
-    """
-    return f"moon_astro_{entry_id}_{suffix}"
-
-
-def make_suggested_object_id(slug: str) -> str:
-    """Return a stable suggested object_id for entity_id creation.
-
-    Args:
-        slug: Stable non-localized slug.
-
-    Returns:
-        A suggested object_id string.
-    """
-    return slug

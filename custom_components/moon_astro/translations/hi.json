@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "अक्षांश",
                     "longitude": "देशांतर",
-                    "altitude": "ऊँचाई (मीटर)"
+                    "elevation": "ऊँचाई (मीटर)"
                 }
             },
             "precision": {

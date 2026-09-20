@@ -8,37 +8,34 @@ downloads across flows and entry reloads.
 
 from __future__ import annotations
 
-import asyncio
-from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 import time
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.event import async_track_point_in_time
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from homeassistant.helpers.event import async_call_later
 
 from .const import (
-    CACHE_DIR_NAME,
     CONF_EVENTS_REFRESH_FALLBACK,
     CONF_SCAN_INTERVAL,
-    DATA_COORDINATOR,
-    DATA_EVENTS_COORDINATOR,
-    DE440_FILE,
     DEFAULT_EVENTS_REFRESH_FALLBACK,
     DEFAULT_EVENTS_STARTUP_DELAY,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
 from .coordinator import (
-    _SHARED_EPHEMERIS_STORE_KEY,
+    SHARED_EPHEMERIS_KEY,
+    MoonAstroConfigEntry,
     MoonAstroCoordinator,
     MoonAstroEventsCoordinator,
+    MoonAstroRuntimeData,
+    async_get_shared_ephemeris,
 )
 from .utils import (
+    EPHEMERIS_LOCK_KEY,
     async_resolve_time_zone,
     cleanup_cache_dir,
     ensure_valid_ephemeris,
@@ -47,56 +44,9 @@ from .utils import (
     validate_ephemeris_file,
 )
 
-PLATFORMS: list[str] = ["binary_sensor", "sensor"]
-
-_DATA_REFRESH_TASKS = "refresh_tasks"
-_STARTUP_EVENTS_TIMER = "startup_events_timer"
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def _get_refresh_tasks(hass: HomeAssistant) -> dict[str, asyncio.Task[None]]:
-    """Return the internal mapping of entry_id -> initial refresh task.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        A dictionary mapping config entry IDs to asyncio tasks.
-    """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    tasks: dict[str, asyncio.Task[None]] = domain_data.setdefault(
-        _DATA_REFRESH_TASKS, {}
-    )
-    return tasks
-
-
-def _get_startup_events_timers(hass: HomeAssistant) -> dict[str, Callable[[], None]]:
-    """Return the internal mapping of entry_id -> scheduled startup events refresh cancel callback.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        A dictionary mapping config entry IDs to cancellation callables.
-    """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    timers: dict[str, Callable[[], None]] = domain_data.setdefault(
-        _STARTUP_EVENTS_TIMER, {}
-    )
-    return timers
-
-
-def _ephemeris_path(hass: HomeAssistant) -> Path:
-    """Return the full ephemeris file path.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        The Path to the ephemeris file.
-    """
-    return Path(hass.config.path(CACHE_DIR_NAME)) / DE440_FILE
 
 
 def _safe_stat_size(path: Path) -> int | None:
@@ -176,6 +126,8 @@ async def _async_prepare_ephemeris(hass: HomeAssistant, *, reason: str) -> None:
 
         dl_started = time.monotonic()
         download_ok = await ensure_valid_ephemeris(hass)
+        # The file on disk may have been replaced: drop any kernel loaded from it.
+        hass.data.pop(SHARED_EPHEMERIS_KEY, None)
         _LOGGER.info(
             "Ephemeris download completed (%s): %s (elapsed=%.3fs)",
             reason,
@@ -215,7 +167,7 @@ async def _async_prepare_ephemeris(hass: HomeAssistant, *, reason: str) -> None:
         )
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: MoonAstroConfigEntry) -> bool:
     """Set up Moon Astro from a config entry.
 
     Args:
@@ -229,121 +181,118 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ConfigEntryNotReady: If required resources cannot be prepared yet.
     """
     await _async_prepare_ephemeris(hass, reason="startup_or_reload")
+
+    try:
+        eph, ts = await async_get_shared_ephemeris(hass)
+    except (OSError, ValueError, RuntimeError) as err:
+        raise ConfigEntryNotReady("Ephemeris file could not be loaded") from err
+
     time_zone = await async_resolve_time_zone(entry)
-
-    scan_seconds = entry.options.get(
-        CONF_SCAN_INTERVAL,
-        DEFAULT_SCAN_INTERVAL,
+    entry.runtime_data = MoonAstroRuntimeData(
+        coordinator=MoonAstroCoordinator(
+            hass,
+            entry,
+            eph=eph,
+            ts=ts,
+            interval=timedelta(
+                seconds=int(entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
+            ),
+            tz=time_zone,
+        ),
+        events_coordinator=MoonAstroEventsCoordinator(
+            hass,
+            entry,
+            eph=eph,
+            ts=ts,
+            interval=timedelta(
+                seconds=int(
+                    entry.options.get(
+                        CONF_EVENTS_REFRESH_FALLBACK, DEFAULT_EVENTS_REFRESH_FALLBACK
+                    )
+                )
+            ),
+            tz=time_zone,
+        ),
     )
-    coordinator = MoonAstroCoordinator.from_config_entry(
-        hass,
-        entry,
-        timedelta(seconds=int(scan_seconds)),
-        time_zone
-    )
-
-    events_fallback_seconds = entry.options.get(
-        CONF_EVENTS_REFRESH_FALLBACK,
-        DEFAULT_EVENTS_REFRESH_FALLBACK,
-    )
-    events_coordinator = MoonAstroEventsCoordinator.from_config_entry(
-        hass,
-        entry,
-        timedelta(seconds=int(events_fallback_seconds)),
-        time_zone
-    )
-
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {
-        DATA_COORDINATOR: coordinator,
-        DATA_EVENTS_COORDINATOR: events_coordinator,
-    }
 
     entry.async_on_unload(entry.add_update_listener(async_update_options))
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    async def _async_deferred_initial_refresh() -> None:
-        """Run the initial refresh sequence without blocking the setup path.
-
-        The main coordinator is refreshed first to populate frequently changing sensors.
-        The events coordinator refresh is scheduled using the Home Assistant scheduler
-        to avoid long sleeps inside a task.
-        """
-        await asyncio.sleep(0)
-
-        try:
-            _LOGGER.debug(
-                "Initial refresh: starting main coordinator refresh (entry_id=%s)",
-                entry.entry_id,
-            )
-            await coordinator.async_refresh()
-        except asyncio.CancelledError:
-            raise
-        except UpdateFailed:
-            _LOGGER.debug(
-                "Initial refresh: main coordinator refresh failed (entry_id=%s)",
-                entry.entry_id,
-            )
-            return
-
-        @callback
-        def _events_cb(_: datetime) -> None:
-            """Refresh event-based data after the startup delay.
-
-            Args:
-                _: The trigger time provided by the scheduler.
-
-            Returns:
-                None.
-            """
-            _LOGGER.debug(
-                "Initial refresh: running scheduled events refresh (entry_id=%s)",
-                entry.entry_id,
-            )
-            timers = _get_startup_events_timers(hass)
-            timers.pop(entry.entry_id, None)
-
-            # Schedule the coroutine in a thread-safe way.
-            hass.create_task(events_coordinator.async_refresh())
-
-        # Cancel any previously scheduled timer for this entry_id.
-        timers = _get_startup_events_timers(hass)
-        cancel_prev = timers.pop(entry.entry_id, None)
-        if cancel_prev is not None:
-            cancel_prev()
-
-        # Schedule the events refresh after a startup delay.
-        _LOGGER.info(
-            "Deferring event-based sensors initial refresh by %s seconds; a periodic fallback refresh is also enabled via options",
-            DEFAULT_EVENTS_STARTUP_DELAY,
-        )
-        delay_seconds = DEFAULT_EVENTS_STARTUP_DELAY
-        when = datetime.now(UTC) + timedelta(seconds=delay_seconds)
-        _LOGGER.debug(
-            "Initial refresh: scheduling events refresh (entry_id=%s delay_seconds=%s when_utc=%s)",
-            entry.entry_id,
-            delay_seconds,
-            when.isoformat(),
-        )
-        timers[entry.entry_id] = async_track_point_in_time(hass, _events_cb, when)
-
-    refresh_task = hass.async_create_task(
-        _async_deferred_initial_refresh(),
+    entry.async_create_background_task(
+        hass,
+        _async_deferred_initial_refresh(hass, entry),
         name=f"{DOMAIN}-{entry.entry_id}-initial_refresh",
     )
-
-    tasks = _get_refresh_tasks(hass)
-    tasks[entry.entry_id] = refresh_task
-
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def _async_deferred_initial_refresh(
+    hass: HomeAssistant, entry: MoonAstroConfigEntry
+) -> None:
+    """Run the initial refresh sequence without blocking the setup path.
+
+    The main coordinator is refreshed first to populate frequently changing sensors.
+    The events coordinator refresh is then scheduled after a startup delay through
+    the Home Assistant scheduler; the pending timer is cancelled automatically if
+    the entry is unloaded before it fires.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Loaded config entry.
+
+    Returns:
+        None.
+    """
+    runtime = entry.runtime_data
+
+    _LOGGER.debug(
+        "Initial refresh: starting main coordinator refresh (entry_id=%s)",
+        entry.entry_id,
+    )
+    await runtime.coordinator.async_refresh()
+    if not runtime.coordinator.last_update_success:
+        _LOGGER.debug(
+            "Initial refresh: main coordinator refresh failed (entry_id=%s)",
+            entry.entry_id,
+        )
+        return
+
+    @callback
+    def _events_cb(_: datetime) -> None:
+        """Start the event-based refresh once the startup delay has elapsed.
+
+        Args:
+            _: The trigger time provided by the scheduler.
+
+        Returns:
+            None.
+        """
+        _LOGGER.debug(
+            "Initial refresh: running scheduled events refresh (entry_id=%s)",
+            entry.entry_id,
+        )
+        entry.async_create_background_task(
+            hass,
+            runtime.events_coordinator.async_refresh(),
+            name=f"{DOMAIN}-{entry.entry_id}-events_initial_refresh",
+        )
+
+    _LOGGER.info(
+        "Deferring event-based sensors initial refresh by %s seconds; a periodic fallback refresh is also enabled via options",
+        DEFAULT_EVENTS_STARTUP_DELAY,
+    )
+    entry.async_on_unload(
+        async_call_later(hass, DEFAULT_EVENTS_STARTUP_DELAY, _events_cb)
+    )
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: MoonAstroConfigEntry) -> bool:
     """Unload a config entry.
 
-    This function is used for entry unload/reload operations and must keep the
-    ephemeris cache to avoid triggering a new download after reload.
+    Both coordinators are shut down by Home Assistant through the unload callbacks
+    they registered on the entry, and the pending startup task and timer are
+    cancelled the same way. The ephemeris cache is kept to avoid a new download
+    after a reload.
 
     Args:
         hass: Home Assistant instance.
@@ -355,50 +304,16 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         return False
 
-    tasks = _get_refresh_tasks(hass)
-    task = tasks.pop(entry.entry_id, None)
-    if task is not None:
-        task.cancel()
-
-    timers = _get_startup_events_timers(hass)
-    cancel = timers.pop(entry.entry_id, None)
-    if cancel is not None:
-        cancel()
-        _LOGGER.debug(
-            "Unload: cancelled startup events refresh timer (entry_id=%s)",
-            entry.entry_id,
-        )
-
-    entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
-    if isinstance(entry_data, dict):
-        events_coordinator = entry_data.get(DATA_EVENTS_COORDINATOR)
-        if isinstance(events_coordinator, MoonAstroEventsCoordinator):
-            await events_coordinator.async_shutdown()
-
-    domain_data = hass.data.get(DOMAIN, {})
-    domain_data.pop(entry.entry_id, None)
-
-    if not tasks:
-        domain_data.pop(_DATA_REFRESH_TASKS, None)
-    if not timers:
-        domain_data.pop(_STARTUP_EVENTS_TIMER, None)
-    if not domain_data:
-        hass.data.pop(DOMAIN, None)
-
-    await cleanup_cache_dir(
-        hass,
-        remove_ephemeris=False,
-        remove_empty_dir=True,
-    )
-
+    await cleanup_cache_dir(hass, remove_empty_dir=True)
     return True
 
 
-async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def async_remove_entry(hass: HomeAssistant, entry: MoonAstroConfigEntry) -> None:
     """Handle config entry removal.
 
     This function is called when the config entry is removed from Home Assistant.
-    It performs definitive cleanup of cached resources, including the ephemeris file.
+    It performs definitive cleanup of cached resources, including the ephemeris file,
+    and drops the shared in-memory objects once no other entry uses them.
 
     Args:
         hass: Home Assistant instance.
@@ -407,25 +322,21 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     Returns:
         None.
     """
-    eph_path = _ephemeris_path(hass)
-    _LOGGER.info("Entry removed: deleting ephemeris cache (file=%s)", str(eph_path))
-
-    await cleanup_cache_dir(
-        hass,
-        remove_ephemeris=True,
-        remove_empty_dir=True,
+    _LOGGER.info(
+        "Entry removed: deleting ephemeris cache (file=%s)", get_ephemeris_path(hass)
     )
+    await cleanup_cache_dir(hass, remove_ephemeris=True, remove_empty_dir=True)
 
-    domain_data = hass.data.get(DOMAIN)
-    if isinstance(domain_data, dict):
-        entries = hass.config_entries.async_entries(DOMAIN)
-        if not entries:
-            domain_data.pop(_SHARED_EPHEMERIS_STORE_KEY, None)
-            if not domain_data:
-                hass.data.pop(DOMAIN, None)
+    # The removed entry is still listed at this point, so only other entries count.
+    if all(
+        other.entry_id == entry.entry_id
+        for other in hass.config_entries.async_entries(DOMAIN)
+    ):
+        hass.data.pop(SHARED_EPHEMERIS_KEY, None)
+        hass.data.pop(EPHEMERIS_LOCK_KEY, None)
 
 
-async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def async_update_options(hass: HomeAssistant, entry: MoonAstroConfigEntry) -> None:
     """Handle options update by reloading the entry.
 
     Args:

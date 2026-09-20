@@ -36,10 +36,6 @@ STANDARD_PRECISION_BRACKET_EXPAND = 1
 CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
 
-# Internal hass.data keys used by the integration to store entry runtime objects.
-DATA_COORDINATOR = "coordinator"
-DATA_EVENTS_COORDINATOR = "events_coordinator"
-
 # Moon phase codes from Skyfield almanac (integers)
 DARK_MOON = 0
 FIRST_QUARTER = 1
@@ -102,19 +98,15 @@ KEY_PREVIOUS_FULL_MOON_ALT_NAMES = "previous_full_moon_alt_names"
 KEY_ABOVE_HORIZON = "above_horizon"
 KEY_WAXING = "waxing"
 
+# Extra state attributes
+ATTR_NEXT_UPDATE = "next_update"
+
 # Zodiac sign sensors (strings)
 KEY_ZODIAC_SIGN_CURRENT_MOON = "zodiac_sign_current_moon"
 KEY_ZODIAC_SIGN_NEXT_FULL_MOON = "zodiac_sign_next_full_moon"
 KEY_ZODIAC_SIGN_NEXT_NEW_MOON = "zodiac_sign_next_new_moon"
 KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON = "zodiac_sign_previous_full_moon"
 KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON = "zodiac_sign_previous_new_moon"
-
-# Zodiac icons for lunations (MDI icon names as strings)
-KEY_ZODIAC_ICON_CURRENT_MOON = "zodiac_icon_current_moon"
-KEY_ZODIAC_ICON_NEXT_FULL_MOON = "zodiac_icon_next_full_moon"
-KEY_ZODIAC_ICON_NEXT_NEW_MOON = "zodiac_icon_next_new_moon"
-KEY_ZODIAC_ICON_PREVIOUS_FULL_MOON = "zodiac_icon_previous_full_moon"
-KEY_ZODIAC_ICON_PREVIOUS_NEW_MOON = "zodiac_icon_previous_new_moon"
 
 # Zodiac degree sensors (floats, degrees within sign 0..30)
 KEY_ZODIAC_DEGREE_CURRENT_MOON = "zodiac_degree_current_moon"
@@ -137,3 +129,44 @@ PRECISION_ZODIAC_DEGREE = 2
 NEW_MOON_STRICT_PCT = 0.8
 FULL_MOON_STRICT_PCT = 99.5
 QUARTER_TOL_PCT = 3.0
+
+# Fixed state code sets; they are also the ENUM options of the matching sensors
+PHASE_CODES: tuple[str, ...] = (
+    "new_moon",
+    "waxing_crescent",
+    "first_quarter",
+    "waxing_gibbous",
+    "full_moon",
+    "waning_gibbous",
+    "last_quarter",
+    "waning_crescent",
+)
+ZODIAC_SIGNS: tuple[str, ...] = (
+    "aries",
+    "taurus",
+    "gemini",
+    "cancer",
+    "leo",
+    "virgo",
+    "libra",
+    "scorpio",
+    "sagittarius",
+    "capricorn",
+    "aquarius",
+    "pisces",
+)
+# Traditional full moon names indexed by Gregorian month, January first
+FULL_MOON_NAMES: tuple[str, ...] = (
+    "wolf_moon",
+    "snow_moon",
+    "worm_moon",
+    "pink_moon",
+    "flower_moon",
+    "strawberry_moon",
+    "buck_moon",
+    "sturgeon_moon",
+    "harvest_moon",
+    "hunters_moon",
+    "beaver_moon",
+    "cold_moon",
+)

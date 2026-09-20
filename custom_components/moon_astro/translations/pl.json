@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Szerokość geograficzna",
                     "longitude": "Długość geograficzna",
-                    "altitude": "Wysokość (m)"
+                    "elevation": "Wysokość (m)"
                 }
             },
             "precision": {

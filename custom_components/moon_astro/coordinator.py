@@ -12,14 +12,14 @@ The code is structured to:
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta, tzinfo
+from functools import partial
 from itertools import pairwise
 import logging
 import math
-from pathlib import Path
 from typing import Any
 
 from skyfield import almanac
@@ -27,12 +27,12 @@ from skyfield.api import Loader, wgs84
 from skyfield.timelib import Time
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util.hass_dict import HassKey
 
 from .const import (
-    CACHE_DIR_NAME,
     CONF_ALT,
     CONF_HIGH_PRECISION,
     CONF_LAT,
@@ -43,6 +43,7 @@ from .const import (
     DOMAIN,
     FIRST_QUARTER,
     FULL_MOON,
+    FULL_MOON_NAMES,
     FULL_MOON_STRICT_PCT,
     HIGH_PRECISION_BRACKET_EXPAND,
     HIGH_PRECISION_BRACKETS_TO_REFINE,
@@ -92,11 +93,6 @@ from .const import (
     KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
     KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
     KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
-    KEY_ZODIAC_ICON_CURRENT_MOON,
-    KEY_ZODIAC_ICON_NEXT_FULL_MOON,
-    KEY_ZODIAC_ICON_NEXT_NEW_MOON,
-    KEY_ZODIAC_ICON_PREVIOUS_FULL_MOON,
-    KEY_ZODIAC_ICON_PREVIOUS_NEW_MOON,
     KEY_ZODIAC_SIGN_CURRENT_MOON,
     KEY_ZODIAC_SIGN_NEXT_FULL_MOON,
     KEY_ZODIAC_SIGN_NEXT_NEW_MOON,
@@ -107,7 +103,9 @@ from .const import (
     QUARTER_TOL_PCT,
     STANDARD_PRECISION_BRACKET_EXPAND,
     STANDARD_PRECISION_STEP_HOURS,
+    ZODIAC_SIGNS,
 )
+from .utils import get_cache_dir
 
 # Type aliases to improve readability where the 3rd-party library does not expose stable typing.
 type Ephemeris = Any
@@ -147,8 +145,34 @@ _PHASE_VALUES: tuple[int, int, int, int] = (
     LAST_QUARTER,
 )
 
-_SHARED_EPHEMERIS_STORE_KEY = "shared_ephemeris_store"
-_SHARED_EPHEMERIS_ITEM_KEY = "eph_ts"
+# Payload keys of the upcoming events used to schedule the next event-based refresh.
+_NEXT_EVENT_KEYS: tuple[str, ...] = (
+    KEY_NEXT_NEW_MOON,
+    KEY_NEXT_FIRST_QUARTER,
+    KEY_NEXT_FULL_MOON,
+    KEY_NEXT_LAST_QUARTER,
+    KEY_NEXT_APOGEE,
+    KEY_NEXT_PERIGEE,
+)
+
+# Zodiac payload keys (sign, degree within sign) per longitude source.
+_ZODIAC_KEYS: dict[str, tuple[str, str]] = {
+    "current": (KEY_ZODIAC_SIGN_CURRENT_MOON, KEY_ZODIAC_DEGREE_CURRENT_MOON),
+    "next_new": (KEY_ZODIAC_SIGN_NEXT_NEW_MOON, KEY_ZODIAC_DEGREE_NEXT_NEW_MOON),
+    "next_full": (KEY_ZODIAC_SIGN_NEXT_FULL_MOON, KEY_ZODIAC_DEGREE_NEXT_FULL_MOON),
+    "prev_new": (
+        KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON,
+        KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
+    ),
+    "prev_full": (
+        KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON,
+        KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+    ),
+}
+
+SHARED_EPHEMERIS_KEY: HassKey[tuple[Ephemeris, Timescale]] = HassKey(
+    f"{DOMAIN}_shared_ephemeris"
+)
 
 # -----------------------------------------------------------------------------
 # Timezone and datetime formatting helpers
@@ -1899,16 +1923,16 @@ def _find_previous_perigee(
 
 @dataclass(frozen=True)
 class _PhaseEvents:
-    """Container for phase events used across computations."""
+    """Next and previous phase events around a reference time."""
 
-    next_new: Time | None
-    next_first: Time | None
-    next_full: Time | None
-    next_last: Time | None
-    prev_new: Time | None
-    prev_first: Time | None
-    prev_full: Time | None
-    prev_last: Time | None
+    next_new: Time | None = None
+    next_first: Time | None = None
+    next_full: Time | None = None
+    next_last: Time | None = None
+    prev_new: Time | None = None
+    prev_first: Time | None = None
+    prev_full: Time | None = None
+    prev_last: Time | None = None
 
 
 def _iter_phase_pairs(
@@ -1948,11 +1972,6 @@ def _extract_phase_events_from_discrete(
             next_map[pv] = ti
         if ti.tt < t_ref.tt:
             prev_map[pv] = ti
-
-        if all(next_map[p] is not None for p in _PHASE_VALUES):
-            # We still want complete prev_map, but it is safe to stop early if we already
-            # crossed t_ref and have found all next values and the list is ordered.
-            pass
 
     return _PhaseEvents(
         next_new=next_map[DARK_MOON],
@@ -2020,46 +2039,32 @@ def _is_second_full_moon_in_same_month_local(
 
 
 def _full_moon_name_code(month: int) -> str:
-    """Return the canonical full moon name code for a given month.
+    """Return the traditional full moon name code for a Gregorian month.
 
     Args:
-        month: Month number [1..12].
+        month: Month number in [1, 12].
 
     Returns:
         Name code.
     """
-    mapping: dict[int, str] = {
-        1: "wolf_moon",
-        2: "snow_moon",
-        3: "worm_moon",
-        4: "pink_moon",
-        5: "flower_moon",
-        6: "strawberry_moon",
-        7: "buck_moon",
-        8: "sturgeon_moon",
-        9: "harvest_moon",
-        10: "hunters_moon",
-        11: "beaver_moon",
-        12: "cold_moon",
-    }
-    return mapping.get(month, "unknown")
+    return FULL_MOON_NAMES[month - 1]
 
 
 def _full_moon_alt_names_state_code(full_moon_name_code: str | None) -> str | None:
-    """Return the translation state code for full moon alternative names.
+    """Return the translation state code listing the alternative full moon names.
+
+    A blue moon has no traditional alternative names and maps to an empty state.
 
     Args:
         full_moon_name_code: Full moon name code.
 
     Returns:
-        Translation state code or None.
+        Translation state code, or None when no full moon is known.
     """
-    if not full_moon_name_code:
+    if full_moon_name_code is None:
         return None
     if full_moon_name_code == "blue_moon":
         return ""
-    if full_moon_name_code == "unknown":
-        return "unknown"
     return f"{full_moon_name_code}_alt_names"
 
 
@@ -2110,31 +2115,17 @@ def _next_full_moon_name_code_from_events(
 # -----------------------------------------------------------------------------
 
 
-def _zodiac_sign_from_longitude_deg(lon_deg: float) -> str | None:
-    """Map ecliptic longitude to a zodiac sign name.
+def _zodiac_sign_from_longitude_deg(lon_deg: float) -> str:
+    """Map an ecliptic longitude to a zodiac sign code.
 
     Args:
         lon_deg: Ecliptic longitude in degrees.
 
     Returns:
-        Lowercase zodiac sign name or None for NaN inputs.
+        Lowercase zodiac sign code.
     """
-    idx = int((lon_deg % 360.0) // 30) % 12
-    names = [
-        "aries",
-        "taurus",
-        "gemini",
-        "cancer",
-        "leo",
-        "virgo",
-        "libra",
-        "scorpio",
-        "sagittarius",
-        "capricorn",
-        "aquarius",
-        "pisces",
-    ]
-    return names[idx]
+    # The modulo guards against a normalized longitude rounding up to exactly 360.
+    return ZODIAC_SIGNS[int((lon_deg % 360.0) // 30.0) % 12]
 
 
 def _degree_within_sign(lon_deg: float) -> float:
@@ -2151,33 +2142,6 @@ def _degree_within_sign(lon_deg: float) -> float:
     """
     lon_norm = (float(lon_deg) % 360.0 + 360.0) % 360.0
     return lon_norm - (math.floor(lon_norm / 30.0) * 30.0)
-
-
-def _zodiac_icon(sign: str | None) -> str | None:
-    """Return an MDI icon name for a zodiac sign.
-
-    Args:
-        sign: Lowercase zodiac sign name.
-
-    Returns:
-        Corresponding icon string or None if unknown.
-    """
-    if not sign:
-        return None
-    return {
-        "aries": "mdi:zodiac-aries",
-        "taurus": "mdi:zodiac-taurus",
-        "gemini": "mdi:zodiac-gemini",
-        "cancer": "mdi:zodiac-cancer",
-        "leo": "mdi:zodiac-leo",
-        "virgo": "mdi:zodiac-virgo",
-        "libra": "mdi:zodiac-libra",
-        "scorpio": "mdi:zodiac-scorpio",
-        "sagittarius": "mdi:zodiac-sagittarius",
-        "capricorn": "mdi:zodiac-capricorn",
-        "aquarius": "mdi:zodiac-aquarius",
-        "pisces": "mdi:zodiac-pisces",
-    }.get(sign)
 
 
 # -----------------------------------------------------------------------------
@@ -2435,16 +2399,7 @@ class _Calc:
 
             events_obj = _extract_phase_events_from_discrete(t, times_list, phases_list)
         except _RECOVERABLE_SKYFIELD_ERRORS:
-            events_obj = _PhaseEvents(
-                next_new=None,
-                next_first=None,
-                next_full=None,
-                next_last=None,
-                prev_new=None,
-                prev_first=None,
-                prev_full=None,
-                prev_last=None,
-            )
+            events_obj = _PhaseEvents()
 
         next_full_name = _next_full_moon_name_code_from_events(
             tz_effective, next_full=events_obj.next_full, prev_full=events_obj.prev_full
@@ -2563,114 +2518,53 @@ class _Calc:
         return payload, raw_lons
 
     @staticmethod
-    def zodiac(
-        current_lon_geo: float,
-        *,
-        lon_next_new: float | None,
-        lon_next_full: float | None,
-        lon_prev_new: float | None,
-        lon_prev_full: float | None,
-    ) -> dict[str, Any]:
-        """Compute zodiac sign/degree/icon keys for current and lunation longitudes.
+    def zodiac(longitudes: Mapping[str, float | None]) -> dict[str, Any]:
+        """Compute zodiac sign and degree-in-sign keys for a set of longitudes.
 
         Args:
-            current_lon_geo: Current geocentric ecliptic longitude of the Moon in degrees.
-            lon_next_new: Ecliptic longitude at next new moon in degrees (or None).
-            lon_next_full: Ecliptic longitude at next full moon in degrees (or None).
-            lon_prev_new: Ecliptic longitude at previous new moon in degrees (or None).
-            lon_prev_full: Ecliptic longitude at previous full moon in degrees (or None).
+            longitudes: Unrounded geocentric ecliptic longitudes in degrees (or None
+                when unavailable), keyed by a source name listed in _ZODIAC_KEYS.
 
         Returns:
-            A payload dictionary fragment containing only zodiac keys.
+            A payload dictionary fragment with the sign and degree keys of each source.
         """
-
-        def zodiac_from_lon(
-            lon_deg: float | None,
-        ) -> tuple[str | None, float | None, str | None]:
-            """Return zodiac sign, degree in sign and icon from longitude.
-
-            Args:
-                lon_deg: Ecliptic longitude in degrees.
-
-            Returns:
-                A tuple (sign, degree_in_sign, icon) where each item may be None.
-            """
-            if lon_deg is None:
-                return None, None, None
-            try:
-                lon_raw = float(lon_deg)
-                sign = _zodiac_sign_from_longitude_deg(lon_raw)
-                degree_raw = _degree_within_sign(lon_raw)
-                degree = round(degree_raw, 4)
-                return sign, degree, _zodiac_icon(sign)
-            except (ValueError, ArithmeticError) as exc:
-                _LOGGER.debug("Failed zodiac computation: %r", exc)
-                return None, None, None
-
-        sign_cur, deg_cur, icon_cur = zodiac_from_lon(current_lon_geo)
-        sign_nn, deg_nn, icon_nn = zodiac_from_lon(lon_next_new)
-        sign_nf, deg_nf, icon_nf = zodiac_from_lon(lon_next_full)
-        sign_pn, deg_pn, icon_pn = zodiac_from_lon(lon_prev_new)
-        sign_pf, deg_pf, icon_pf = zodiac_from_lon(lon_prev_full)
-
-        return {
-            KEY_ZODIAC_SIGN_CURRENT_MOON: sign_cur,
-            KEY_ZODIAC_DEGREE_CURRENT_MOON: deg_cur,
-            KEY_ZODIAC_ICON_CURRENT_MOON: icon_cur,
-            KEY_ZODIAC_SIGN_NEXT_NEW_MOON: sign_nn,
-            KEY_ZODIAC_DEGREE_NEXT_NEW_MOON: deg_nn,
-            KEY_ZODIAC_ICON_NEXT_NEW_MOON: icon_nn,
-            KEY_ZODIAC_SIGN_NEXT_FULL_MOON: sign_nf,
-            KEY_ZODIAC_DEGREE_NEXT_FULL_MOON: deg_nf,
-            KEY_ZODIAC_ICON_NEXT_FULL_MOON: icon_nf,
-            KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON: sign_pn,
-            KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON: deg_pn,
-            KEY_ZODIAC_ICON_PREVIOUS_NEW_MOON: icon_pn,
-            KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON: sign_pf,
-            KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON: deg_pf,
-            KEY_ZODIAC_ICON_PREVIOUS_FULL_MOON: icon_pf,
-        }
+        payload: dict[str, Any] = {}
+        for source, lon_deg in longitudes.items():
+            sign_key, degree_key = _ZODIAC_KEYS[source]
+            payload[sign_key] = (
+                None if lon_deg is None else _zodiac_sign_from_longitude_deg(lon_deg)
+            )
+            payload[degree_key] = (
+                None if lon_deg is None else round(_degree_within_sign(lon_deg), 4)
+            )
+        return payload
 
 
-def _get_shared_ephemeris_store(hass: HomeAssistant) -> dict[str, Any]:
-    """Return the shared store used to reuse loaded ephemeris objects.
+async def async_get_shared_ephemeris(
+    hass: HomeAssistant,
+) -> tuple[Ephemeris, Timescale]:
+    """Return the ephemeris and timescale shared by all coordinators.
+
+    The Skyfield objects are loaded once per Home Assistant instance and cached in
+    hass.data so that entry reloads and both coordinators reuse the same kernel.
 
     Args:
         hass: Home Assistant instance.
 
     Returns:
-        A dictionary stored in hass.data used to share heavy Skyfield objects.
+        A tuple (ephemeris, timescale).
     """
-    domain_data = hass.data.setdefault(DOMAIN, {})
-    raw = domain_data.get(_SHARED_EPHEMERIS_STORE_KEY)
-    if isinstance(raw, dict):
-        return raw
+    if (shared := hass.data.get(SHARED_EPHEMERIS_KEY)) is not None:
+        return shared
 
-    store: dict[str, Any] = {}
-    domain_data[_SHARED_EPHEMERIS_STORE_KEY] = store
-    return store
+    def _load() -> tuple[Ephemeris, Timescale]:
+        """Load the ephemeris kernel and timescale from the cache directory."""
+        loader = Loader(str(get_cache_dir(hass)))
+        return loader(DE440_FILE), loader.timescale()
 
-
-def _get_cached_ephemeris_tuple(
-    store: dict[str, Any],
-) -> tuple[Ephemeris, Timescale] | None:
-    """Return a cached (ephemeris, timescale) tuple from the shared store.
-
-    Args:
-        store: Shared store dictionary.
-
-    Returns:
-        A (ephemeris, timescale) tuple or None if not available/invalid.
-    """
-    cached = store.get(_SHARED_EPHEMERIS_ITEM_KEY)
-    if not (isinstance(cached, tuple) and len(cached) == 2):
-        return None
-
-    eph, ts = cached
-    if eph is None or ts is None:
-        return None
-
-    return eph, ts
+    shared = await hass.async_add_executor_job(_load)
+    hass.data[SHARED_EPHEMERIS_KEY] = shared
+    return shared
 
 
 # -----------------------------------------------------------------------------
@@ -2684,9 +2578,10 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
-        lat: float,
-        lon: float,
-        elev: float,
+        entry: MoonAstroConfigEntry,
+        *,
+        eph: Ephemeris,
+        ts: Timescale,
         interval: timedelta,
         tz: tzinfo,
     ) -> None:
@@ -2694,206 +2589,81 @@ class MoonAstroCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         Args:
             hass: Home Assistant instance.
-            lat: Observer latitude in degrees.
-            lon: Observer longitude in degrees.
-            elev: Observer elevation in meters.
+            entry: Config entry providing the observer coordinates.
+            eph: Loaded ephemeris shared with the other coordinators.
+            ts: Loaded timescale shared with the other coordinators.
             interval: Update interval for the coordinator.
             tz: Time zone used to localize event timestamps.
         """
         super().__init__(
             hass,
             logger=_LOGGER,
+            config_entry=entry,
             name="Moon Astro",
             update_interval=interval,
         )
-        self._lat: float = float(lat)
-        self._lon: float = float(lon)
-        self._elev: float = float(elev)
-        self._eph: Ephemeris | None = None
-        self._ts: Timescale | None = None
-        self._tz: tzinfo = tz
-        self._hass: HomeAssistant = hass
+        self._lat = float(entry.data.get(CONF_LAT, hass.config.latitude))
+        self._lon = float(entry.data.get(CONF_LON, hass.config.longitude))
+        self._elev = float(entry.data.get(CONF_ALT, hass.config.elevation))
+        self._eph = eph
+        self._ts = ts
+        self._tz = tz
 
-    @classmethod
-    def from_config_entry(
-        cls,
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        interval: timedelta,
-        tz: tzinfo,
-    ) -> MoonAstroCoordinator:
-        """Build the coordinator from a ConfigEntry.
+    async def _async_compute_payload(self) -> dict[str, Any]:
+        """Compute the payload from two concurrent executor jobs.
 
-        Args:
-            hass: Home Assistant instance.
-            entry: Config entry containing coordinates and options.
-            interval: Update interval for the coordinator.
-            tz: Time zone used to localize event timestamps.
-
-        Returns:
-            A fully configured MoonAstroCoordinator instance.
-        """
-        data = entry.data
-        return cls(
-            hass=hass,
-            lat=float(data.get(CONF_LAT, hass.config.latitude)),
-            lon=float(data.get(CONF_LON, hass.config.longitude)),
-            elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
-            interval=interval,
-            tz=tz,
-        )
-
-    async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
-        """Load ephemerides and timescale asynchronously with caching.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        store = _get_shared_ephemeris_store(self._hass)
-
-        cached_tuple = _get_cached_ephemeris_tuple(store)
-        if cached_tuple is not None:
-            return cached_tuple
-
-        def _load() -> tuple[Ephemeris, Timescale]:
-            """Blocking loader executed in the executor.
-
-            Returns:
-                A tuple (ephemeris, timescale).
-            """
-            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
-            Path(cache_dir).mkdir(parents=True, exist_ok=True)
-            load = Loader(cache_dir)
-            eph: Ephemeris = load(DE440_FILE)
-            ts: Timescale = load.timescale()
-            return eph, ts
-
-        eph, ts = await self._hass.async_add_executor_job(_load)
-        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
-        return eph, ts
-
-    async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
-        """Ensure ephemeris and timescale are loaded and return them.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        if self._eph is None or self._ts is None:
-            self._eph, self._ts = await self._async_load_ephemeris()
-
-        assert self._eph is not None, "Ephemeris must be loaded"
-        assert self._ts is not None, "Timescale must be loaded"
-        return self._eph, self._ts
-
-    async def _async_exec(self, func: Callable[[], Any]) -> Any:
-        """Run a blocking callable in Home Assistant executor.
-
-        Args:
-            func: A zero-argument callable performing blocking work.
-
-        Returns:
-            The callable return value.
-        """
-        return await self._hass.async_add_executor_job(func)
-
-    async def _async_compute_payload(
-        self, eph: Ephemeris, ts: Timescale
-    ) -> dict[str, Any]:
-        """Compute the coordinator payload using concurrent executor tasks.
-
-        The computation is split into independent blocking parts to reduce the time a
-        single executor job monopolizes the threadpool and to allow better scheduling.
-
-        Args:
-            eph: Loaded ephemeris.
-            ts: Loaded timescale.
+        Current-position and rise/set computations are independent and run in
+        parallel; the zodiac derivation is pure arithmetic and runs inline.
 
         Returns:
             A dictionary with all computed keys ready to be exposed by entities.
         """
         now_utc = _round_utc_datetime_to_nearest_minute(datetime.now(UTC))
-        t = ts.from_datetime(now_utc)
-        t_future = ts.from_datetime(now_utc + timedelta(hours=6))
-
-        # Prepare blocking callables. Each callable must be pure and return its data.
-        def _calc_current() -> tuple[dict[str, Any], dict[str, float]]:
-            """Compute current observation payload and raw values.
-
-            Returns:
-                Tuple (payload, raw_values).
-            """
-            return _Calc.current(
-                eph,
-                ts,
-                t,
-                t_future,
-                lat=self._lat,
-                lon=self._lon,
-                elev_m=self._elev,
-            )
-
-        def _calc_rise_set() -> dict[str, Any]:
-            """Compute rise and set payload.
-
-            Returns:
-                Payload dictionary fragment.
-            """
-            return _Calc.rise_set(
-                eph,
-                t,
-                self._tz,
-                lat=self._lat,
-                lon=self._lon,
-                elev_m=self._elev,
-            )
-
-        # Launch independent computations concurrently.
-        current_task = self._hass.async_create_task(self._async_exec(_calc_current))
-        rise_set_task = self._hass.async_create_task(self._async_exec(_calc_rise_set))
-
-        # Await the independent results.
-        current_payload, current_raw = await current_task
-        rise_set_payload = await rise_set_task
-
-        # Zodiac depends on current longitude and lunation longitudes.
-        def _calc_zodiac() -> dict[str, Any]:
-            """Compute zodiac payload for the current Moon position.
-
-            Returns:
-                Payload dictionary fragment.
-            """
-            return _Calc.zodiac(
-                current_raw["ecl_lon_geo"],
-                lon_next_new=None,
-                lon_next_full=None,
-                lon_prev_new=None,
-                lon_prev_full=None,
-            )
-
-        zodiac_payload = await self._async_exec(_calc_zodiac)
-
-        # Merge only frequently changing payload fragments.
-        payload: dict[str, Any] = {}
-        payload.update(current_payload)
-        payload.update(rise_set_payload)
-        payload.update(zodiac_payload)
-
-        return payload
+        t = self._ts.from_datetime(now_utc)
+        (current_payload, current_raw), rise_set_payload = await asyncio.gather(
+            self.hass.async_add_executor_job(
+                partial(
+                    _Calc.current,
+                    self._eph,
+                    self._ts,
+                    t,
+                    self._ts.from_datetime(now_utc + timedelta(hours=6)),
+                    lat=self._lat,
+                    lon=self._lon,
+                    elev_m=self._elev,
+                )
+            ),
+            self.hass.async_add_executor_job(
+                partial(
+                    _Calc.rise_set,
+                    self._eph,
+                    t,
+                    self._tz,
+                    lat=self._lat,
+                    lon=self._lon,
+                    elev_m=self._elev,
+                )
+            ),
+        )
+        return {
+            **current_payload,
+            **rise_set_payload,
+            **_Calc.zodiac({"current": current_raw["ecl_lon_geo"]}),
+        }
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Compute current lunar data and upcoming events for sensors.
+        """Compute current lunar data for sensors.
 
         Returns:
             A dictionary with all computed keys ready to be exposed by entities.
 
         Raises:
-            UpdateFailed: If an unexpected error occurs during calculations.
+            UpdateFailed: If a recoverable error occurs during calculations.
         """
         try:
-            eph, ts = await self._async_ensure_ephemeris_loaded()
-            return await self._async_compute_payload(eph, ts)
+            return await self._async_compute_payload()
         except _RECOVERABLE_UPDATE_ERRORS as err:
-            raise UpdateFailed(str(err)) from err
+            raise UpdateFailed(f"Moon position computation failed: {err}") from err
 
 
 # -----------------------------------------------------------------------------
@@ -2912,143 +2682,50 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
-        lat: float,
-        lon: float,
-        elev: float,
+        entry: MoonAstroConfigEntry,
+        *,
+        eph: Ephemeris,
+        ts: Timescale,
         interval: timedelta,
         tz: tzinfo,
-        *,
-        high_precision: bool = DEFAULT_HIGH_PRECISION
     ) -> None:
-        """Initialize the coordinator with observer and scheduling settings.
+        """Initialize the coordinator with computation and scheduling settings.
 
         Args:
             hass: Home Assistant instance.
-            lat: Observer latitude in degrees.
-            lon: Observer longitude in degrees.
-            elev: Observer elevation in meters.
+            entry: Config entry providing the precision options.
+            eph: Loaded ephemeris shared with the other coordinators.
+            ts: Loaded timescale shared with the other coordinators.
             interval: Fallback update interval.
-
-        Returns:
-            None.
+            tz: Time zone used to localize event timestamps.
         """
         super().__init__(
             hass,
-            logger=logging.getLogger(__name__),
+            logger=_LOGGER,
+            config_entry=entry,
             name="Moon Astro Events",
             update_interval=interval,
         )
-        self._lat: float = float(lat)
-        self._lon: float = float(lon)
-        self._elev: float = float(elev)
-        self._hass: HomeAssistant = hass
-
-        self._eph: Ephemeris | None = None
-        self._ts: Timescale | None = None
-        self._tz: tzinfo = tz
-        self._high_precision: bool = high_precision
+        self._eph = eph
+        self._ts = ts
+        self._tz = tz
+        self._high_precision = bool(
+            entry.options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION)
+        )
 
         self._unsub_next_event: Callable[[], None] | None = None
         self._next_refresh_utc: datetime | None = None
 
         # Dedicated executor to avoid monopolizing Home Assistant's shared thread pool.
         # A single worker enforces determinism and prevents concurrent heavy computations.
-        self._executor: ThreadPoolExecutor = ThreadPoolExecutor(
+        self._executor = ThreadPoolExecutor(
             max_workers=1,
             thread_name_prefix="moon_astro_events",
         )
 
-        # Lock used to prevent concurrent event-based computations.
-        self._compute_lock: asyncio.Lock = asyncio.Lock()
-
         # Track an in-flight refresh task to avoid spawning multiple long-running
         # computations when many refresh requests happen close together.
         self._inflight_task: asyncio.Task[None] | None = None
-
-    @classmethod
-    def from_config_entry(
-        cls, hass: HomeAssistant, entry: ConfigEntry, interval: timedelta, tz: tzinfo
-    ) -> MoonAstroEventsCoordinator:
-        """Build the coordinator from a ConfigEntry.
-
-        Args:
-            hass: Home Assistant instance.
-            entry: Config entry containing coordinates and options.
-            interval: Fallback update interval.
-            tz: Time zone for event calculations.
-
-        Returns:
-            A fully configured MoonAstroEventsCoordinator instance.
-        """
-        data = entry.data
-        return cls(
-            hass=hass,
-            lat=float(data.get(CONF_LAT, hass.config.latitude)),
-            lon=float(data.get(CONF_LON, hass.config.longitude)),
-            elev=float(data.get(CONF_ALT, hass.config.elevation or 0)),
-            interval=interval,
-            tz=tz,
-            high_precision=bool(
-                entry.options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION)
-            ),
-        )
-
-    async def _async_load_ephemeris(self) -> tuple[Ephemeris, Timescale]:
-        """Load ephemerides and timescale asynchronously with caching.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        store = _get_shared_ephemeris_store(self._hass)
-
-        cached_tuple = _get_cached_ephemeris_tuple(store)
-        if cached_tuple is not None:
-            return cached_tuple
-
-        def _load() -> tuple[Ephemeris, Timescale]:
-            """Blocking loader executed in the executor.
-
-            Returns:
-                A tuple (ephemeris, timescale).
-            """
-            cache_dir = self._hass.config.path(CACHE_DIR_NAME)
-            Path(cache_dir).mkdir(parents=True, exist_ok=True)
-            load = Loader(cache_dir)
-            eph: Ephemeris = load(DE440_FILE)
-            ts: Timescale = load.timescale()
-            return eph, ts
-
-        eph, ts = await self._hass.async_add_executor_job(_load)
-        store[_SHARED_EPHEMERIS_ITEM_KEY] = (eph, ts)
-        return eph, ts
-
-    async def _async_ensure_ephemeris_loaded(self) -> tuple[Ephemeris, Timescale]:
-        """Ensure ephemeris and timescale are loaded and return them.
-
-        Returns:
-            A tuple (ephemeris, timescale).
-        """
-        if self._eph is None or self._ts is None:
-            self._eph, self._ts = await self._async_load_ephemeris()
-
-        assert self._eph is not None, "Ephemeris must be loaded"
-        assert self._ts is not None, "Timescale must be loaded"
-        return self._eph, self._ts
-
-    async def _async_exec(self, func: Callable[[], Any]) -> Any:
-        """Run a blocking callable in a dedicated executor.
-
-        This avoids monopolizing Home Assistant's shared thread pool when event-based
-        computations take a long time.
-
-        Args:
-            func: A zero-argument callable performing blocking work.
-
-        Returns:
-            The callable return value.
-        """
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(self._executor, func)
 
     @property
     def next_refresh_utc(self) -> datetime | None:
@@ -3081,213 +2758,148 @@ class MoonAstroEventsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._next_refresh_utc = None
 
     def _schedule_next_event_refresh(self, data: dict[str, Any]) -> None:
-        """Schedule a refresh shortly after the next computed astronomical event.
+        """Schedule a refresh shortly after the earliest upcoming event.
 
         Args:
-            data: Coordinator data containing timestamp keys.
+            data: Coordinator data containing the next event timestamps.
 
         Returns:
             None.
         """
         self._cancel_next_event_timer()
 
-        candidates: list[datetime] = []
-        for key in (
-            KEY_NEXT_NEW_MOON,
-            KEY_NEXT_FIRST_QUARTER,
-            KEY_NEXT_FULL_MOON,
-            KEY_NEXT_LAST_QUARTER,
-            KEY_NEXT_APOGEE,
-            KEY_NEXT_PERIGEE,
-        ):
-            dt = _parse_iso_to_utc(data.get(key))
-            if dt is None:
-                continue
-            candidates.append(dt)
-
+        candidates = [
+            dt
+            for key in _NEXT_EVENT_KEYS
+            if (dt := _parse_iso_to_utc(data.get(key))) is not None
+        ]
         if not candidates:
-            interval = self.update_interval
-            if interval is not None:
-                self._next_refresh_utc = datetime.now(UTC) + interval
-            else:
-                self._next_refresh_utc = None
+            self._next_refresh_utc = (
+                None
+                if (interval := self.update_interval) is None
+                else datetime.now(UTC) + interval
+            )
             return
 
-        next_dt = min(candidates)
-        _LOGGER.debug(
-            "Events scheduler: next_event_candidate_utc=%s candidates_count=%s",
-            next_dt.isoformat(),
-            len(candidates),
-        )
-
-        # Schedule slightly after the event boundary to avoid edge instability.
-        when = next_dt + timedelta(minutes=2)
-
-        # If the event is already in the past (clock jump or delayed startup), refresh soon.
+        # Refresh slightly after the boundary to avoid edge instability. An event
+        # already in the past (clock jump, delayed startup) triggers a prompt refresh.
+        next_event = min(candidates)
         now = datetime.now(UTC)
+        when = next_event + timedelta(minutes=2)
         if when <= now:
             when = now + timedelta(seconds=30)
+        self._next_refresh_utc = when
 
-        self._next_refresh_utc = when.astimezone(UTC)
-
-        def _cb(_: datetime) -> None:
-            """Callback scheduled at the next event boundary.
-
-            Args:
-                _: The trigger time provided by the scheduler.
-
-            Returns:
-                None.
-            """
-            _LOGGER.debug("Events scheduler: triggering refresh task")
+        @callback
+        def _on_event_boundary(_: datetime) -> None:
+            """Request a refresh once the event boundary has passed."""
             self._unsub_next_event = None
-            self._hass.create_task(self.async_request_refresh())
+            self.hass.async_create_background_task(
+                self.async_request_refresh(), name=f"{DOMAIN}-events-boundary-refresh"
+            )
 
         _LOGGER.debug(
-            "Events scheduler: scheduling refresh at when_utc=%s (now_utc=%s)",
+            "Events scheduler: refresh scheduled at %s for the event at %s",
             when.isoformat(),
-            datetime.now(UTC).isoformat(),
+            next_event.isoformat(),
         )
-        self._unsub_next_event = async_track_point_in_time(self._hass, _cb, when)
+        self._unsub_next_event = async_track_point_in_time(
+            self.hass, _on_event_boundary, when
+        )
 
-    async def _async_compute_events_payload(
-        self, eph: Ephemeris, ts: Timescale
-    ) -> dict[str, Any]:
-        """Compute the events-only payload in an executor thread.
-
-        Args:
-            eph: Loaded ephemeris.
-            ts: Loaded timescale.
+    async def _async_compute_events_payload(self) -> dict[str, Any]:
+        """Compute the event-based payload in the dedicated executor.
 
         Returns:
-            A dictionary containing only rare event-based keys.
+            A dictionary containing only event-based keys.
         """
-        now_utc = _round_utc_datetime_to_nearest_minute(datetime.now(UTC))
-        t = ts.from_datetime(now_utc)
+        eph, ts, tz = self._eph, self._ts, self._tz
+        t = ts.from_datetime(_round_utc_datetime_to_nearest_minute(datetime.now(UTC)))
+        high_precision = self._high_precision
 
         def _calc() -> dict[str, Any]:
-            """Heavy event computations executed in the executor.
-
-            Returns:
-                Payload dictionary fragment.
-            """
-            payload: dict[str, Any] = {}
-
-            phase_payload, events = _Calc.phases_and_names(eph, ts, t, self._tz)
-            payload.update(phase_payload)
-
-            payload.update(
-                _Calc.apsis(
-                    eph,
-                    ts,
-                    t,
-                    self._tz,
-                    high_precision=self._high_precision,
-                )
-            )
-
+            """Run the heavy event computations in the executor thread."""
+            phase_payload, events = _Calc.phases_and_names(eph, ts, t, tz)
             ecl_payload, ecl_raw_lons = _Calc.lunation_ecliptics(eph, events)
-            payload.update(ecl_payload)
+            return {
+                **phase_payload,
+                **_Calc.apsis(eph, ts, t, tz, high_precision=high_precision),
+                **ecl_payload,
+                **_Calc.zodiac(ecl_raw_lons),
+            }
 
-            # Compute zodiac only for lunation longitudes. The "current" zodiac remains
-            # handled by the main coordinator.
-            payload.update(
-                _Calc.zodiac(
-                    current_lon_geo=float("nan"),
-                    lon_next_new=ecl_raw_lons["next_new"],
-                    lon_next_full=ecl_raw_lons["next_full"],
-                    lon_prev_new=ecl_raw_lons["prev_new"],
-                    lon_prev_full=ecl_raw_lons["prev_full"],
-                )
-            )
-
-            # Remove keys that should not be produced by this coordinator.
-            payload.pop(KEY_ZODIAC_SIGN_CURRENT_MOON, None)
-            payload.pop(KEY_ZODIAC_DEGREE_CURRENT_MOON, None)
-            payload.pop(KEY_ZODIAC_ICON_CURRENT_MOON, None)
-
-            return payload
-
-        return await self._async_exec(_calc)
+        return await asyncio.get_running_loop().run_in_executor(self._executor, _calc)
 
     async def _async_run_refresh_job(self) -> None:
-        """Run a full refresh job without blocking the update caller.
+        """Compute the event-based payload and publish it.
 
-        This method is responsible for:
-        - computing event-based payload in the dedicated executor
-        - updating self.data through DataUpdateCoordinator mechanisms
-        - scheduling the next event-based refresh time
+        The previous data is kept when the computation fails; listeners are then
+        notified of the unavailability through the coordinator error path.
 
         Returns:
             None.
         """
-        if self._compute_lock.locked():
-            _LOGGER.debug(
-                "Events coordinator: refresh job skipped (computation already running)"
-            )
+        try:
+            data = await self._async_compute_events_payload()
+        except _RECOVERABLE_UPDATE_ERRORS as err:
+            self.async_set_update_error(err)
             return
-
-        async with self._compute_lock:
-            try:
-                eph, ts = await self._async_ensure_ephemeris_loaded()
-                data = await self._async_compute_events_payload(eph, ts)
-
-                # Store and notify listeners.
-                self.async_set_updated_data(data)
-
-                # Schedule next refresh around the next computed event.
-                self._schedule_next_event_refresh(data)
-            except asyncio.CancelledError:
-                raise
-            except _RECOVERABLE_UPDATE_ERRORS as err:
-                _LOGGER.debug("Events coordinator: refresh job failed: %r", err)
-                # Keep old data when a job fails to avoid oscillating states.
+        self.async_set_updated_data(data)
+        self._schedule_next_event_refresh(data)
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Compute rare event-based lunar data.
+        """Start a background computation and return the latest available data.
 
-        This implementation ensures Home Assistant stays responsive by not awaiting
-        long-running computations inside the coordinator update path. The actual
-        work is performed by a background task using a dedicated executor.
+        The heavy computation never runs inside the coordinator update path so that
+        scheduled and requested refreshes return immediately; the background job
+        publishes the new payload through async_set_updated_data.
 
         Returns:
-            The latest available event-based data (possibly stale if a job is running).
+            The latest event-based data, possibly stale while a job is running.
         """
-        # If a refresh job is already in-flight, do not spawn another one.
-        if self._inflight_task is not None and not self._inflight_task.done():
-            _LOGGER.debug(
-                "Events coordinator: returning cached data (refresh already running)"
+        if self._inflight_task is None or self._inflight_task.done():
+            self._inflight_task = self.hass.async_create_background_task(
+                self._async_run_refresh_job(), name=f"{DOMAIN}-events-refresh"
             )
-            return self.data or {}
-
-        # Start a background refresh job and immediately return the last data.
-        self._inflight_task = self._hass.async_create_task(
-            self._async_run_refresh_job(),
-            name=f"{DOMAIN}-events-refresh",
-        )
-
-        interval = self.update_interval
-        if interval is not None and self._next_refresh_utc is None:
-            self._next_refresh_utc = datetime.now(UTC) + interval
-
+            if self._next_refresh_utc is None and (
+                interval := self.update_interval
+            ) is not None:
+                self._next_refresh_utc = datetime.now(UTC) + interval
+        else:
+            _LOGGER.debug("Events coordinator: computation already running")
         return self.data or {}
 
     async def async_shutdown(self) -> None:
-        """Release scheduled callbacks and executor resources held by this coordinator.
+        """Stop scheduled refreshes and release the dedicated executor.
+
+        Home Assistant calls this method through the unload callback registered on
+        the config entry; it may run more than once and stays idempotent.
 
         Returns:
             None.
         """
+        await super().async_shutdown()
         self._cancel_next_event_timer()
 
-        task = self._inflight_task
-        if task is not None and not task.done():
+        if (task := self._inflight_task) is not None and not task.done():
             task.cancel()
 
-        executor = self._executor
+        # Non-blocking: pending jobs are dropped and the worker exits after the
+        # currently running job, if any.
+        self._executor.shutdown(wait=False, cancel_futures=True)
 
-        def _shutdown() -> None:
-            """Shutdown the dedicated executor."""
-            executor.shutdown(wait=True, cancel_futures=True)
 
-        await self._hass.async_add_executor_job(_shutdown)
+# -----------------------------------------------------------------------------
+# Config entry runtime data
+# -----------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class MoonAstroRuntimeData:
+    """Runtime objects attached to a loaded config entry."""
+
+    coordinator: MoonAstroCoordinator
+    events_coordinator: MoonAstroEventsCoordinator
+
+
+type MoonAstroConfigEntry = ConfigEntry[MoonAstroRuntimeData]

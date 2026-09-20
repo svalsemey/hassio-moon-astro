@@ -8,7 +8,7 @@
                 "data": {
                     "latitude": "Γεωγραφικό πλάτος",
                     "longitude": "Γεωγραφικό μήκος",
-                    "altitude": "Υψόμετρο (m)"
+                    "elevation": "Υψόμετρο (m)"
                 }
             },
             "precision": {
