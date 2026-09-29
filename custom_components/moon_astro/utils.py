@@ -172,8 +172,10 @@ async def _async_download_kernel(hass: HomeAssistant, cache_dir: Path) -> None:
                 await hass.async_add_executor_job(handle.close)
         await hass.async_add_executor_job(temp_path.replace, path)
     except (aiohttp.ClientError, TimeoutError, OSError) as err:
-        await hass.async_add_executor_job(_unlink_quietly, temp_path)
         raise EphemerisError(f"Download of {DE440_URL} failed: {err}") from err
+    finally:
+        # Already renamed on success; left behind by a failure or a cancellation.
+        await hass.async_add_executor_job(_unlink_quietly, temp_path)
 
 
 async def _async_prepare_kernel(hass: HomeAssistant) -> EphemerisKernel:

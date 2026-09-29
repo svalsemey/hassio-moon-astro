@@ -7,7 +7,7 @@
 
 High-precision Moon ephemeris integration for Home Assistant, powered by Skyfield (DE440). Provides current topocentric/geocentric ecliptic coordinates, illumination, distance, parallax, moonrise/set, lunation timestamps (next and previous), apogee/perigee, and zodiac information.
 
-- Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
+- Coordinates in the true ecliptic and equinox of date (IAU 2006/2000A precession-nutation)
 - Topocentric elevation/azimuth from your configured location
 - Fully localized entities and state translations
 - Config flow with options for scan interval, time zone handling and event refresh resilience
@@ -72,7 +72,7 @@ Some intermediate computations use non-rounded (“raw”) values internally to 
 
 - Phase instants (new moon, quarters, full moon) and moonrise/moonset come from Skyfield's discrete event search, accurate to the millisecond before the instants are rounded to the minute.
 - Apogee and perigee are the extremes of the geometric geocentric distance, located with Skyfield's vectorized extremum search to within ten seconds; the published minute is the one whose boundary is closest to the extreme, so it does not depend on the sampling grid.
-- Ecliptic-of-date coordinates use the IAU 1980 nutation series with the true obliquity.
+- Ecliptic coordinates are measured in the true ecliptic and equinox of date: Skyfield rotates the ICRS positions with its IAU 2006/2000A precession-nutation model and the true obliquity. Zodiac signs and degrees derive from the unrounded geocentric longitude.
 - Rise, set and the above-horizon state use the Moon center at −34′ of altitude (standard refraction).
 - The phase sensor reports new moon, first quarter, full moon or last quarter within about six hours (3° of phase angle) of the exact instant.
 
