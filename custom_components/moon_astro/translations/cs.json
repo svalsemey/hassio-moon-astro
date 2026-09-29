@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Měsíc Astro",
-                "description": "Nastavte své GPS souřadnice a nadmořskou výšku.",
+                "title": "Poloha pozorovatele",
+                "description": "Měsíc Astro počítá polohu Měsíce, jak je vidět z tohoto místa. Hodnoty jsou předvyplněny z konfigurace Home Assistant.",
                 "data": {
                     "latitude": "Zeměpisná šířka",
                     "longitude": "Zeměpisná délka",
                     "elevation": "Nadmořská výška (m)"
+                },
+                "data_description": {
+                    "latitude": "Zeměpisná šířka v desetinných stupních, kladná severně od rovníku.",
+                    "longitude": "Zeměpisná délka v desetinných stupních, kladná východně od Greenwiche.",
+                    "elevation": "Výška nad mořem v metrech."
+                }
+            },
+            "reconfigure": {
+                "title": "Poloha pozorovatele",
+                "description": "Aktualizujte místo použité pro polohu Měsíce. Existující entity zůstanou zachovány.",
+                "data": {
+                    "latitude": "Zeměpisná šířka",
+                    "longitude": "Zeměpisná délka",
+                    "elevation": "Nadmořská výška (m)"
+                },
+                "data_description": {
+                    "latitude": "Zeměpisná šířka v desetinných stupních, kladná severně od rovníku.",
+                    "longitude": "Zeměpisná délka v desetinných stupních, kladná východně od Greenwiche.",
+                    "elevation": "Výška nad mořem v metrech."
                 }
             },
             "precision": {
-                "title": "Měsíc Astro",
-                "description": "Režim vysoké přesnosti snižuje variabilitu časových razítek, ale zvyšuje využití CPU, protože používá jemnější krok vzorkování a širší interval zpřesnění. Nedoporučuje se jej zapínat na méně výkonných zařízeních, jako je Raspberry Pi.",
+                "title": "Přesnost výpočtu",
+                "description": "Efemeridy DE440 jsou připraveny.",
                 "data": {
                     "high_precision": "Režim vysoké přesnosti"
+                },
+                "data_description": {
+                    "high_precision": "Zpřesňuje okamžiky apogea a perigea jemnějším krokem vzorkování a širším intervalem hledání. Výrazně zvyšuje využití CPU a nedoporučuje se na málo výkonných zařízeních, jako je Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Stahování efemerid Skyfield DE440 (> 100 MB). Během stahování prosím nezavírejte toto okno..."
+            "download_ephemeris": "Stahování efemerid JPL DE440 (přibližně 115 MB). Podle vašeho připojení to může trvat několik minut."
+        },
+        "error": {
+            "download_failed": "Efemeridy DE440 se nepodařilo stáhnout. Zkontrolujte, zda Home Assistant dosáhne na ssd.jpl.nasa.gov, a zkuste to znovu."
         },
         "abort": {
             "already_configured": "Měsíc Astro je již nastaven",
-            "missing_data": "Chybí konfigurační data",
             "reconfigure_successful": "Konfigurace byla aktualizována"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Možnosti Měsíc Astro",
-                "description": "Upravte interval aktualizace senzorů a práci s časovým pásmem.\n\nRežim vysoké přesnosti snižuje variabilitu časových razítek, ale zvyšuje využití CPU, protože používá jemnější krok vzorkování a širší rozsah zpřesnění. Nedoporučuje se na zařízeních s nízkým výkonem, jako je Raspberry Pi.\n\nZáložní interval obnovení událostí vynucuje periodické obnovení senzorů založených na událostech (následující/předchozí fáze, apogeum/perigeum, zvěrokruh při lunacích) pro případ, že se zmešká naplánované obnovení kolem další události (restart, změna času, zpoždění). Nižší hodnoty obnovují častěji; vyšší hodnoty snižují využití CPU.",
+                "description": "Změny se projeví po opětovném načtení integrace po uložení.",
                 "data": {
                     "scan_interval": "Interval aktualizace senzorů (sekundy)",
                     "use_ha_timezone": "Použít časové pásmo Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Záložní interval obnovení událostí (sekundy)"
                 },
                 "data_description": {
-                    "time_zone": "IANA časové pásmo používané k lokalizaci časových razítek událostí, když není použito časové pásmo Home Assistant."
+                    "scan_interval": "Počet sekund mezi dvěma výpočty aktuální polohy Měsíce (60 až 21600). Kratší intervaly zvyšují využití CPU.",
+                    "use_ha_timezone": "Použít časové pásmo Home Assistant pro kalendářní měsíce, které pojmenovávají úplňky. Vypněte pro výběr jiného pásma níže.",
+                    "time_zone": "IANA časové pásmo použité, když se nepoužívá časové pásmo Home Assistant. Samotná časová razítka jsou vždy publikována jako okamžiky UTC.",
+                    "high_precision": "Zpřesňuje okamžiky apogea a perigea jemnějším krokem vzorkování a širším intervalem hledání. Výrazně zvyšuje využití CPU a nedoporučuje se na málo výkonných zařízeních, jako je Raspberry Pi.",
+                    "events_refresh_fallback": "Počet sekund mezi dvěma vynucenými přepočty senzorů založených na událostech (3600 až 604800) pro případ, že se zmešká obnovení naplánované po další události. 24 hodin bohatě stačí."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "Efemeridy DE440 nejsou k dispozici: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Úplněk",
                     "waning_gibbous": "Couvající vypouklý",
                     "last_quarter": "Poslední čtvrť",
-                    "waning_crescent": "Couvající srpek",
-                    "unknown": "Neznámé"
+                    "waning_crescent": "Couvající srpek"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Lovecký úplněk",
                     "beaver_moon": "Bobří úplněk",
                     "cold_moon": "Studený úplněk",
-                    "blue_moon": "Modrý úplněk",
-                    "unknown": "Neznámý"
+                    "blue_moon": "Modrý úplněk"
                 }
             },
             "next_full_moon_alt_names": {
@@ -144,22 +175,20 @@
                     "wolf_moon_alt_names": "Měsíc po Yule, Zůstaň doma měsíc, Tichý měsíc, Přísný měsíc, Středový měsíc",
                     "snow_moon_alt_names": "Hladový měsíc, Medvědí měsíc, Bouřkový měsíc, Ledový měsíc",
                     "worm_moon_alt_names": "Postní měsíc, Vraní měsíc, Krustový měsíc, Cudný měsíc, Cukrový měsíc, Mízný měsíc",
-                    "pink_moon_alt_names": "Měsíc lámání ledu, Pučící měsíc, Probouzecí měsíc, Vaječný měsíc, Velikonoční měsíc",
+                    "pink_moon_alt_names": "Měsíc lámání ledu, Pučící měsíc, Probouzející měsíc, Vaječný měsíc, Velikonoční měsíc",
                     "flower_moon_alt_names": "Sázecí měsíc, Mléčný měsíc, Zaječí měsíc, Travní měsíc, Mateřský měsíc, Jasný měsíc",
-                    "strawberry_moon_alt_names": "Růžový (rose) měsíc, Horký měsíc, Medovinový měsíc, Květinový měsíc, Sázecí měsíc",
+                    "strawberry_moon_alt_names": "Měsíc růží, Horký měsíc, Medovinový měsíc, Květinový měsíc, Sázecí měsíc",
                     "buck_moon_alt_names": "Hromový měsíc, Senný měsíc, Bylinný měsíc",
                     "sturgeon_moon_alt_names": "Obilný měsíc, Kukuřičný měsíc, Rysí měsíc, Bleskový měsíc",
                     "harvest_moon_alt_names": "Úplněk kukuřice, Zelenokukuřičný měsíc, Kukuřičný měsíc, Vinný měsíc, Písňový měsíc, Ječný měsíc",
                     "hunters_moon_alt_names": "Měsíc sušení rýže, Měsíc padajícího listí, Mrazivý měsíc, Krvavý měsíc, Sanguinní měsíc",
                     "beaver_moon_alt_names": "Jínový měsíc, Mrazivý měsíc, Obchodní měsíc, Sněžný měsíc, Smuteční měsíc, Měsíc nejtemnějších hlubin",
-                    "cold_moon_alt_names": "Měsíc dlouhých nocí, Měsíc před Yule, Dubový měsíc, Úplněk studeného měsíce",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Měsíc dlouhých nocí, Měsíc před Yule, Dubový měsíc, Úplněk studeného měsíce"
                 }
             },
             "next_last_quarter": {
                 "name": "Příští poslední čtvrť"
             },
-
             "previous_rise": {
                 "name": "Předchozí východ"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "Lovecký úplněk",
                     "beaver_moon": "Bobří úplněk",
                     "cold_moon": "Studený úplněk",
-                    "blue_moon": "Modrý úplněk",
-                    "unknown": "Neznámý"
+                    "blue_moon": "Modrý úplněk"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -206,22 +234,20 @@
                     "wolf_moon_alt_names": "Měsíc po Yule, Zůstaň doma měsíc, Tichý měsíc, Přísný měsíc, Středový měsíc",
                     "snow_moon_alt_names": "Hladový měsíc, Medvědí měsíc, Bouřkový měsíc, Ledový měsíc",
                     "worm_moon_alt_names": "Postní měsíc, Vraní měsíc, Krustový měsíc, Cudný měsíc, Cukrový měsíc, Mízný měsíc",
-                    "pink_moon_alt_names": "Měsíc lámání ledu, Pučící měsíc, Probouzecí měsíc, Vaječný měsíc, Velikonoční měsíc",
+                    "pink_moon_alt_names": "Měsíc lámání ledu, Pučící měsíc, Probouzející měsíc, Vaječný měsíc, Velikonoční měsíc",
                     "flower_moon_alt_names": "Sázecí měsíc, Mléčný měsíc, Zaječí měsíc, Travní měsíc, Mateřský měsíc, Jasný měsíc",
-                    "strawberry_moon_alt_names": "Růžový (rose) měsíc, Horký měsíc, Medovinový měsíc, Květinový měsíc, Sázecí měsíc",
+                    "strawberry_moon_alt_names": "Měsíc růží, Horký měsíc, Medovinový měsíc, Květinový měsíc, Sázecí měsíc",
                     "buck_moon_alt_names": "Hromový měsíc, Senný měsíc, Bylinný měsíc",
                     "sturgeon_moon_alt_names": "Obilný měsíc, Kukuřičný měsíc, Rysí měsíc, Bleskový měsíc",
                     "harvest_moon_alt_names": "Úplněk kukuřice, Zelenokukuřičný měsíc, Kukuřičný měsíc, Vinný měsíc, Písňový měsíc, Ječný měsíc",
                     "hunters_moon_alt_names": "Měsíc sušení rýže, Měsíc padajícího listí, Mrazivý měsíc, Krvavý měsíc, Sanguinní měsíc",
                     "beaver_moon_alt_names": "Jínový měsíc, Mrazivý měsíc, Obchodní měsíc, Sněžný měsíc, Smuteční měsíc, Měsíc nejtemnějších hlubin",
-                    "cold_moon_alt_names": "Měsíc dlouhých nocí, Měsíc před Yule, Dubový měsíc, Úplněk studeného měsíce",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Měsíc dlouhých nocí, Měsíc před Yule, Dubový měsíc, Úplněk studeného měsíce"
                 }
             },
             "previous_last_quarter": {
                 "name": "Předchozí poslední čtvrť"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptikální délka při příštím úplňku"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptikální šířka při předchozím novu"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Znamení zvěrokruhu (aktuální)",
                 "state": {

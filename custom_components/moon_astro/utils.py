@@ -1,8 +1,8 @@
-"""Utility functions for Moon Astro integration.
+"""Ephemeris lifecycle and configuration helpers for Moon Astro.
 
-This module centralizes helpers for ephemeris lifecycle management.
-All filesystem and Skyfield operations are executed in an executor to avoid
-blocking the event loop.
+The DE440 kernel is downloaded once into the Home Assistant configuration
+directory, validated, loaded a single time per Home Assistant instance and then
+shared by every coordinator. Filesystem and Skyfield calls run in the executor.
 """
 
 from __future__ import annotations
@@ -10,12 +10,20 @@ from __future__ import annotations
 import asyncio
 from contextlib import suppress
 from datetime import tzinfo
+from functools import cache, partial
 import logging
 from pathlib import Path
 import zoneinfo
 
+import aiohttp
+from skyfield.api import Loader
+from skyfield.jpllib import SpiceKernel
+from skyfield.timelib import Timescale
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
@@ -24,42 +32,40 @@ from .const import (
     CONF_TIME_ZONE,
     CONF_USE_HA_TZ,
     DE440_FILE,
+    DE440_URL,
     DEFAULT_USE_HA_TZ,
     DOMAIN,
+    MIN_EPHEMERIS_SIZE_BYTES,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-EPHEMERIS_LOCK_KEY: HassKey[asyncio.Lock] = HassKey(f"{DOMAIN}_ephemeris_lock")
+type EphemerisKernel = tuple[SpiceKernel, Timescale]
 
-try:
-    from skyfield.api import Loader
-    from skyfield.jpllib import SpiceKernel
+_SHARED_KERNEL_KEY: HassKey[EphemerisKernel] = HassKey(f"{DOMAIN}_ephemeris_kernel")
+_PREPARE_TASK_KEY: HassKey[asyncio.Task[EphemerisKernel]] = HassKey(
+    f"{DOMAIN}_ephemeris_task"
+)
 
-    SKYFIELD_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    SKYFIELD_AVAILABLE = False
+_DOWNLOAD_CHUNK_BYTES = 1024 * 1024
+# No overall limit: the 115 MB transfer may legitimately take many minutes.
+_DOWNLOAD_TIMEOUT = aiohttp.ClientTimeout(total=None, connect=30, sock_read=60)
+# Errors raised by Skyfield and jplephem when a kernel file is damaged.
+_KERNEL_LOAD_ERRORS: tuple[type[Exception], ...] = (
+    OSError,
+    ValueError,
+    KeyError,
+    IndexError,
+    TypeError,
+)
 
 
-def get_ephemeris_lock(hass: HomeAssistant) -> asyncio.Lock:
-    """Return the shared lock used to prevent concurrent ephemeris downloads.
-
-    The lock is created on first use and kept in hass.data so that config flows and
-    entry setups running concurrently serialize their downloads.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        The shared asyncio.Lock instance.
-    """
-    if (lock := hass.data.get(EPHEMERIS_LOCK_KEY)) is None:
-        lock = hass.data[EPHEMERIS_LOCK_KEY] = asyncio.Lock()
-    return lock
+class EphemerisError(HomeAssistantError):
+    """Raised when the DE440 ephemeris cannot be made available."""
 
 
 def get_cache_dir(hass: HomeAssistant) -> Path:
-    """Return the cache directory used to store Skyfield resources.
+    """Return the directory holding the Skyfield resources.
 
     Args:
         hass: Home Assistant instance.
@@ -70,234 +76,201 @@ def get_cache_dir(hass: HomeAssistant) -> Path:
     return Path(hass.config.path(CACHE_DIR_NAME))
 
 
-def get_ephemeris_path(hass: HomeAssistant) -> Path:
-    """Return the expected full path of the ephemeris file.
+def _unlink_quietly(path: Path) -> None:
+    """Delete a file, ignoring a missing file or a filesystem error."""
+    with suppress(OSError):
+        path.unlink()
+
+
+def _open_kernel(cache_dir: Path) -> EphemerisKernel:
+    """Open the cached kernel and check that it is usable.
+
+    Runs in the executor.
 
     Args:
-        hass: Home Assistant instance.
+        cache_dir: Directory holding the kernel file.
 
     Returns:
-        Path to the ephemeris file.
+        The loaded kernel and timescale.
+
+    Raises:
+        FileNotFoundError: If the kernel file is missing.
+        EphemerisError: If the file is truncated or unreadable.
     """
-    return get_cache_dir(hass) / DE440_FILE
+    path = cache_dir / DE440_FILE
+    if (size := path.stat().st_size) < MIN_EPHEMERIS_SIZE_BYTES:
+        raise EphemerisError(f"{path} is truncated ({size} bytes)")
+    try:
+        timescale = Loader(str(cache_dir), verbose=False).timescale()
+        kernel = SpiceKernel(str(path))
+        # Exercise every segment used at runtime so that a damaged file is rejected.
+        kernel["earth"].at(timescale.now()).observe(
+            kernel["moon"]
+        ).apparent().fraction_illuminated(kernel["sun"])
+    except _KERNEL_LOAD_ERRORS as err:
+        raise EphemerisError(f"{path} is unreadable: {err}") from err
+    return kernel, timescale
 
 
-async def cleanup_cache_dir(
-    hass: HomeAssistant,
-    *,
-    remove_empty_dir: bool = False,
-    remove_ephemeris: bool = False,
-) -> None:
-    """Clean up Skyfield cache content.
+def _load_kernel(cache_dir: Path) -> EphemerisKernel | None:
+    """Return the cached kernel, or None when it is missing or was found damaged.
 
-    Args:
-        hass: Home Assistant instance.
-        remove_empty_dir: If True, remove the cache directory if empty after cleanup.
-        remove_ephemeris: If True, also remove the main ephemeris file.
-
-    Returns:
-        None.
-    """
-
-    def _blocking_cleanup() -> None:
-        """Execute cleanup in executor to avoid blocking the event loop."""
-        cache_dir = get_cache_dir(hass)
-        if not cache_dir.exists():
-            return
-
-        with suppress(OSError):
-            for temp_file in cache_dir.glob("*.download*"):
-                with suppress(OSError):
-                    temp_file.unlink()
-
-        if remove_ephemeris:
-            ephemeris_path = cache_dir / DE440_FILE
-            with suppress(OSError):
-                ephemeris_path.unlink()
-
-        if remove_empty_dir:
-            with suppress(OSError):
-                if not any(cache_dir.iterdir()):
-                    cache_dir.rmdir()
-
-    await hass.async_add_executor_job(_blocking_cleanup)
-
-
-async def validate_ephemeris_file(
-    hass: HomeAssistant,
-    *,
-    remove_on_invalid: bool = False,
-) -> bool:
-    """Validate the integrity of the ephemeris file.
-
-    The validation checks:
-    - file existence
-    - conservative minimum size threshold
-    - ability to load it with Skyfield
-    - expected kernel type
-    - presence of essential bodies
-
-    Args:
-        hass: Home Assistant instance.
-        remove_on_invalid: If True, delete the ephemeris file when invalid.
-
-    Returns:
-        True if file is valid and usable, False if invalid or missing.
-    """
-
-    def _blocking_validation() -> bool:
-        """Execute validation in executor to avoid blocking."""
-        if not SKYFIELD_AVAILABLE:
-            return False
-
-        cache_dir = get_cache_dir(hass)
-        ephemeris_path = cache_dir / DE440_FILE
-        _LOGGER.debug(
-            "Ephemeris validation: path=%s exists=%s",
-            str(ephemeris_path),
-            ephemeris_path.exists(),
-        )
-        if not ephemeris_path.exists():
-            return False
-
-        min_expected_size = 100 * 1024 * 1024
-        try:
-            _LOGGER.debug(
-                "Ephemeris validation: size_bytes=%s min_expected_bytes=%s",
-                ephemeris_path.stat().st_size,
-                min_expected_size,
-            )
-            if ephemeris_path.stat().st_size < min_expected_size:
-                if remove_on_invalid:
-                    with suppress(OSError):
-                        ephemeris_path.unlink()
-                return False
-        except OSError:
-            return False
-
-        try:
-            loader = Loader(str(cache_dir))
-            eph = loader(DE440_FILE)
-        except (OSError, AttributeError, RuntimeError):
-            if remove_on_invalid:
-                with suppress(OSError):
-                    ephemeris_path.unlink()
-            return False
-
-        if not isinstance(eph, SpiceKernel):
-            if remove_on_invalid:
-                with suppress(OSError):
-                    ephemeris_path.unlink()
-            return False
-
-        if 0 not in eph or 3 not in eph or 301 not in eph:
-            _LOGGER.debug(
-                "Ephemeris validation: missing required bodies (0=%s 3=%s 301=%s)",
-                0 in eph,
-                3 in eph,
-                301 in eph,
-            )
-            if remove_on_invalid:
-                with suppress(OSError):
-                    ephemeris_path.unlink()
-            return False
-
-        return True
-
-    return await hass.async_add_executor_job(_blocking_validation)
-
-
-async def ensure_valid_ephemeris(hass: HomeAssistant) -> bool:
-    """Ensure a valid ephemeris file exists, downloading only if necessary.
-
-    Args:
-        hass: Home Assistant instance.
-
-    Returns:
-        True if a valid ephemeris is available, False otherwise.
-    """
-    if not SKYFIELD_AVAILABLE:
-        return False
-
-    await cleanup_cache_dir(hass)
-
-    _LOGGER.debug("Ephemeris ensure: validating existing file before download")
-    if await validate_ephemeris_file(hass, remove_on_invalid=False):
-        return True
-
-    def _blocking_download() -> bool:
-        """Download ephemeris file in executor.
-
-        Returns:
-            True if the download attempt did not raise and the expected file exists.
-        """
-        cache_dir = get_cache_dir(hass)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        ephemeris_path = cache_dir / DE440_FILE
-
-        try:
-            loader = Loader(str(cache_dir))
-            loader(DE440_FILE)
-        except (OSError, RuntimeError, ValueError) as exc:
-            _LOGGER.info("Ephemeris download failed: %r", exc)
-            return False
-
-        if not ephemeris_path.exists():
-            try:
-                actual = None
-                if hasattr(loader, "path_to"):
-                    actual = loader.path_to(DE440_FILE)
-                _LOGGER.info(
-                    "Ephemeris download completed but file not found at expected path: expected=%s actual=%s",
-                    str(ephemeris_path),
-                    str(actual) if actual is not None else "unknown",
-                )
-            except asyncio.CancelledError:
-                raise
-            except (
-                OSError,
-                RuntimeError,
-                ValueError,
-                AttributeError,
-                TypeError,
-            ) as exc:
-                _LOGGER.info(
-                    "Ephemeris download completed but file not found at expected path: expected=%s (error=%r)",
-                    str(ephemeris_path),
-                    exc,
-                )
-            return False
-
-        _LOGGER.info("Ephemeris file ready in cache: %s", str(ephemeris_path))
-        return True
-
-    _LOGGER.debug(
-        "Ephemeris ensure: existing file invalid or missing, starting download"
-    )
-    if not await hass.async_add_executor_job(_blocking_download):
-        return False
-
-    return await validate_ephemeris_file(hass, remove_on_invalid=False)
-
-
-def available_time_zones() -> list[str]:
-    """Return the sorted IANA time zone names available on this system.
-
-    The lookup walks the tzdata directories on disk and must be executed in an
+    A damaged file is deleted so that a fresh copy gets downloaded. Runs in the
     executor.
 
+    Args:
+        cache_dir: Directory holding the kernel file.
+
     Returns:
-        Sorted list of IANA time zone names.
+        The loaded kernel and timescale, or None.
+
+    Raises:
+        EphemerisError: If the cache directory cannot be accessed.
     """
-    return sorted(zoneinfo.available_timezones())
+    try:
+        kernel = _open_kernel(cache_dir)
+    except FileNotFoundError:
+        return None
+    except OSError as err:
+        raise EphemerisError(f"Cannot access {cache_dir / DE440_FILE}: {err}") from err
+    except EphemerisError as err:
+        _LOGGER.warning("Discarding the ephemeris file: %s", err)
+        _unlink_quietly(cache_dir / DE440_FILE)
+        return None
+    return kernel
+
+
+async def _async_download_kernel(hass: HomeAssistant, cache_dir: Path) -> None:
+    """Stream the DE440 kernel from JPL into the cache directory.
+
+    The data goes through a temporary file renamed once complete, so that an
+    interrupted transfer never leaves a partial kernel in place.
+
+    Args:
+        hass: Home Assistant instance.
+        cache_dir: Destination directory, created when missing.
+
+    Raises:
+        EphemerisError: If the download fails.
+    """
+    path = cache_dir / DE440_FILE
+    temp_path = path.with_name(f"{DE440_FILE}.download")
+    try:
+        await hass.async_add_executor_job(
+            partial(cache_dir.mkdir, parents=True, exist_ok=True)
+        )
+        async with async_get_clientsession(hass).get(
+            DE440_URL, timeout=_DOWNLOAD_TIMEOUT
+        ) as response:
+            response.raise_for_status()
+            handle = await hass.async_add_executor_job(temp_path.open, "wb")
+            try:
+                async for chunk in response.content.iter_chunked(_DOWNLOAD_CHUNK_BYTES):
+                    await hass.async_add_executor_job(handle.write, chunk)
+            finally:
+                await hass.async_add_executor_job(handle.close)
+        await hass.async_add_executor_job(temp_path.replace, path)
+    except (aiohttp.ClientError, TimeoutError, OSError) as err:
+        await hass.async_add_executor_job(_unlink_quietly, temp_path)
+        raise EphemerisError(f"Download of {DE440_URL} failed: {err}") from err
+
+
+async def _async_prepare_kernel(hass: HomeAssistant) -> EphemerisKernel:
+    """Load the cached kernel, downloading a fresh copy first when needed.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        The loaded kernel and timescale.
+
+    Raises:
+        EphemerisError: If no usable kernel can be obtained.
+    """
+    cache_dir = get_cache_dir(hass)
+    if (kernel := await hass.async_add_executor_job(_load_kernel, cache_dir)) is None:
+        _LOGGER.info(
+            "Downloading the DE440 ephemeris (about 115 MB) from %s", DE440_URL
+        )
+        await _async_download_kernel(hass, cache_dir)
+        if (
+            kernel := await hass.async_add_executor_job(_load_kernel, cache_dir)
+        ) is None:
+            raise EphemerisError("The downloaded ephemeris file failed validation")
+        _LOGGER.info("DE440 ephemeris stored in %s", cache_dir)
+    hass.data[_SHARED_KERNEL_KEY] = kernel
+    return kernel
+
+
+async def async_get_ephemeris(hass: HomeAssistant) -> EphemerisKernel:
+    """Return the shared ephemeris kernel and timescale, preparing them on first use.
+
+    Concurrent callers (config flow, entry setup) share a single preparation task.
+    That task is shielded so that a cancelled caller, typically an abandoned config
+    flow, does not abort a download another caller may be waiting for.
+
+    Args:
+        hass: Home Assistant instance.
+
+    Returns:
+        The loaded kernel and timescale.
+
+    Raises:
+        EphemerisError: If the kernel cannot be made available.
+    """
+    if (kernel := hass.data.get(_SHARED_KERNEL_KEY)) is not None:
+        return kernel
+    if (task := hass.data.get(_PREPARE_TASK_KEY)) is None or task.done():
+        task = hass.data[_PREPARE_TASK_KEY] = hass.async_create_background_task(
+            _async_prepare_kernel(hass), name=f"{DOMAIN}-ephemeris"
+        )
+    return await asyncio.shield(task)
+
+
+async def async_discard_ephemeris(hass: HomeAssistant) -> None:
+    """Drop the shared kernel and delete the cached files.
+
+    A preparation still in flight is cancelled and awaited first so that no file
+    reappears after the cleanup.
+
+    Args:
+        hass: Home Assistant instance.
+    """
+    if (task := hass.data.pop(_PREPARE_TASK_KEY, None)) is not None and not task.done():
+        task.cancel()
+        await asyncio.wait([task])
+    hass.data.pop(_SHARED_KERNEL_KEY, None)
+    cache_dir = get_cache_dir(hass)
+
+    def _remove() -> None:
+        """Delete the kernel and any partial download, then the empty directory."""
+        for name in (DE440_FILE, f"{DE440_FILE}.download"):
+            _unlink_quietly(cache_dir / name)
+        # Only succeeds when nothing else is stored in the directory.
+        with suppress(OSError):
+            cache_dir.rmdir()
+
+    await hass.async_add_executor_job(_remove)
+
+
+@cache
+def available_time_zones() -> tuple[str, ...]:
+    """Return the sorted IANA time zone names available on this system.
+
+    The first call walks the tzdata directories and must run in the executor.
+
+    Returns:
+        Sorted time zone names.
+    """
+    return tuple(sorted(zoneinfo.available_timezones()))
 
 
 async def async_resolve_time_zone(entry: ConfigEntry) -> tzinfo:
-    """Return the time zone used to localize event timestamps for a config entry.
+    """Return the time zone used for calendar-based values of a config entry.
 
     The Home Assistant time zone is used unless the entry explicitly opts out and
     provides a valid IANA time zone name. An unresolvable name falls back to the
-    Home Assistant time zone so that entities never end up without a zone.
+    Home Assistant time zone so that the coordinators always have a zone.
 
     Args:
         entry: Config entry providing the time zone options.

@@ -35,6 +35,9 @@ STANDARD_PRECISION_BRACKET_EXPAND = 1
 # Files and external resources
 CACHE_DIR_NAME = ".skyfield"
 DE440_FILE = "de440.bsp"
+DE440_URL = "https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp"
+# A complete DE440 kernel weighs about 115 MB; anything smaller is a truncated copy
+MIN_EPHEMERIS_SIZE_BYTES = 100 * 1024 * 1024
 
 # Moon phase codes from Skyfield almanac (integers)
 DARK_MOON = 0
@@ -68,7 +71,7 @@ KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON = "ecliptic_latitude_previous_new_moon"
 KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON = "ecliptic_longitude_previous_full_moon"
 KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON = "ecliptic_latitude_previous_full_moon"
 
-# Next event timestamps (ISO strings localized, converted to UTC datetime by sensors)
+# Next event instants (aware UTC datetimes rounded to the minute)
 KEY_NEXT_RISE = "next_rise"
 KEY_NEXT_SET = "next_set"
 KEY_NEXT_APOGEE = "next_apogee"
@@ -78,7 +81,7 @@ KEY_NEXT_FULL_MOON = "next_full_moon"
 KEY_NEXT_LAST_QUARTER = "next_last_quarter"
 KEY_NEXT_NEW_MOON = "next_new_moon"
 
-# Previous event timestamps (ISO strings localized, converted to UTC datetime by sensors)
+# Previous event instants (aware UTC datetimes rounded to the minute)
 KEY_PREVIOUS_RISE = "previous_rise"
 KEY_PREVIOUS_SET = "previous_set"
 KEY_PREVIOUS_APOGEE = "previous_apogee"
@@ -125,10 +128,17 @@ PRECISION_ECL_TOPO = 3
 PRECISION_ECL_GEO = 3
 PRECISION_ZODIAC_DEGREE = 2
 
-# Nominal phase thresholds/tolerances
-NEW_MOON_STRICT_PCT = 0.8
-FULL_MOON_STRICT_PCT = 99.5
-QUARTER_TOL_PCT = 3.0
+# Astronomical search parameters
+# Phase angle distance to a principal phase within which its name is reported;
+# the Moon covers about 3 degrees of phase angle in six hours.
+PRINCIPAL_PHASE_WINDOW_DEG = 3.0
+# Altitude of the Moon center defining rise, set and the above-horizon state;
+# the standard 34 arcminutes account for atmospheric refraction.
+HORIZON_ALTITUDE_DEG = -34.0 / 60.0
+RISE_SET_SEARCH_DAYS = 7.0
+# Two lunations back so that the previous full moon can be recognized as a blue moon
+PHASE_SEARCH_DAYS_BACK = 70.0
+PHASE_SEARCH_DAYS_AHEAD = 40.0
 
 # Fixed state code sets; they are also the ENUM options of the matching sensors
 PHASE_CODES: tuple[str, ...] = (

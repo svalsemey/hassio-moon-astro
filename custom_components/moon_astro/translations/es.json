@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Luna Astro",
-                "description": "Configura tus coordenadas GPS y altitud.",
+                "title": "Ubicación del observador",
+                "description": "Luna Astro calcula la posición de la Luna vista desde esta ubicación. Los valores se rellenan previamente a partir de la configuración de Home Assistant.",
                 "data": {
                     "latitude": "Latitud",
                     "longitude": "Longitud",
                     "elevation": "Elevación (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitud geográfica en grados decimales, positiva al norte del ecuador.",
+                    "longitude": "Longitud geográfica en grados decimales, positiva al este de Greenwich.",
+                    "elevation": "Altura sobre el nivel del mar, en metros."
+                }
+            },
+            "reconfigure": {
+                "title": "Ubicación del observador",
+                "description": "Actualiza la ubicación utilizada para la posición de la Luna. Las entidades existentes se conservan.",
+                "data": {
+                    "latitude": "Latitud",
+                    "longitude": "Longitud",
+                    "elevation": "Elevación (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitud geográfica en grados decimales, positiva al norte del ecuador.",
+                    "longitude": "Longitud geográfica en grados decimales, positiva al este de Greenwich.",
+                    "elevation": "Altura sobre el nivel del mar, en metros."
                 }
             },
             "precision": {
-                "title": "Luna Astro",
-                "description": "El modo de alta precisión reduce la variabilidad de las marcas de tiempo, pero aumenta el uso de CPU porque utiliza un paso de muestreo más fino y un rango de refinamiento más amplio. No se recomienda activar esta opción en dispositivos de baja potencia como Raspberry Pi.",
+                "title": "Precisión del cálculo",
+                "description": "La efeméride DE440 está lista.",
                 "data": {
                     "high_precision": "Modo de alta precisión"
+                },
+                "data_description": {
+                    "high_precision": "Refina los instantes de apogeo y perigeo con un paso de muestreo más fino y un intervalo de búsqueda más amplio. Esto aumenta notablemente el uso de CPU y no se recomienda en dispositivos de baja potencia como una Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Descargando la efeméride Skyfield DE440 (> 100 MB). Por favor, no cierres esta ventana durante la descarga..."
+            "download_ephemeris": "Descargando la efeméride JPL DE440 (unos 115 MB). Puede tardar varios minutos según tu conexión."
+        },
+        "error": {
+            "download_failed": "No se pudo descargar la efeméride DE440. Comprueba que Home Assistant puede acceder a ssd.jpl.nasa.gov y vuelve a intentarlo."
         },
         "abort": {
             "already_configured": "Luna Astro ya está configurado",
-            "missing_data": "Faltan datos de configuración",
             "reconfigure_successful": "Configuración actualizada"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Opciones de Luna Astro",
-                "description": "Ajusta el intervalo de actualización de los sensores y la gestión de la zona horaria.\n\nEl modo de alta precisión reduce la variabilidad de las marcas de tiempo, pero aumenta el uso de CPU porque utiliza un paso de muestreo más fino y un rango de refinamiento más amplio. No se recomienda en dispositivos de baja potencia como Raspberry Pi.\n\nEl intervalo de actualización de respaldo de eventos fuerza una actualización periódica de los sensores basados en eventos (fases siguientes/anteriores, apogeo/perigeo, zodiaco en las lunaciones) en caso de que se pierda la actualización programada alrededor del próximo evento (reinicio, cambio de hora, retraso). Valores más bajos actualizan con más frecuencia; valores más altos reducen el uso de CPU.",
+                "description": "Los cambios se aplican cuando la integración se recarga tras guardar.",
                 "data": {
                     "scan_interval": "Intervalo de actualización de los sensores (segundos)",
                     "use_ha_timezone": "Usar la zona horaria de Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Intervalo de actualización de respaldo de eventos (segundos)"
                 },
                 "data_description": {
-                    "time_zone": "Zona horaria IANA utilizada para localizar las marcas de tiempo de los eventos cuando no se utiliza la zona horaria de Home Assistant."
+                    "scan_interval": "Segundos entre dos cálculos de la posición actual de la Luna (60 a 21600). Intervalos más cortos aumentan el uso de CPU.",
+                    "use_ha_timezone": "Usa la zona horaria de Home Assistant para los meses del calendario que dan nombre a las lunas llenas. Desactívalo para elegir otra zona más abajo.",
+                    "time_zone": "Zona horaria IANA utilizada cuando no se usa la zona horaria de Home Assistant. Las marcas de tiempo en sí siempre se publican como instantes UTC.",
+                    "high_precision": "Refina los instantes de apogeo y perigeo con un paso de muestreo más fino y un intervalo de búsqueda más amplio. Esto aumenta notablemente el uso de CPU y no se recomienda en dispositivos de baja potencia como una Raspberry Pi.",
+                    "events_refresh_fallback": "Segundos entre dos recálculos forzados de los sensores basados en eventos (3600 a 604800), por si se pierde la actualización programada tras el próximo evento. 24 horas es más que suficiente."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "La efeméride DE440 no está disponible: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Luna llena",
                     "waning_gibbous": "Gibosa menguante",
                     "last_quarter": "Cuarto menguante",
-                    "waning_crescent": "Menguante",
-                    "unknown": "Desconocida"
+                    "waning_crescent": "Menguante"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Luna del Cazador",
                     "beaver_moon": "Luna del Castor",
                     "cold_moon": "Luna Fría",
-                    "blue_moon": "Luna Azul",
-                    "unknown": "Desconocido"
+                    "blue_moon": "Luna Azul"
                 }
             },
             "next_full_moon_alt_names": {
@@ -144,22 +175,20 @@
                     "wolf_moon_alt_names": "Luna después de Yule, Luna de quedarse en casa, Luna silenciosa, Luna severa, Luna central",
                     "snow_moon_alt_names": "Luna hambrienta, Luna del oso, Luna de tormenta, Luna de hielo",
                     "worm_moon_alt_names": "Luna de Cuaresma, Luna del cuervo, Luna de costra, Luna casta, Luna de azúcar, Luna de savia",
-                    "pink_moon_alt_names": "Luna de romper el hielo, Luna de brotes, Luna del despertar, Luna del huevo, Luna pascual",
+                    "pink_moon_alt_names": "Luna que rompe el hielo, Luna de brotes, Luna del despertar, Luna del huevo, Luna pascual",
                     "flower_moon_alt_names": "Luna de siembra, Luna de leche, Luna de liebre, Luna de hierba, Luna de las madres, Luna brillante",
                     "strawberry_moon_alt_names": "Luna de la rosa, Luna caliente, Luna de hidromiel, Luna de las flores, Luna de siembra",
                     "buck_moon_alt_names": "Luna del trueno, Luna del heno, Luna de hierbas",
                     "sturgeon_moon_alt_names": "Luna del grano, Luna del maíz, Luna del lince, Luna del relámpago",
                     "harvest_moon_alt_names": "Luna llena del maíz, Luna del maíz verde, Luna del maíz, Luna del vino, Luna de la canción, Luna de la cebada",
-                    "hunters_moon_alt_names": "Luna del arroz secándose, Luna de hojas que caen, Luna de congelación, Luna de sangre, Luna sanguina",
+                    "hunters_moon_alt_names": "Luna del arroz secándose, Luna de hojas que caen, Luna de congelación, Luna de sangre, Luna sanguínea",
                     "beaver_moon_alt_names": "Luna de escarcha, Luna de congelación, Luna del comercio, Luna de nieve, Luna de luto, Luna de las profundidades más oscuras",
-                    "cold_moon_alt_names": "Luna de las noches largas, Luna antes de Yule, Luna del roble, Luna fría llena",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Luna de las noches largas, Luna antes de Yule, Luna del roble, Luna llena fría"
                 }
             },
             "next_last_quarter": {
                 "name": "Próximo último cuarto"
             },
-
             "previous_rise": {
                 "name": "Orto anterior"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "Luna del Cazador",
                     "beaver_moon": "Luna del Castor",
                     "cold_moon": "Luna Fría",
-                    "blue_moon": "Luna Azul",
-                    "unknown": "Desconocido"
+                    "blue_moon": "Luna Azul"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -206,22 +234,20 @@
                     "wolf_moon_alt_names": "Luna después de Yule, Luna de quedarse en casa, Luna silenciosa, Luna severa, Luna central",
                     "snow_moon_alt_names": "Luna hambrienta, Luna del oso, Luna de tormenta, Luna de hielo",
                     "worm_moon_alt_names": "Luna de Cuaresma, Luna del cuervo, Luna de costra, Luna casta, Luna de azúcar, Luna de savia",
-                    "pink_moon_alt_names": "Luna de romper el hielo, Luna de brotes, Luna del despertar, Luna del huevo, Luna pascual",
+                    "pink_moon_alt_names": "Luna que rompe el hielo, Luna de brotes, Luna del despertar, Luna del huevo, Luna pascual",
                     "flower_moon_alt_names": "Luna de siembra, Luna de leche, Luna de liebre, Luna de hierba, Luna de las madres, Luna brillante",
                     "strawberry_moon_alt_names": "Luna de la rosa, Luna caliente, Luna de hidromiel, Luna de las flores, Luna de siembra",
                     "buck_moon_alt_names": "Luna del trueno, Luna del heno, Luna de hierbas",
                     "sturgeon_moon_alt_names": "Luna del grano, Luna del maíz, Luna del lince, Luna del relámpago",
                     "harvest_moon_alt_names": "Luna llena del maíz, Luna del maíz verde, Luna del maíz, Luna del vino, Luna de la canción, Luna de la cebada",
-                    "hunters_moon_alt_names": "Luna del arroz secándose, Luna de hojas que caen, Luna de congelación, Luna de sangre, Luna sanguina",
+                    "hunters_moon_alt_names": "Luna del arroz secándose, Luna de hojas que caen, Luna de congelación, Luna de sangre, Luna sanguínea",
                     "beaver_moon_alt_names": "Luna de escarcha, Luna de congelación, Luna del comercio, Luna de nieve, Luna de luto, Luna de las profundidades más oscuras",
-                    "cold_moon_alt_names": "Luna de las noches largas, Luna antes de Yule, Luna del roble, Luna fría llena",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Luna de las noches largas, Luna antes de Yule, Luna del roble, Luna llena fría"
                 }
             },
             "previous_last_quarter": {
                 "name": "Último cuarto anterior"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Longitud eclíptica en la próxima luna llena"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Latitud eclíptica en la luna nueva anterior"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Signo del zodiaco (actual)",
                 "state": {

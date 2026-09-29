@@ -3,36 +3,60 @@
     "config": {
         "step": {
             "user": {
-                "title": "月亮阿斯特罗",
-                "description": "设置你的 GPS 坐标和海拔高度。",
+                "title": "观测者位置",
+                "description": "月亮阿斯特罗根据此位置计算月亮的位置。数值已根据 Home Assistant 配置预先填写。",
                 "data": {
                     "latitude": "纬度",
                     "longitude": "经度",
                     "elevation": "海拔（米）"
+                },
+                "data_description": {
+                    "latitude": "以十进制度表示的地理纬度，赤道以北为正。",
+                    "longitude": "以十进制度表示的地理经度，格林尼治以东为正。",
+                    "elevation": "海平面以上的高度，单位为米。"
+                }
+            },
+            "reconfigure": {
+                "title": "观测者位置",
+                "description": "更新用于计算月亮位置的位置。现有实体将被保留。",
+                "data": {
+                    "latitude": "纬度",
+                    "longitude": "经度",
+                    "elevation": "海拔（米）"
+                },
+                "data_description": {
+                    "latitude": "以十进制度表示的地理纬度，赤道以北为正。",
+                    "longitude": "以十进制度表示的地理经度，格林尼治以东为正。",
+                    "elevation": "海平面以上的高度，单位为米。"
                 }
             },
             "precision": {
-                "title": "月亮阿斯特罗",
-                "description": "高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更精细的采样步长和更宽的精炼范围。不建议在 Raspberry Pi 等低性能设备上启用此选项。",
+                "title": "计算精度",
+                "description": "DE440 星历已准备就绪。",
                 "data": {
                     "high_precision": "高精度模式"
+                },
+                "data_description": {
+                    "high_precision": "使用更精细的采样步长和更宽的搜索区间来精确求解远地点和近地点的时刻。这会明显增加 CPU 使用率，不建议在 Raspberry Pi 等低功耗设备上使用。"
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "正在下载 Skyfield DE440 星历（> 100 MB）。下载过程中请不要关闭此窗口..."
+            "download_ephemeris": "正在下载 JPL DE440 星历（约 115 MB）。根据你的网络情况，这可能需要几分钟。"
+        },
+        "error": {
+            "download_failed": "无法下载 DE440 星历。请检查 Home Assistant 是否可以访问 ssd.jpl.nasa.gov，然后重试。"
         },
         "abort": {
             "already_configured": "月亮阿斯特罗已配置",
-            "missing_data": "缺少配置数据",
             "reconfigure_successful": "配置已更新"
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "月相天文选项",
-                "description": "调整传感器更新间隔和时区处理。\n\n高精度模式可降低时间戳的波动，但会增加 CPU 使用率，因为它使用更细的采样步长和更宽的优化区间。不建议在 Raspberry Pi 等低性能设备上启用。\n\n事件刷新回退间隔用于在错过围绕下一次事件的计划刷新时（重启、时间变更、延迟），强制周期性刷新基于事件的传感器（下一次/上一次月相、远地点/近地点、朔望时的黄道十二宫）。数值越小刷新越频繁；数值越大可降低 CPU 使用率。",
+                "title": "月亮阿斯特罗选项",
+                "description": "更改将在保存后集成重新加载时生效。",
                 "data": {
                     "scan_interval": "传感器更新间隔（秒）",
                     "use_ha_timezone": "使用 Home Assistant 时区",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "事件刷新回退间隔（秒）"
                 },
                 "data_description": {
-                    "time_zone": "当不使用 Home Assistant 时区时，用于本地化事件时间戳的 IANA 时区。"
+                    "scan_interval": "两次计算当前月亮位置之间的间隔秒数（60 至 21600）。间隔越短，CPU 使用率越高。",
+                    "use_ha_timezone": "为满月命名所依据的日历月份使用 Home Assistant 时区。关闭后可在下方选择其他时区。",
+                    "time_zone": "不使用 Home Assistant 时区时所用的 IANA 时区。时间戳本身始终以 UTC 时刻发布。",
+                    "high_precision": "使用更精细的采样步长和更宽的搜索区间来精确求解远地点和近地点的时刻。这会明显增加 CPU 使用率，不建议在 Raspberry Pi 等低功耗设备上使用。",
+                    "events_refresh_fallback": "基于事件的传感器两次强制重新计算之间的间隔秒数（3600 至 604800），以防下一次事件之后计划的刷新被错过。24 小时已经足够。"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "DE440 星历不可用：{error}"
         }
     },
     "entity": {
@@ -61,14 +94,13 @@
                 "name": "月相",
                 "state": {
                     "new_moon": "新月",
-                    "waxing_crescent": "娥眉月",
+                    "waxing_crescent": "蛾眉月",
                     "first_quarter": "上弦月",
                     "waxing_gibbous": "盈凸月",
                     "full_moon": "满月",
                     "waning_gibbous": "亏凸月",
                     "last_quarter": "下弦月",
-                    "waning_crescent": "残月",
-                    "unknown": "未知"
+                    "waning_crescent": "残月"
                 }
             },
             "azimuth": {
@@ -134,14 +166,13 @@
                     "hunters_moon": "猎人月",
                     "beaver_moon": "海狸月",
                     "cold_moon": "寒月",
-                    "blue_moon": "蓝月",
-                    "unknown": "未知"
+                    "blue_moon": "蓝月"
                 }
             },
             "next_full_moon_alt_names": {
                 "name": "下次满月别名",
                 "state": {
-                    "wolf_moon_alt_names": "Yule后月, 宅家月, 静月, 严寒月, 中心月",
+                    "wolf_moon_alt_names": "尤尔节后月, 宅家月, 静月, 严寒月, 中心月",
                     "snow_moon_alt_names": "饥饿月, 熊月, 风暴月, 冰月",
                     "worm_moon_alt_names": "四旬期月, 乌鸦月, 结壳月, 贞洁月, 糖月, 树液月",
                     "pink_moon_alt_names": "破冰月, 萌芽月, 觉醒月, 蛋月, 复活节月",
@@ -152,8 +183,7 @@
                     "harvest_moon_alt_names": "玉米满月, 青玉米月, 玉米月, 葡萄酒月, 歌曲月, 大麦月",
                     "hunters_moon_alt_names": "晾稻月, 落叶月, 冻结月, 血月, 绯红月",
                     "beaver_moon_alt_names": "霜月, 冻结月, 贸易月, 雪月, 哀悼月, 至暗月",
-                    "cold_moon_alt_names": "长夜月, Yule前月, 橡树月, 寒冷满月",
-                    "unknown": ""
+                    "cold_moon_alt_names": "长夜月, 尤尔节前月, 橡树月, 寒冷满月"
                 }
             },
             "next_last_quarter": {
@@ -195,14 +225,13 @@
                     "hunters_moon": "猎人月",
                     "beaver_moon": "海狸月",
                     "cold_moon": "寒月",
-                    "blue_moon": "蓝月",
-                    "unknown": "未知"
+                    "blue_moon": "蓝月"
                 }
             },
             "previous_full_moon_alt_names": {
                 "name": "上次满月别名",
                 "state": {
-                    "wolf_moon_alt_names": "Yule后月, 宅家月, 静月, 严寒月, 中心月",
+                    "wolf_moon_alt_names": "尤尔节后月, 宅家月, 静月, 严寒月, 中心月",
                     "snow_moon_alt_names": "饥饿月, 熊月, 风暴月, 冰月",
                     "worm_moon_alt_names": "四旬期月, 乌鸦月, 结壳月, 贞洁月, 糖月, 树液月",
                     "pink_moon_alt_names": "破冰月, 萌芽月, 觉醒月, 蛋月, 复活节月",
@@ -213,8 +242,7 @@
                     "harvest_moon_alt_names": "玉米满月, 青玉米月, 玉米月, 葡萄酒月, 歌曲月, 大麦月",
                     "hunters_moon_alt_names": "晾稻月, 落叶月, 冻结月, 血月, 绯红月",
                     "beaver_moon_alt_names": "霜月, 冻结月, 贸易月, 雪月, 哀悼月, 至暗月",
-                    "cold_moon_alt_names": "长夜月, Yule前月, 橡树月, 寒冷满月",
-                    "unknown": ""
+                    "cold_moon_alt_names": "长夜月, 尤尔节前月, 橡树月, 寒冷满月"
                 }
             },
             "previous_last_quarter": {

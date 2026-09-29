@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "ムーンアストロ",
-                "description": "GPS 座標と標高を設定してください。",
+                "title": "観測者の位置",
+                "description": "ムーンアストロは、この位置から見た月の位置を計算します。値は Home Assistant の設定から事前入力されています。",
                 "data": {
                     "latitude": "緯度",
                     "longitude": "経度",
                     "elevation": "標高 (m)"
+                },
+                "data_description": {
+                    "latitude": "10進数の度で表す地理的緯度。赤道より北が正です。",
+                    "longitude": "10進数の度で表す地理的経度。グリニッジより東が正です。",
+                    "elevation": "海抜の高さ（メートル）。"
+                }
+            },
+            "reconfigure": {
+                "title": "観測者の位置",
+                "description": "月の位置の計算に使用する位置を更新します。既存のエンティティは保持されます。",
+                "data": {
+                    "latitude": "緯度",
+                    "longitude": "経度",
+                    "elevation": "標高 (m)"
+                },
+                "data_description": {
+                    "latitude": "10進数の度で表す地理的緯度。赤道より北が正です。",
+                    "longitude": "10進数の度で表す地理的経度。グリニッジより東が正です。",
+                    "elevation": "海抜の高さ（メートル）。"
                 }
             },
             "precision": {
-                "title": "ムーンアストロ",
-                "description": "高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリングステップと広いリファインメント範囲を使用するため CPU 使用率が増加します。Raspberry Pi のような低消費電力デバイスでは有効化を推奨しません。",
+                "title": "計算精度",
+                "description": "DE440 暦表の準備ができました。",
                 "data": {
                     "high_precision": "高精度モード"
+                },
+                "data_description": {
+                    "high_precision": "より細かいサンプリングステップと広い探索範囲で、遠地点と近地点の時刻をリファインします。CPU 使用率が顕著に増加するため、Raspberry Pi のような低消費電力デバイスでは推奨されません。"
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Skyfield DE440 暦表（> 100 MB）をダウンロードしています。ダウンロード中はこのウィンドウを閉じないでください..."
+            "download_ephemeris": "JPL DE440 暦表（約 115 MB）をダウンロードしています。接続環境によっては数分かかる場合があります。"
+        },
+        "error": {
+            "download_failed": "DE440 暦表をダウンロードできませんでした。Home Assistant が ssd.jpl.nasa.gov に到達できることを確認してから、もう一度お試しください。"
         },
         "abort": {
             "already_configured": "ムーンアストロはすでに設定されています",
-            "missing_data": "設定データが不足しています",
             "reconfigure_successful": "設定が更新されました"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "ムーンアストロのオプション",
-                "description": "センサーの更新間隔とタイムゾーン処理を調整します。\n\n高精度モードはタイムスタンプのばらつきを減らしますが、より細かいサンプリング間隔と広いリファイン範囲を使用するため CPU 使用率が増加します。Raspberry Pi などの低性能デバイスでは推奨されません。\n\nイベント更新フォールバック間隔は、次のイベント付近で予定されていた更新が失敗した場合（再起動、時刻変更、遅延）に備えて、イベントベースのセンサー（次/前のフェーズ、遠地点/近地点、朔望時の黄道十二宮）を定期的に更新します。小さい値ほど頻繁に更新され、大きい値ほど CPU 使用率が低くなります。",
+                "description": "変更は、保存後に統合が再読み込みされたときに適用されます。",
                 "data": {
                     "scan_interval": "センサー更新間隔（秒）",
                     "use_ha_timezone": "Home Assistant のタイムゾーンを使用",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "イベント更新フォールバック間隔（秒）"
                 },
                 "data_description": {
-                    "time_zone": "Home Assistant のタイムゾーンが使用されていない場合に、イベントのタイムスタンプをローカライズするために使用される IANA タイムゾーン。"
+                    "scan_interval": "現在の月の位置を計算する間隔（秒）（60〜21600）。間隔が短いほど CPU 使用率が高くなります。",
+                    "use_ha_timezone": "満月の名称の基準となる暦の月に、Home Assistant のタイムゾーンを使用します。下で別のタイムゾーンを選択するには無効にしてください。",
+                    "time_zone": "Home Assistant のタイムゾーンが使用されていない場合に使用される IANA タイムゾーン。タイムスタンプ自体は常に UTC の時刻として公開されます。",
+                    "high_precision": "より細かいサンプリングステップと広い探索範囲で、遠地点と近地点の時刻をリファインします。CPU 使用率が顕著に増加するため、Raspberry Pi のような低消費電力デバイスでは推奨されません。",
+                    "events_refresh_fallback": "次のイベント後に予定されている更新が失われた場合に備えて、イベントベースのセンサーを強制的に再計算する間隔（秒）（3600〜604800）。24 時間で十分です。"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "DE440 暦表は利用できません: {error}"
         }
     },
     "entity": {
@@ -61,14 +94,13 @@
                 "name": "位相",
                 "state": {
                     "new_moon": "新月",
-                    "waxing_crescent": "三日月（上弦前）",
+                    "waxing_crescent": "満ちていく三日月",
                     "first_quarter": "上弦",
-                    "waxing_gibbous": "十三夜（上弦後）",
+                    "waxing_gibbous": "満ちていく凸月",
                     "full_moon": "満月",
-                    "waning_gibbous": "居待月（下弦前）",
+                    "waning_gibbous": "欠けていく凸月",
                     "last_quarter": "下弦",
-                    "waning_crescent": "三日月（下弦後）",
-                    "unknown": "不明"
+                    "waning_crescent": "欠けていく三日月"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "ハンターズムーン",
                     "beaver_moon": "ビーバームーン",
                     "cold_moon": "コールドムーン",
-                    "blue_moon": "ブルームーン",
-                    "unknown": "不明"
+                    "blue_moon": "ブルームーン"
                 }
             },
             "next_full_moon_alt_names": {
@@ -150,16 +181,14 @@
                     "buck_moon_alt_names": "雷の月, 干し草の月, 薬草の月",
                     "sturgeon_moon_alt_names": "穀物の月, トウモロコシの月, オオヤマネコの月, 稲妻の月",
                     "harvest_moon_alt_names": "トウモロコシの満月, 青いトウモロコシの月, トウモロコシの月, ワインの月, 歌の月, 大麦の月",
-                    "hunters_moon_alt_names": "乾燥米の月, 落葉の月, 凍結の月, 血の月, サングインムーン",
+                    "hunters_moon_alt_names": "乾燥米の月, 落葉の月, 凍結の月, 血の月, 血色の月",
                     "beaver_moon_alt_names": "霜の月, 凍結の月, 交易の月, 雪の月, 喪の月, 最も暗い深みの月",
-                    "cold_moon_alt_names": "長い夜の月, ユール前の月, オークの月, 寒い満月",
-                    "unknown": ""
+                    "cold_moon_alt_names": "長い夜の月, ユール前の月, オークの月, 寒い満月"
                 }
             },
             "next_last_quarter": {
                 "name": "次の下弦"
             },
-
             "previous_rise": {
                 "name": "前回の月の出"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "ハンターズムーン",
                     "beaver_moon": "ビーバームーン",
                     "cold_moon": "コールドムーン",
-                    "blue_moon": "ブルームーン",
-                    "unknown": "不明"
+                    "blue_moon": "ブルームーン"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -212,16 +240,14 @@
                     "buck_moon_alt_names": "雷の月, 干し草の月, 薬草の月",
                     "sturgeon_moon_alt_names": "穀物の月, トウモロコシの月, オオヤマネコの月, 稲妻の月",
                     "harvest_moon_alt_names": "トウモロコシの満月, 青いトウモロコシの月, トウモロコシの月, ワインの月, 歌の月, 大麦の月",
-                    "hunters_moon_alt_names": "乾燥米の月, 落葉の月, 凍結の月, 血の月, サングインムーン",
+                    "hunters_moon_alt_names": "乾燥米の月, 落葉の月, 凍結の月, 血の月, 血色の月",
                     "beaver_moon_alt_names": "霜の月, 凍結の月, 交易の月, 雪の月, 喪の月, 最も暗い深みの月",
-                    "cold_moon_alt_names": "長い夜の月, ユール前の月, オークの月, 寒い満月",
-                    "unknown": ""
+                    "cold_moon_alt_names": "長い夜の月, ユール前の月, オークの月, 寒い満月"
                 }
             },
             "previous_last_quarter": {
                 "name": "前回の下弦"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "次の満月時の黄経"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "前回の新月時の黄緯"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "黄道十二宮（現在）",
                 "state": {

@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Mond Astro",
-                "description": "Legen Sie Ihre GPS-Koordinaten und die Höhe fest.",
+                "title": "Standort des Beobachters",
+                "description": "Mond Astro berechnet die Position des Mondes von diesem Standort aus gesehen. Die Werte sind aus der Home-Assistant-Konfiguration vorausgefüllt.",
                 "data": {
                     "latitude": "Breitengrad",
                     "longitude": "Längengrad",
                     "elevation": "Höhe (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografische Breite in Dezimalgrad, positiv nördlich des Äquators.",
+                    "longitude": "Geografische Länge in Dezimalgrad, positiv östlich von Greenwich.",
+                    "elevation": "Höhe über dem Meeresspiegel in Metern."
+                }
+            },
+            "reconfigure": {
+                "title": "Standort des Beobachters",
+                "description": "Aktualisieren Sie den Standort, der für die Mondposition verwendet wird. Bestehende Entitäten bleiben erhalten.",
+                "data": {
+                    "latitude": "Breitengrad",
+                    "longitude": "Längengrad",
+                    "elevation": "Höhe (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografische Breite in Dezimalgrad, positiv nördlich des Äquators.",
+                    "longitude": "Geografische Länge in Dezimalgrad, positiv östlich von Greenwich.",
+                    "elevation": "Höhe über dem Meeresspiegel in Metern."
                 }
             },
             "precision": {
-                "title": "Mond Astro",
-                "description": "Der Hochpräzisionsmodus verringert die Variabilität der Zeitstempel, erhöht jedoch die CPU-Auslastung, da er eine feinere Abtastschrittweite und ein breiteres Verfeinerungsintervall verwendet. Es wird nicht empfohlen, diese Option auf leistungsschwachen Geräten wie Raspberry Pi zu aktivieren.",
+                "title": "Berechnungsgenauigkeit",
+                "description": "Die DE440-Ephemeride ist bereit.",
                 "data": {
                     "high_precision": "Hochpräzisionsmodus"
+                },
+                "data_description": {
+                    "high_precision": "Verfeinert die Zeitpunkte von Apogäum und Perigäum mit einer feineren Abtastschrittweite und einem breiteren Suchintervall. Dies erhöht die CPU-Auslastung spürbar und wird auf leistungsschwachen Geräten wie dem Raspberry Pi nicht empfohlen."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Lade die Skyfield DE440-Ephemeride herunter (> 100 MB). Bitte schließen Sie dieses Fenster während des Downloads nicht..."
+            "download_ephemeris": "Die JPL-DE440-Ephemeride wird heruntergeladen (ca. 115 MB). Je nach Verbindung kann dies mehrere Minuten dauern."
+        },
+        "error": {
+            "download_failed": "Die DE440-Ephemeride konnte nicht heruntergeladen werden. Prüfen Sie, ob Home Assistant ssd.jpl.nasa.gov erreichen kann, und versuchen Sie es erneut."
         },
         "abort": {
             "already_configured": "Mond Astro ist bereits konfiguriert",
-            "missing_data": "Konfigurationsdaten fehlen",
             "reconfigure_successful": "Konfiguration aktualisiert"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Optionen für Mond Astro",
-                "description": "Passe das Aktualisierungsintervall der Sensoren und die Zeitzonenbehandlung an.\n\nDer Hochpräzisionsmodus reduziert die Variabilität von Zeitstempeln, erhöht aber die CPU-Auslastung, da er einen feineren Abtastschritt und einen größeren Verfeinerungsbereich verwendet. Er wird auf leistungsschwachen Geräten wie dem Raspberry Pi nicht empfohlen.\n\nDas Ereignis-Auffrischungs-Fallback-Intervall erzwingt eine regelmäßige Aktualisierung ereignisbasierter Sensoren (nächste/vorherige Phasen, Apogäum/Perigäum, Tierkreis bei Lunationen), falls die geplante Aktualisierung rund um das nächste Ereignis verpasst wird (Neustart, Zeitänderung, Verzögerung). Niedrigere Werte aktualisieren häufiger; höhere Werte reduzieren die CPU-Auslastung.",
+                "description": "Änderungen werden übernommen, wenn die Integration nach dem Speichern neu geladen wird.",
                 "data": {
                     "scan_interval": "Aktualisierungsintervall der Sensoren (Sekunden)",
                     "use_ha_timezone": "Zeitzone von Home Assistant verwenden",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Fallback-Intervall für Ereignis-Aktualisierung (Sekunden)"
                 },
                 "data_description": {
-                    "time_zone": "IANA-Zeitzone, die verwendet wird, um Ereignis-Zeitstempel zu lokalisieren, wenn die Zeitzone von Home Assistant nicht verwendet wird."
+                    "scan_interval": "Sekunden zwischen zwei Berechnungen der aktuellen Mondposition (60 bis 21600). Kürzere Intervalle erhöhen die CPU-Auslastung.",
+                    "use_ha_timezone": "Verwendet die Zeitzone von Home Assistant für die Kalendermonate, nach denen Vollmonde benannt werden. Deaktivieren, um unten eine andere Zone zu wählen.",
+                    "time_zone": "IANA-Zeitzone, die verwendet wird, wenn die Zeitzone von Home Assistant nicht verwendet wird. Die Zeitstempel selbst werden immer als UTC-Zeitpunkte veröffentlicht.",
+                    "high_precision": "Verfeinert die Zeitpunkte von Apogäum und Perigäum mit einer feineren Abtastschrittweite und einem breiteren Suchintervall. Dies erhöht die CPU-Auslastung spürbar und wird auf leistungsschwachen Geräten wie dem Raspberry Pi nicht empfohlen.",
+                    "events_refresh_fallback": "Sekunden zwischen zwei erzwungenen Neuberechnungen der ereignisbasierten Sensoren (3600 bis 604800), falls die nach dem nächsten Ereignis geplante Aktualisierung verpasst wird. 24 Stunden reichen völlig aus."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "Die DE440-Ephemeride ist nicht verfügbar: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Vollmond",
                     "waning_gibbous": "Abnehmender Mond",
                     "last_quarter": "Letztes Viertel",
-                    "waning_crescent": "Abnehmende Sichel",
-                    "unknown": "Unbekannt"
+                    "waning_crescent": "Abnehmende Sichel"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Jägermond",
                     "beaver_moon": "Bibermond",
                     "cold_moon": "Kalter Mond",
-                    "blue_moon": "Blauer Mond",
-                    "unknown": "Unbekannt"
+                    "blue_moon": "Blauer Mond"
                 }
             },
             "next_full_moon_alt_names": {
@@ -152,14 +183,12 @@
                     "harvest_moon_alt_names": "Voller Maismond, Grüner-Mais-Mond, Maismond, Weinmond, Liedmond, Gerstenmond",
                     "hunters_moon_alt_names": "Reistrocknungs-Mond, Fallende-Blätter-Mond, Gefriermond, Blutmond, Sanguiner Mond",
                     "beaver_moon_alt_names": "Reifmond, Gefriermond, Handelsmond, Schneemond, Trauermond, Mond der dunkelsten Tiefen",
-                    "cold_moon_alt_names": "Mond der langen Nächte, Mond vor Yule, Eichenmond, Voller kalter Mond",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Mond der langen Nächte, Mond vor Yule, Eichenmond, Voller kalter Mond"
                 }
             },
             "next_last_quarter": {
                 "name": "Nächstes letztes Viertel"
             },
-
             "previous_rise": {
                 "name": "Vorheriger Aufgang"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "Jägermond",
                     "beaver_moon": "Bibermond",
                     "cold_moon": "Kalter Mond",
-                    "blue_moon": "Blauer Mond",
-                    "unknown": "Unbekannt"
+                    "blue_moon": "Blauer Mond"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -214,14 +242,12 @@
                     "harvest_moon_alt_names": "Voller Maismond, Grüner-Mais-Mond, Maismond, Weinmond, Liedmond, Gerstenmond",
                     "hunters_moon_alt_names": "Reistrocknungs-Mond, Fallende-Blätter-Mond, Gefriermond, Blutmond, Sanguiner Mond",
                     "beaver_moon_alt_names": "Reifmond, Gefriermond, Handelsmond, Schneemond, Trauermond, Mond der dunkelsten Tiefen",
-                    "cold_moon_alt_names": "Mond der langen Nächte, Mond vor Yule, Eichenmond, Voller kalter Mond",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Mond der langen Nächte, Mond vor Yule, Eichenmond, Voller kalter Mond"
                 }
             },
             "previous_last_quarter": {
                 "name": "Vorheriges letztes Viertel"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptische Länge beim nächsten Vollmond"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptische Breite beim vorherigen Neumond"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Tierkreiszeichen (aktuell)",
                 "state": {

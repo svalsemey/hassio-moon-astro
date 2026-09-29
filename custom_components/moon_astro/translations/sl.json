@@ -1,38 +1,62 @@
 {
-    "title": "Lunin Astro",
+    "title": "Luna Astro",
     "config": {
         "step": {
             "user": {
-                "title": "Lunin Astro",
-                "description": "Nastavite svoje GPS koordinate in nadmorsko višino.",
+                "title": "Lokacija opazovalca",
+                "description": "Luna Astro izračuna položaj Lune, kot je viden s te lokacije. Vrednosti so vnaprej izpolnjene iz konfiguracije Home Assistant.",
                 "data": {
                     "latitude": "Zemljepisna širina",
                     "longitude": "Zemljepisna dolžina",
                     "elevation": "Nadmorska višina (m)"
+                },
+                "data_description": {
+                    "latitude": "Zemljepisna širina v decimalnih stopinjah, pozitivna severno od ekvatorja.",
+                    "longitude": "Zemljepisna dolžina v decimalnih stopinjah, pozitivna vzhodno od Greenwicha.",
+                    "elevation": "Višina nad morjem v metrih."
+                }
+            },
+            "reconfigure": {
+                "title": "Lokacija opazovalca",
+                "description": "Posodobite lokacijo, ki se uporablja za položaj Lune. Obstoječe entitete so ohranjene.",
+                "data": {
+                    "latitude": "Zemljepisna širina",
+                    "longitude": "Zemljepisna dolžina",
+                    "elevation": "Nadmorska višina (m)"
+                },
+                "data_description": {
+                    "latitude": "Zemljepisna širina v decimalnih stopinjah, pozitivna severno od ekvatorja.",
+                    "longitude": "Zemljepisna dolžina v decimalnih stopinjah, pozitivna vzhodno od Greenwicha.",
+                    "elevation": "Višina nad morjem v metrih."
                 }
             },
             "precision": {
-                "title": "Lunin Astro",
-                "description": "Način visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja finejši korak vzorčenja in širši interval izboljšave. Vklop te možnosti ni priporočljiv na napravah z manjšo zmogljivostjo, kot je Raspberry Pi.",
+                "title": "Natančnost izračuna",
+                "description": "Efemeride DE440 so pripravljene.",
                 "data": {
                     "high_precision": "Način visoke natančnosti"
+                },
+                "data_description": {
+                    "high_precision": "Izboljša trenutke apogeja in perigeja z manjšim korakom vzorčenja in širšim iskalnim intervalom. To opazno poveča porabo CPU in ni priporočljivo na napravah z nizko močjo, kot je Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Prenašanje efemerid Skyfield DE440 (> 100 MB). Med prenosom prosimo ne zaprite tega okna..."
+            "download_ephemeris": "Prenašanje efemerid JPL DE440 (približno 115 MB). Glede na vašo povezavo lahko to traja nekaj minut."
+        },
+        "error": {
+            "download_failed": "Efemerid DE440 ni bilo mogoče prenesti. Preverite, ali lahko Home Assistant doseže ssd.jpl.nasa.gov, in poskusite znova."
         },
         "abort": {
-            "already_configured": "Lunin Astro je že konfiguriran",
-            "missing_data": "Manjkajo konfiguracijski podatki",
+            "already_configured": "Luna Astro je že konfiguriran",
             "reconfigure_successful": "Konfiguracija je posodobljena"
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "Možnosti Lunin Astro",
-                "description": "Prilagodite interval posodabljanja senzorjev in upravljanje časovnega pasu.\n\nNačin visoke natančnosti zmanjša variabilnost časovnih žigov, vendar poveča porabo CPU, ker uporablja manjši korak vzorčenja in širši razpon izpopolnjevanja. Ni priporočljiv na napravah z nizko močjo, kot je Raspberry Pi.\n\nRezervni interval osveževanja dogodkov vsili periodično osveževanje senzorjev, ki temeljijo na dogodkih (naslednje/prejšnje faze, apogej/perigej, zodiak pri lunacijah), če se načrtovano osveževanje okoli naslednjega dogodka izpusti (ponovni zagon, sprememba časa, zamik). Nižje vrednosti osvežujejo pogosteje; višje vrednosti zmanjšajo porabo CPU.",
+                "title": "Možnosti Luna Astro",
+                "description": "Spremembe se uporabijo, ko se integracija po shranjevanju znova naloži.",
                 "data": {
                     "scan_interval": "Interval posodabljanja senzorjev (sekunde)",
                     "use_ha_timezone": "Uporabi časovni pas Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Rezervni interval osveževanja dogodkov (sekunde)"
                 },
                 "data_description": {
-                    "time_zone": "IANA časovni pas, uporabljen za lokalizacijo časovnih žigov dogodkov, kadar se ne uporablja časovni pas Home Assistant."
+                    "scan_interval": "Število sekund med dvema izračunoma trenutnega položaja Lune (od 60 do 21600). Krajši intervali povečajo porabo CPU.",
+                    "use_ha_timezone": "Uporabi časovni pas Home Assistant za koledarske mesece, po katerih se imenujejo polne lune. Izklopite za izbiro drugega pasu spodaj.",
+                    "time_zone": "Časovni pas IANA, ki se uporablja, kadar se časovni pas Home Assistant ne uporablja. Sami časovni žigi so vedno objavljeni kot trenutki UTC.",
+                    "high_precision": "Izboljša trenutke apogeja in perigeja z manjšim korakom vzorčenja in širšim iskalnim intervalom. To opazno poveča porabo CPU in ni priporočljivo na napravah z nizko močjo, kot je Raspberry Pi.",
+                    "events_refresh_fallback": "Število sekund med dvema prisilnima ponovnima izračunoma senzorjev, ki temeljijo na dogodkih (od 3600 do 604800), za primer, da se osvežitev, načrtovana po naslednjem dogodku, izpusti. 24 ur je povsem dovolj."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "Efemeride DE440 niso na voljo: {error}"
         }
     },
     "entity": {
@@ -63,12 +96,11 @@
                     "new_moon": "Mlaj",
                     "waxing_crescent": "Prirastoči srp",
                     "first_quarter": "Prvi krajec",
-                    "waxing_gibbous": "Prirastoča izbočena",
-                    "full_moon": "Ščip (polna luna)",
-                    "waning_gibbous": "Upadajoča izbočena",
+                    "waxing_gibbous": "Prirastoča izbočena luna",
+                    "full_moon": "Ščip",
+                    "waning_gibbous": "Upadajoča izbočena luna",
                     "last_quarter": "Zadnji krajec",
-                    "waning_crescent": "Zadnji srp",
-                    "unknown": "Neznano"
+                    "waning_crescent": "Zadnji srp"
                 }
             },
             "azimuth": {
@@ -134,32 +166,29 @@
                     "hunters_moon": "Lovčeva luna",
                     "beaver_moon": "Bobrova luna",
                     "cold_moon": "Hladna luna",
-                    "blue_moon": "Modra luna",
-                    "unknown": "Neznano"
+                    "blue_moon": "Modra luna"
                 }
             },
             "next_full_moon_alt_names": {
                 "name": "Alternativna imena naslednje polne lune",
                 "state": {
-                    "wolf_moon_alt_names": "Luna po Yule, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
+                    "wolf_moon_alt_names": "Luna po Yulu, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
                     "snow_moon_alt_names": "Lačna luna, Medvedja luna, Nevihtna luna, Ledena luna",
                     "worm_moon_alt_names": "Postna luna, Vranja luna, Skorjasta luna, Čista luna, Sladkorna luna, Luna sokov",
                     "pink_moon_alt_names": "Luna lomljenja ledu, Brsteča luna, Prebujajoča luna, Jajčna luna, Velikonočna luna",
-                    "flower_moon_alt_names": "Sadjena luna, Mlečna luna, Zajčja luna, Travna luna, Materinska luna, Svetla luna",
-                    "strawberry_moon_alt_names": "Rožna (Rose) luna, Vroča luna, Luna medice, Cvetlična luna, Sadjena luna",
+                    "flower_moon_alt_names": "Luna sajenja, Mlečna luna, Zajčja luna, Travna luna, Materinska luna, Svetla luna",
+                    "strawberry_moon_alt_names": "Luna vrtnic, Vroča luna, Luna medice, Cvetlična luna, Luna sajenja",
                     "buck_moon_alt_names": "Gromovna luna, Senena luna, Zeliščna luna",
-                    "sturgeon_moon_alt_names": "Žitna luna, Koruza luna, Risova luna, Luna bliskov",
+                    "sturgeon_moon_alt_names": "Žitna luna, Koruzna luna, Risova luna, Luna bliskov",
                     "harvest_moon_alt_names": "Polna koruzna luna, Luna zelene koruze, Koruzna luna, Vinska luna, Luna pesmi, Ječmenova luna",
-                    "hunters_moon_alt_names": "Luna sušenja riža, Luna padajočega listja, Zmrzovalna luna, Krvava luna, Sanguine luna",
-                    "beaver_moon_alt_names": "Slanasta luna, Zmrzovalna luna, Trgovska luna, Snežna luna, Žalna luna, Luna najtemnejših globin",
-                    "cold_moon_alt_names": "Luna dolgih noči, Luna pred Yule, Hrastova luna, Polna hladna luna",
-                    "unknown": ""
+                    "hunters_moon_alt_names": "Luna sušenja riža, Luna padajočega listja, Zmrzovalna luna, Krvava luna, Škrlatna luna",
+                    "beaver_moon_alt_names": "Luna slane, Zmrzovalna luna, Trgovska luna, Snežna luna, Žalna luna, Luna najtemnejših globin",
+                    "cold_moon_alt_names": "Luna dolgih noči, Luna pred Yulom, Hrastova luna, Polna hladna luna"
                 }
             },
             "next_last_quarter": {
                 "name": "Naslednji zadnji krajec"
             },
-
             "previous_rise": {
                 "name": "Prejšnji vzhod"
             },
@@ -196,32 +225,29 @@
                     "hunters_moon": "Lovčeva luna",
                     "beaver_moon": "Bobrova luna",
                     "cold_moon": "Hladna luna",
-                    "blue_moon": "Modra luna",
-                    "unknown": "Neznano"
+                    "blue_moon": "Modra luna"
                 }
             },
             "previous_full_moon_alt_names": {
                 "name": "Alternativna imena prejšnje polne lune",
                 "state": {
-                    "wolf_moon_alt_names": "Luna po Yule, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
+                    "wolf_moon_alt_names": "Luna po Yulu, Domača luna, Tiha luna, Stroga luna, Sredinska luna",
                     "snow_moon_alt_names": "Lačna luna, Medvedja luna, Nevihtna luna, Ledena luna",
                     "worm_moon_alt_names": "Postna luna, Vranja luna, Skorjasta luna, Čista luna, Sladkorna luna, Luna sokov",
                     "pink_moon_alt_names": "Luna lomljenja ledu, Brsteča luna, Prebujajoča luna, Jajčna luna, Velikonočna luna",
-                    "flower_moon_alt_names": "Sadjena luna, Mlečna luna, Zajčja luna, Travna luna, Materinska luna, Svetla luna",
-                    "strawberry_moon_alt_names": "Rožna (Rose) luna, Vroča luna, Luna medice, Cvetlična luna, Sadjena luna",
+                    "flower_moon_alt_names": "Luna sajenja, Mlečna luna, Zajčja luna, Travna luna, Materinska luna, Svetla luna",
+                    "strawberry_moon_alt_names": "Luna vrtnic, Vroča luna, Luna medice, Cvetlična luna, Luna sajenja",
                     "buck_moon_alt_names": "Gromovna luna, Senena luna, Zeliščna luna",
-                    "sturgeon_moon_alt_names": "Žitna luna, Koruza luna, Risova luna, Luna bliskov",
+                    "sturgeon_moon_alt_names": "Žitna luna, Koruzna luna, Risova luna, Luna bliskov",
                     "harvest_moon_alt_names": "Polna koruzna luna, Luna zelene koruze, Koruzna luna, Vinska luna, Luna pesmi, Ječmenova luna",
-                    "hunters_moon_alt_names": "Luna sušenja riža, Luna padajočega listja, Zmrzovalna luna, Krvava luna, Sanguine luna",
-                    "beaver_moon_alt_names": "Slanasta luna, Zmrzovalna luna, Trgovska luna, Snežna luna, Žalna luna, Luna najtemnejših globin",
-                    "cold_moon_alt_names": "Luna dolgih noči, Luna pred Yule, Hrastova luna, Polna hladna luna",
-                    "unknown": ""
+                    "hunters_moon_alt_names": "Luna sušenja riža, Luna padajočega listja, Zmrzovalna luna, Krvava luna, Škrlatna luna",
+                    "beaver_moon_alt_names": "Luna slane, Zmrzovalna luna, Trgovska luna, Snežna luna, Žalna luna, Luna najtemnejših globin",
+                    "cold_moon_alt_names": "Luna dolgih noči, Luna pred Yulom, Hrastova luna, Polna hladna luna"
                 }
             },
             "previous_last_quarter": {
                 "name": "Prejšnji zadnji krajec"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptična dolžina ob naslednji polni luni"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptična širina ob prejšnjem mlaju"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Zodiakalno znamenje (trenutno)",
                 "state": {
@@ -332,7 +357,6 @@
                     "pisces": "Ribi"
                 }
             },
-
             "zodiac_degree_current_moon": {
                 "name": "Stopinja zodiaka (trenutna)"
             },

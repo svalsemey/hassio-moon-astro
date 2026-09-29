@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Måne Astro",
-                "description": "Angiv dine GPS-koordinater og højde.",
+                "title": "Observatørens placering",
+                "description": "Måne Astro beregner Månens position set fra dette sted. Værdierne er forududfyldt fra Home Assistant-konfigurationen.",
                 "data": {
                     "latitude": "Breddegrad",
                     "longitude": "Længdegrad",
                     "elevation": "Højde (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografisk breddegrad i decimalgrader, positiv nord for ækvator.",
+                    "longitude": "Geografisk længdegrad i decimalgrader, positiv øst for Greenwich.",
+                    "elevation": "Højde over havets overflade i meter."
+                }
+            },
+            "reconfigure": {
+                "title": "Observatørens placering",
+                "description": "Opdater den placering, der bruges til Månens position. Eksisterende entiteter bevares.",
+                "data": {
+                    "latitude": "Breddegrad",
+                    "longitude": "Længdegrad",
+                    "elevation": "Højde (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografisk breddegrad i decimalgrader, positiv nord for ækvator.",
+                    "longitude": "Geografisk længdegrad i decimalgrader, positiv øst for Greenwich.",
+                    "elevation": "Højde over havets overflade i meter."
                 }
             },
             "precision": {
-                "title": "Måne Astro",
-                "description": "Højpræcisionstilstand reducerer variationen i tidsstempler, men øger CPU-forbruget, fordi den bruger et finere samplingtrin og et bredere forfinelsesinterval. Det anbefales ikke at aktivere denne mulighed på enheder med lav ydeevne som Raspberry Pi.",
+                "title": "Beregningspræcision",
+                "description": "DE440-efemeriden er klar.",
                 "data": {
                     "high_precision": "Højpræcisionstilstand"
+                },
+                "data_description": {
+                    "high_precision": "Forfiner tidspunkterne for apogæum og perigæum med et finere samplingtrin og et bredere søgeinterval. Det øger CPU-forbruget mærkbart og anbefales ikke på enheder med lav ydeevne som Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Downloader Skyfield DE440-efemeriden (> 100 MB). Luk venligst ikke dette vindue under download..."
+            "download_ephemeris": "Downloader JPL DE440-efemeriden (ca. 115 MB). Det kan tage flere minutter afhængigt af din forbindelse."
+        },
+        "error": {
+            "download_failed": "DE440-efemeriden kunne ikke downloades. Kontroller, at Home Assistant kan nå ssd.jpl.nasa.gov, og prøv igen."
         },
         "abort": {
             "already_configured": "Måne Astro er allerede konfigureret",
-            "missing_data": "Konfigurationsdata mangler",
             "reconfigure_successful": "Konfigurationen er opdateret"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Indstillinger for Måne Astro",
-                "description": "Juster sensorerne opdateringsinterval og håndtering af tidszone.\n\nHøjpræcisionstilstand reducerer variationen i tidsstempler, men øger CPU-forbruget, fordi den bruger et finere samplingtrin og et bredere forfinelsesinterval. Den anbefales ikke på enheder med lav ydeevne som Raspberry Pi.\n\nHændelsers reserveopdateringsinterval tvinger en periodisk opdatering af hændelsesbaserede sensorer (næste/forrige faser, apogæum/perigæum, zodiak ved lunationer), hvis den planlagte opdatering omkring næste hændelse mislykkes (genstart, tidsændring, forsinkelse). Lavere værdier opdaterer oftere; højere værdier reducerer CPU-forbruget.",
+                "description": "Ændringer anvendes, når integrationen genindlæses efter lagring.",
                 "data": {
                     "scan_interval": "Opdateringsinterval for sensorer (sekunder)",
                     "use_ha_timezone": "Brug Home Assistants tidszone",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Reserveopdateringsinterval for hændelser (sekunder)"
                 },
                 "data_description": {
-                    "time_zone": "IANA-tidszone, der bruges til at lokalisere hændelsestidsstempler, når Home Assistants tidszone ikke bruges."
+                    "scan_interval": "Sekunder mellem to beregninger af Månens aktuelle position (60 til 21600). Kortere intervaller øger CPU-forbruget.",
+                    "use_ha_timezone": "Brug Home Assistants tidszone til de kalendermåneder, der navngiver fuldmåner. Deaktiver for at vælge en anden zone nedenfor.",
+                    "time_zone": "IANA-tidszone, der bruges, når Home Assistants tidszone ikke bruges. Selve tidsstemplerne udgives altid som UTC-tidspunkter.",
+                    "high_precision": "Forfiner tidspunkterne for apogæum og perigæum med et finere samplingtrin og et bredere søgeinterval. Det øger CPU-forbruget mærkbart og anbefales ikke på enheder med lav ydeevne som Raspberry Pi.",
+                    "events_refresh_fallback": "Sekunder mellem to tvungne genberegninger af de hændelsesbaserede sensorer (3600 til 604800), hvis den opdatering, der er planlagt efter næste hændelse, går glip. 24 timer er rigeligt."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "DE440-efemeriden er ikke tilgængelig: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Fuldmåne",
                     "waning_gibbous": "Aftagende måne",
                     "last_quarter": "Sidste kvarter",
-                    "waning_crescent": "Aftagende segl",
-                    "unknown": "Ukendt"
+                    "waning_crescent": "Aftagende segl"
                 }
             },
             "azimuth": {
@@ -105,10 +137,10 @@
                 "name": "Næste månenedgang"
             },
             "next_apogee": {
-                "name": "Næste apogeum"
+                "name": "Næste apogæum"
             },
             "next_perigee": {
-                "name": "Næste perigeum"
+                "name": "Næste perigæum"
             },
             "next_new_moon": {
                 "name": "Næste nymåne"
@@ -134,8 +166,7 @@
                     "hunters_moon": "Jægerens måne",
                     "beaver_moon": "Bævermåne",
                     "cold_moon": "Koldmåne",
-                    "blue_moon": "Blå måne",
-                    "unknown": "Ukendt"
+                    "blue_moon": "Blå måne"
                 }
             },
             "next_full_moon_alt_names": {
@@ -150,16 +181,14 @@
                     "buck_moon_alt_names": "Tordenmåne, Hømåne, Urtmåne",
                     "sturgeon_moon_alt_names": "Kornmåne, Majsmåne, Losmåne, Lynmåne",
                     "harvest_moon_alt_names": "Fuld majsmåne, Grøn majsmåne, Majsmåne, Vinmåne, Sangmåne, Bygmåne",
-                    "hunters_moon_alt_names": "Tørreris-måne, Faldende blade-måne, Frostmåne, Blodmåne, Sanguin måne",
+                    "hunters_moon_alt_names": "Ristørringsmåne, Faldende blade-måne, Frostmåne, Blodmåne, Sanguin måne",
                     "beaver_moon_alt_names": "Rim-måne, Frostmåne, Handelsmåne, Snemåne, Sorgmåne, Mørkeste dybder-måne",
-                    "cold_moon_alt_names": "Lange nætters måne, Månen før Yule, Egemåne, Fuld koldmåne",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lange nætters måne, Månen før Yule, Egemåne, Fuld koldmåne"
                 }
             },
             "next_last_quarter": {
                 "name": "Næste sidste kvarter"
             },
-
             "previous_rise": {
                 "name": "Forrige måneopgang"
             },
@@ -167,10 +196,10 @@
                 "name": "Forrige månenedgang"
             },
             "previous_apogee": {
-                "name": "Forrige apogeum"
+                "name": "Forrige apogæum"
             },
             "previous_perigee": {
-                "name": "Forrige perigeum"
+                "name": "Forrige perigæum"
             },
             "previous_new_moon": {
                 "name": "Forrige nymåne"
@@ -196,8 +225,7 @@
                     "hunters_moon": "Jægerens måne",
                     "beaver_moon": "Bævermåne",
                     "cold_moon": "Koldmåne",
-                    "blue_moon": "Blå måne",
-                    "unknown": "Ukendt"
+                    "blue_moon": "Blå måne"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -212,16 +240,14 @@
                     "buck_moon_alt_names": "Tordenmåne, Hømåne, Urtmåne",
                     "sturgeon_moon_alt_names": "Kornmåne, Majsmåne, Losmåne, Lynmåne",
                     "harvest_moon_alt_names": "Fuld majsmåne, Grøn majsmåne, Majsmåne, Vinmåne, Sangmåne, Bygmåne",
-                    "hunters_moon_alt_names": "Tørreris-måne, Faldende blade-måne, Frostmåne, Blodmåne, Sanguin måne",
+                    "hunters_moon_alt_names": "Ristørringsmåne, Faldende blade-måne, Frostmåne, Blodmåne, Sanguin måne",
                     "beaver_moon_alt_names": "Rim-måne, Frostmåne, Handelsmåne, Snemåne, Sorgmåne, Mørkeste dybder-måne",
-                    "cold_moon_alt_names": "Lange nætters måne, Månen før Yule, Egemåne, Fuld koldmåne",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lange nætters måne, Månen før Yule, Egemåne, Fuld koldmåne"
                 }
             },
             "previous_last_quarter": {
                 "name": "Forrige sidste kvarter"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptisk længdegrad ved næste fuldmåne"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptisk breddegrad ved forrige nymåne"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Stjernetegn (aktuelt)",
                 "state": {

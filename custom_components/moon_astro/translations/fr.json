@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Lune Astro",
-                "description": "Définissez vos coordonnées GPS et votre altitude.",
+                "title": "Emplacement de l’observateur",
+                "description": "Lune Astro calcule la position de la Lune telle qu’elle est vue depuis cet emplacement.",
+                "data": {
+                    "latitude": "Latitude",
+                    "longitude": "Longitude",
+                    "elevation": "Elevation (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitude géographique en degrés décimaux, positive au nord de l’équateur.",
+                    "longitude": "Longitude géographique en degrés décimaux, positive à l’est de Greenwich.",
+                    "elevation": "Altitude au-dessus du niveau de la mer, en mètres."
+                }
+            },
+            "reconfigure": {
+                "title": "Emplacement de l’observateur",
+                "description": "Mettre à jour l’emplacement utilisé pour la position de la Lune. Les entités existantes sont conservées.",
                 "data": {
                     "latitude": "Latitude",
                     "longitude": "Longitude",
                     "elevation": "Élévation (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitude géographique en degrés décimaux, positive au nord de l’équateur.",
+                    "longitude": "Longitude géographique en degrés décimaux, positive à l’est de Greenwich.",
+                    "elevation": "Altitude au-dessus du niveau de la mer, en mètres."
                 }
             },
             "precision": {
-                "title": "Lune Astro",
-                "description": "Le mode haute précision diminue la variabilité des horodatages, mais augmente l’utilisation du CPU car il utilise un pas d’échantillonnage plus fin et un bracket de raffinement plus large. Il est déconseillé d’activer cette option sur les appareils peu puissants comme les Raspberry Pi.",
+                "title": "Précision du calcul",
+                "description": "L’éphéméride DE440 est prête.",
                 "data": {
                     "high_precision": "Mode haute précision"
+                },
+                "data_description": {
+                    "high_precision": "Affinement des instants d’apogée et de périgée avec un pas d’échantillonnage plus fin et un bracket plus large. Cela augmente notablement l’utilisation du CPU et n’est pas recommandé sur des appareils à faible puissance tels que le Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Téléchargement de l’éphéméride Skyfield DE440 (> 100 Mo). Veuillez ne pas fermer cette fenêtre pendant le téléchargement..."
+            "download_ephemeris": "Téléchargement de l’éphéméride JPL DE440 (environ 115 Mo). Cela peut prendre plusieurs minutes selon votre connexion."
+        },
+        "error": {
+            "download_failed": "L’éphéméride DE440 n’a pas pu être téléchargée. Vérifiez que Home Assistant peut atteindre ssd.jpl.nasa.gov, puis réessayez."
         },
         "abort": {
             "already_configured": "Lune Astro est déjà configuré",
-            "missing_data": "Données de configuration manquantes",
             "reconfigure_successful": "Configuration mise à jour"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Options Lune Astro",
-                "description": "Ajustez l'intervalle de mise à jour des capteurs et la gestion du fuseau horaire.\n\nLe mode haute précision réduit la variabilité des horodatages, mais augmente l'utilisation du CPU car il utilise une étape d'échantillonnage plus fine et une plage de raffinement plus large. Il n'est pas recommandé sur des appareils à faible puissance tels que le Raspberry Pi.\n\nL'intervalle de secours de rafraîchissement des événements force un rafraîchissement périodique des capteurs basés sur des événements (phases suivantes/précédentes, apogée/périgée, zodiaque aux lunaisons) au cas où le rafraîchissement planifié autour du prochain événement serait manqué (redémarrage, changement d'heure, délai). Une valeur plus faible rafraîchit plus souvent ; une valeur plus élevée réduit l'utilisation du CPU.",
+                "description": "Les modifications sont appliquées lorsque l’intégration est rechargée après l’enregistrement.",
                 "data": {
                     "scan_interval": "Intervalle de mise à jour des capteurs (secondes)",
                     "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Intervalle de secours de rafraîchissement des événements (secondes)"
                 },
                 "data_description": {
-                    "time_zone": "Fuseau horaire IANA utilisé pour localiser les horodatages des événements lorsque le fuseau horaire de Home Assistant n'est pas utilisé."
+                    "scan_interval": "Intervalle entre deux calculs de la position actuelle de la Lune (60 à 21600). Des intervalles plus courts augmentent l’utilisation du CPU.",
+                    "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant pour les mois du calendrier qui nomment les pleines lunes. Désactivez-le pour choisir un autre fuseau horaire ci-dessous.",
+                    "time_zone": "Fuseau horaire IANA utilisé lorsque le fuseau horaire de Home Assistant n'est pas utilisé. Les horodatages eux-mêmes sont toujours publiés en tant qu'instants UTC.",
+                    "high_precision": "Affinement des instants d’apogée et de périgée avec une étape d’échantillonnage plus fine et une plage de raffinement plus large. Cela augmente sensiblement l’utilisation du CPU et n’est pas recommandé sur des appareils à faible puissance tels que le Raspberry Pi.",
+                    "events_refresh_fallback": "Secondes entre deux recomputations forcées des capteurs basés sur des événements (3600 à 604800), au cas où le rafraîchissement prévu après le prochain événement serait manqué. 24 heures suffisent amplement."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "L’éphéméride DE440 n’est pas disponible : {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Pleine lune",
                     "waning_gibbous": "Gibbeuse décroissante",
                     "last_quarter": "Dernier quartier",
-                    "waning_crescent": "Dernier croissant",
-                    "unknown": "Inconnue"
+                    "waning_crescent": "Dernier croissant"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Lune du Chasseur",
                     "beaver_moon": "Lune du Castor",
                     "cold_moon": "Lune Froide",
-                    "blue_moon": "Lune Bleue",
-                    "unknown": "Inconnue"
+                    "blue_moon": "Lune Bleue"
                 }
             },
             "next_full_moon_alt_names": {
@@ -152,8 +183,7 @@
                     "harvest_moon_alt_names": "Pleine Lune du Maïs, Lune du Maïs Vert, Lune du Maïs, Lune du Vin, Lune du Chant, Lune de l’Orge",
                     "hunters_moon_alt_names": "Lune du Riz Séché, Lune des Feuilles Tombantes, Lune du Gel, Lune de Sang, Lune Sanguine",
                     "beaver_moon_alt_names": "Lune du Givre, Lune du Gel, Lune du Commerce, Lune de Neige, Lune du Deuil, Lune des Profondeurs les plus sombres",
-                    "cold_moon_alt_names": "Lune des Longues Nuits, Lune avant Yule, Lune du Chêne, Pleine Lune Froide",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lune des Longues Nuits, Lune avant Yule, Lune du Chêne, Pleine Lune Froide"
                 }
             },
             "next_last_quarter": {
@@ -195,8 +225,7 @@
                     "hunters_moon": "Lune du Chasseur",
                     "beaver_moon": "Lune du Castor",
                     "cold_moon": "Lune Froide",
-                    "blue_moon": "Lune Bleue",
-                    "unknown": "Inconnue"
+                    "blue_moon": "Lune Bleue"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -213,8 +242,7 @@
                     "harvest_moon_alt_names": "Pleine Lune du Maïs, Lune du Maïs Vert, Lune du Maïs, Lune du Vin, Lune du Chant, Lune de l’Orge",
                     "hunters_moon_alt_names": "Lune du Riz Séché, Lune des Feuilles Tombantes, Lune du Gel, Lune de Sang, Lune Sanguine",
                     "beaver_moon_alt_names": "Lune du Givre, Lune du Gel, Lune du Commerce, Lune de Neige, Lune du Deuil, Lune des Profondeurs les plus sombres",
-                    "cold_moon_alt_names": "Lune des Longues Nuits, Lune avant Yule, Lune du Chêne, Pleine Lune Froide",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lune des Longues Nuits, Lune avant Yule, Lune du Chêne, Pleine Lune Froide"
                 }
             },
             "previous_last_quarter": {

@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Maan Astro",
-                "description": "Stel je GPS-coördinaten en hoogte in.",
+                "title": "Locatie van de waarnemer",
+                "description": "Maan Astro berekent de positie van de maan gezien vanaf deze locatie. De waarden worden vooraf ingevuld vanuit de Home Assistant-configuratie.",
                 "data": {
                     "latitude": "Breedtegraad",
                     "longitude": "Lengtegraad",
                     "elevation": "Hoogte (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografische breedtegraad in decimale graden, positief ten noorden van de evenaar.",
+                    "longitude": "Geografische lengtegraad in decimale graden, positief ten oosten van Greenwich.",
+                    "elevation": "Hoogte boven zeeniveau, in meters."
+                }
+            },
+            "reconfigure": {
+                "title": "Locatie van de waarnemer",
+                "description": "Werk de locatie bij die wordt gebruikt voor de positie van de maan. Bestaande entiteiten blijven behouden.",
+                "data": {
+                    "latitude": "Breedtegraad",
+                    "longitude": "Lengtegraad",
+                    "elevation": "Hoogte (m)"
+                },
+                "data_description": {
+                    "latitude": "Geografische breedtegraad in decimale graden, positief ten noorden van de evenaar.",
+                    "longitude": "Geografische lengtegraad in decimale graden, positief ten oosten van Greenwich.",
+                    "elevation": "Hoogte boven zeeniveau, in meters."
                 }
             },
             "precision": {
-                "title": "Maan Astro",
-                "description": "De modus hoge precisie vermindert de variabiliteit van tijdstempels, maar verhoogt het CPU-gebruik omdat er een fijnere samplingstap en een bredere verfijningsmarge wordt gebruikt. Het wordt niet aanbevolen om deze optie in te schakelen op apparaten met weinig rekenkracht zoals Raspberry Pi.",
+                "title": "Rekennauwkeurigheid",
+                "description": "De DE440-efemeride is gereed.",
                 "data": {
                     "high_precision": "Modus hoge precisie"
+                },
+                "data_description": {
+                    "high_precision": "Verfijnt de momenten van apogeum en perigeum met een fijnere samplingstap en een bredere zoekmarge. Dit verhoogt het CPU-gebruik merkbaar en wordt niet aanbevolen op apparaten met weinig rekenkracht, zoals een Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Skyfield DE440-ephemeride downloaden (> 100 MB). Sluit dit venster niet tijdens het downloaden..."
+            "download_ephemeris": "De JPL DE440-efemeride wordt gedownload (ongeveer 115 MB). Dit kan enkele minuten duren, afhankelijk van je verbinding."
+        },
+        "error": {
+            "download_failed": "De DE440-efemeride kon niet worden gedownload. Controleer of Home Assistant ssd.jpl.nasa.gov kan bereiken en probeer het opnieuw."
         },
         "abort": {
             "already_configured": "Maan Astro is al geconfigureerd",
-            "missing_data": "Configuratiegegevens ontbreken",
             "reconfigure_successful": "Configuratie bijgewerkt"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Maan Astro-opties",
-                "description": "Pas het update-interval van de sensoren en de tijdzone-afhandeling aan.\n\nDe modus met hoge precisie vermindert de variatie in tijdstempels, maar verhoogt het CPU-gebruik omdat een fijnere sample-stap en een bredere verfijningsmarge worden gebruikt. Niet aanbevolen op apparaten met weinig rekenkracht zoals de Raspberry Pi.\n\nHet fallback-interval voor het verversen van gebeurtenissen forceert een periodieke verversing van gebeurtenisgestuurde sensoren (volgende/vorige fasen, apogeum/perigeum, dierenriem bij lunaties) als de geplande verversing rond de volgende gebeurtenis wordt gemist (herstart, tijdswijziging, vertraging). Lagere waarden verversen vaker; hogere waarden verlagen het CPU-gebruik.",
+                "description": "Wijzigingen worden toegepast wanneer de integratie na het opslaan opnieuw wordt geladen.",
                 "data": {
                     "scan_interval": "Update-interval van sensoren (seconden)",
                     "use_ha_timezone": "Tijdzone van Home Assistant gebruiken",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Fallback-interval voor het verversen van gebeurtenissen (seconden)"
                 },
                 "data_description": {
-                    "time_zone": "De IANA-tijdzone die wordt gebruikt om tijdstempels van gebeurtenissen te lokaliseren wanneer de tijdzone van Home Assistant niet wordt gebruikt."
+                    "scan_interval": "Aantal seconden tussen twee berekeningen van de huidige positie van de maan (60 tot 21600). Kortere intervallen verhogen het CPU-gebruik.",
+                    "use_ha_timezone": "Gebruik de tijdzone van Home Assistant voor de kalendermaanden waarnaar volle manen worden vernoemd. Schakel dit uit om hieronder een andere tijdzone te kiezen.",
+                    "time_zone": "IANA-tijdzone die wordt gebruikt wanneer de tijdzone van Home Assistant niet wordt gebruikt. De tijdstempels zelf worden altijd als UTC-momenten gepubliceerd.",
+                    "high_precision": "Verfijnt de momenten van apogeum en perigeum met een fijnere samplingstap en een bredere zoekmarge. Dit verhoogt het CPU-gebruik merkbaar en wordt niet aanbevolen op apparaten met weinig rekenkracht, zoals een Raspberry Pi.",
+                    "events_refresh_fallback": "Aantal seconden tussen twee geforceerde herberekeningen van de gebeurtenisgestuurde sensoren (3600 tot 604800), voor het geval de na de volgende gebeurtenis geplande verversing wordt gemist. 24 uur is ruim voldoende."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "De DE440-efemeride is niet beschikbaar: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Volle maan",
                     "waning_gibbous": "Afnemende maan",
                     "last_quarter": "Laatste kwartier",
-                    "waning_crescent": "Afnemende sikkel",
-                    "unknown": "Onbekend"
+                    "waning_crescent": "Afnemende sikkel"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Jagersmaan",
                     "beaver_moon": "Bevermaan",
                     "cold_moon": "Koude Maan",
-                    "blue_moon": "Blauwe Maan",
-                    "unknown": "Onbekend"
+                    "blue_moon": "Blauwe Maan"
                 }
             },
             "next_full_moon_alt_names": {
@@ -150,16 +181,14 @@
                     "buck_moon_alt_names": "Dondermaan, Hooimaan, Kruidenmaan",
                     "sturgeon_moon_alt_names": "Graanmaan, Maïsmaan, Lynxmaan, Bliksemmaan",
                     "harvest_moon_alt_names": "Volle Maïsmaan, Groene Maïsmaan, Maïsmaan, Wijnmaan, Zangmaan, Gerstmaan",
-                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Sanguine Maan",
+                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Bloedrode Maan",
                     "beaver_moon_alt_names": "Rijpmaan, Vriesmaan, Handelsmaan, Sneeuwmaan, Rouwmaan, Donkerste-dieptenmaan",
-                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan"
                 }
             },
             "next_last_quarter": {
                 "name": "Volgend laatste kwartier"
             },
-
             "previous_rise": {
                 "name": "Vorige opkomst"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "Jagersmaan",
                     "beaver_moon": "Bevermaan",
                     "cold_moon": "Koude Maan",
-                    "blue_moon": "Blauwe Maan",
-                    "unknown": "Onbekend"
+                    "blue_moon": "Blauwe Maan"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -212,16 +240,14 @@
                     "buck_moon_alt_names": "Dondermaan, Hooimaan, Kruidenmaan",
                     "sturgeon_moon_alt_names": "Graanmaan, Maïsmaan, Lynxmaan, Bliksemmaan",
                     "harvest_moon_alt_names": "Volle Maïsmaan, Groene Maïsmaan, Maïsmaan, Wijnmaan, Zangmaan, Gerstmaan",
-                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Sanguine Maan",
+                    "hunters_moon_alt_names": "Droogrijstmaan, Vallende-bladerenmaan, Vriesmaan, Bloedmaan, Bloedrode Maan",
                     "beaver_moon_alt_names": "Rijpmaan, Vriesmaan, Handelsmaan, Sneeuwmaan, Rouwmaan, Donkerste-dieptenmaan",
-                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Maan van de Lange Nachten, Maan vóór Yule, Eikenmaan, Volle Koude Maan"
                 }
             },
             "previous_last_quarter": {
                 "name": "Vorig laatste kwartier"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ecliptische lengte bij de volgende volle maan"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ecliptische breedte bij de vorige nieuwe maan"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Dierenriemteken (huidig)",
                 "state": {
@@ -332,7 +357,6 @@
                     "pisces": "Vissen"
                 }
             },
-
             "zodiac_degree_current_moon": {
                 "name": "Dierenriemgraad (huidig)"
             },

@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Hold Asztro",
-                "description": "Állítsd be a GPS-koordinátáidat és a tengerszint feletti magasságot.",
+                "title": "A megfigyelő helye",
+                "description": "A Hold Asztro a Hold helyzetét számítja ki az adott helyről nézve. Az értékek előre ki vannak töltve a Home Assistant konfigurációjából.",
                 "data": {
                     "latitude": "Szélesség",
                     "longitude": "Hosszúság",
                     "elevation": "Magasság (m)"
+                },
+                "data_description": {
+                    "latitude": "Földrajzi szélesség tizedesfokban, az egyenlítőtől északra pozitív.",
+                    "longitude": "Földrajzi hosszúság tizedesfokban, Greenwichtől keletre pozitív.",
+                    "elevation": "Tengerszint feletti magasság méterben."
+                }
+            },
+            "reconfigure": {
+                "title": "A megfigyelő helye",
+                "description": "Frissítse a Hold helyzetének számításához használt helyet. A meglévő entitások megmaradnak.",
+                "data": {
+                    "latitude": "Szélesség",
+                    "longitude": "Hosszúság",
+                    "elevation": "Magasság (m)"
+                },
+                "data_description": {
+                    "latitude": "Földrajzi szélesség tizedesfokban, az egyenlítőtől északra pozitív.",
+                    "longitude": "Földrajzi hosszúság tizedesfokban, Greenwichtől keletre pozitív.",
+                    "elevation": "Tengerszint feletti magasság méterben."
                 }
             },
             "precision": {
-                "title": "Hold Asztro",
-                "description": "A nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-használatot, mivel finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott engedélyezni alacsony teljesítményű eszközökön, például Raspberry Pi-n.",
+                "title": "Számítási pontosság",
+                "description": "A DE440 efemerida készen áll.",
                 "data": {
                     "high_precision": "Nagy pontosságú mód"
+                },
+                "data_description": {
+                    "high_precision": "Finomabb mintavételezési lépéssel és szélesebb keresési tartománnyal finomítja az apogeum és a perigeum időpontjait. Ez észrevehetően növeli a CPU-használatot, ezért alacsony teljesítményű eszközökön, például Raspberry Pi-n nem ajánlott."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "A Skyfield DE440 efemerida letöltése (> 100 MB). Kérjük, a letöltés alatt ne zárja be ezt az ablakot..."
+            "download_ephemeris": "A JPL DE440 efemerida letöltése (körülbelül 115 MB). A kapcsolat sebességétől függően ez több percig is eltarthat."
+        },
+        "error": {
+            "download_failed": "A DE440 efemeridát nem sikerült letölteni. Ellenőrizze, hogy a Home Assistant eléri-e az ssd.jpl.nasa.gov címet, majd próbálja újra."
         },
         "abort": {
             "already_configured": "A Hold Asztro már be van állítva",
-            "missing_data": "Hiányoznak a konfigurációs adatok",
             "reconfigure_successful": "A konfiguráció frissítve"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Hold Asztro beállítások",
-                "description": "Állítsa be az érzékelők frissítési gyakoriságát és az időzóna-kezelést.\n\nA nagy pontosságú mód csökkenti az időbélyegek változékonyságát, de növeli a CPU-terhelést, mert finomabb mintavételezési lépést és szélesebb finomítási tartományt használ. Nem ajánlott alacsony teljesítményű eszközökön, például Raspberry Pi-n.\n\nAz eseményfrissítés tartalék időköze időszakos frissítést kényszerít ki az eseményalapú szenzoroknál (következő/előző fázisok, apogeum/perigeum, zodiákus a lunációknál) arra az esetre, ha a következő esemény körüli ütemezett frissítés kimarad (újraindítás, időváltozás, késés). Alacsonyabb értékek gyakrabban frissítenek; magasabb értékek csökkentik a CPU-terhelést.",
+                "description": "A módosítások akkor lépnek életbe, amikor az integráció mentés után újratöltődik.",
                 "data": {
                     "scan_interval": "Érzékelők frissítési intervalluma (másodperc)",
                     "use_ha_timezone": "Home Assistant időzónájának használata",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Eseményfrissítés tartalék időköze (másodperc)"
                 },
                 "data_description": {
-                    "time_zone": "Az IANA időzóna, amelyet az események időbélyegének meghatározásához használnak, ha a Home Assistant időzónája nincs használatban."
+                    "scan_interval": "A Hold aktuális helyzetének két számítása közötti idő másodpercben (60–21600). A rövidebb időközök növelik a CPU-használatot.",
+                    "use_ha_timezone": "A Home Assistant időzónájának használata a teliholdakat elnevező naptári hónapokhoz. Kapcsolja ki, ha lent másik időzónát szeretne választani.",
+                    "time_zone": "IANA időzóna, amelyet akkor használ, ha a Home Assistant időzónája nincs használatban. Maguk az időbélyegek mindig UTC időpontként kerülnek közzétételre.",
+                    "high_precision": "Finomabb mintavételezési lépéssel és szélesebb keresési tartománnyal finomítja az apogeum és a perigeum időpontjait. Ez észrevehetően növeli a CPU-használatot, ezért alacsony teljesítményű eszközökön, például Raspberry Pi-n nem ajánlott.",
+                    "events_refresh_fallback": "Az eseményalapú érzékelők két kényszerített újraszámítása közötti idő másodpercben (3600–604800), arra az esetre, ha a következő esemény után ütemezett frissítés kimarad. 24 óra bőven elegendő."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "A DE440 efemerida nem érhető el: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Telihold",
                     "waning_gibbous": "Fogyó domború",
                     "last_quarter": "Utolsó negyed",
-                    "waning_crescent": "Fogyó sarló",
-                    "unknown": "Ismeretlen"
+                    "waning_crescent": "Fogyó sarló"
                 }
             },
             "azimuth": {
@@ -128,14 +160,13 @@
                     "pink_moon": "Rózsaszín Hold",
                     "flower_moon": "Virág Hold",
                     "strawberry_moon": "Eper Hold",
-                    "buck_moon": "Bika Hold",
+                    "buck_moon": "Szarvasbika Hold",
                     "sturgeon_moon": "Tokhal Hold",
                     "harvest_moon": "Aratás Hold",
                     "hunters_moon": "Vadász Hold",
                     "beaver_moon": "Hód Hold",
                     "cold_moon": "Hideg Hold",
-                    "blue_moon": "Kék Hold",
-                    "unknown": "Ismeretlen"
+                    "blue_moon": "Kék Hold"
                 }
             },
             "next_full_moon_alt_names": {
@@ -150,16 +181,14 @@
                     "buck_moon_alt_names": "Mennydörgés Hold, Széna Hold, Fűszernövény Hold",
                     "sturgeon_moon_alt_names": "Gabona Hold, Kukorica Hold, Hiúz Hold, Villám Hold",
                     "harvest_moon_alt_names": "Teljes Kukorica Hold, Zöld Kukorica Hold, Kukorica Hold, Bor Hold, Dal Hold, Árpa Hold",
-                    "hunters_moon_alt_names": "Száradó Rizs Hold, Hulló Levelek Hold, Fagy Hold, Vér Hold, Sanguine Hold",
-                    "beaver_moon_alt_names": "Dér Hold, Fagy Hold, Csere/kereskedelem Hold, Hó Hold, Gyász Hold, A legsötétebb mélységek Holdja",
-                    "cold_moon_alt_names": "Hosszú Éjszakák Holdja, Yule előtti Hold, Tölgy Hold, Telihideg Hold",
-                    "unknown": ""
+                    "hunters_moon_alt_names": "Száradó Rizs Hold, Hulló Levelek Hold, Fagy Hold, Vér Hold, Vérszínű Hold",
+                    "beaver_moon_alt_names": "Dér Hold, Fagy Hold, Kereskedelmi Hold, Hó Hold, Gyász Hold, A legsötétebb mélységek Holdja",
+                    "cold_moon_alt_names": "Hosszú Éjszakák Holdja, Yule előtti Hold, Tölgy Hold, Teljes Hideg Hold"
                 }
             },
             "next_last_quarter": {
                 "name": "Következő utolsó negyed"
             },
-
             "previous_rise": {
                 "name": "Előző felkelés"
             },
@@ -190,14 +219,13 @@
                     "pink_moon": "Rózsaszín Hold",
                     "flower_moon": "Virág Hold",
                     "strawberry_moon": "Eper Hold",
-                    "buck_moon": "Bika Hold",
+                    "buck_moon": "Szarvasbika Hold",
                     "sturgeon_moon": "Tokhal Hold",
                     "harvest_moon": "Aratás Hold",
                     "hunters_moon": "Vadász Hold",
                     "beaver_moon": "Hód Hold",
                     "cold_moon": "Hideg Hold",
-                    "blue_moon": "Kék Hold",
-                    "unknown": "Ismeretlen"
+                    "blue_moon": "Kék Hold"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -212,16 +240,14 @@
                     "buck_moon_alt_names": "Mennydörgés Hold, Széna Hold, Fűszernövény Hold",
                     "sturgeon_moon_alt_names": "Gabona Hold, Kukorica Hold, Hiúz Hold, Villám Hold",
                     "harvest_moon_alt_names": "Teljes Kukorica Hold, Zöld Kukorica Hold, Kukorica Hold, Bor Hold, Dal Hold, Árpa Hold",
-                    "hunters_moon_alt_names": "Száradó Rizs Hold, Hulló Levelek Hold, Fagy Hold, Vér Hold, Sanguine Hold",
-                    "beaver_moon_alt_names": "Dér Hold, Fagy Hold, Csere/kereskedelem Hold, Hó Hold, Gyász Hold, A legsötétebb mélységek Holdja",
-                    "cold_moon_alt_names": "Hosszú Éjszakák Holdja, Yule előtti Hold, Tölgy Hold, Telihideg Hold",
-                    "unknown": ""
+                    "hunters_moon_alt_names": "Száradó Rizs Hold, Hulló Levelek Hold, Fagy Hold, Vér Hold, Vérszínű Hold",
+                    "beaver_moon_alt_names": "Dér Hold, Fagy Hold, Kereskedelmi Hold, Hó Hold, Gyász Hold, A legsötétebb mélységek Holdja",
+                    "cold_moon_alt_names": "Hosszú Éjszakák Holdja, Yule előtti Hold, Tölgy Hold, Teljes Hideg Hold"
                 }
             },
             "previous_last_quarter": {
                 "name": "Előző utolsó negyed"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Ekliptikai hosszúság a következő teliholdkor"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Ekliptikai szélesség az előző újholdkor"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Állatövi jegy (aktuális)",
                 "state": {
@@ -333,19 +358,19 @@
                 }
             },
             "zodiac_degree_current_moon": {
-                "name": "Zodiákus fok (aktuális)"
+                "name": "Állatövi fok (aktuális)"
             },
             "zodiac_degree_next_new_moon": {
-                "name": "Fok az állatövben a következő újholdkor"
+                "name": "Állatövi fok a következő újholdkor"
             },
             "zodiac_degree_next_full_moon": {
-                "name": "Fok az állatövben a következő teliholdkor"
+                "name": "Állatövi fok a következő teliholdkor"
             },
             "zodiac_degree_previous_new_moon": {
-                "name": "Fok az állatövben az előző újholdkor"
+                "name": "Állatövi fok az előző újholdkor"
             },
             "zodiac_degree_previous_full_moon": {
-                "name": "Fok az állatövben az előző teliholdkor"
+                "name": "Állatövi fok az előző teliholdkor"
             }
         }
     }

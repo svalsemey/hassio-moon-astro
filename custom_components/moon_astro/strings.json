@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Moon Astro",
-                "description": "Set your GPS coordinates and altitude.",
+                "title": "Observer location",
+                "description": "Moon Astro computes the Moon position as seen from this location. The values are pre-filled from the Home Assistant configuration.",
                 "data": {
                     "latitude": "Latitude",
                     "longitude": "Longitude",
                     "elevation": "Elevation (m)"
+                },
+                "data_description": {
+                    "latitude": "Geographic latitude in decimal degrees, positive north of the equator.",
+                    "longitude": "Geographic longitude in decimal degrees, positive east of Greenwich.",
+                    "elevation": "Height above sea level, in meters."
+                }
+            },
+            "reconfigure": {
+                "title": "Observer location",
+                "description": "Update the location used for the Moon position. Existing entities are kept.",
+                "data": {
+                    "latitude": "Latitude",
+                    "longitude": "Longitude",
+                    "elevation": "Elevation (m)"
+                },
+                "data_description": {
+                    "latitude": "Geographic latitude in decimal degrees, positive north of the equator.",
+                    "longitude": "Geographic longitude in decimal degrees, positive east of Greenwich.",
+                    "elevation": "Height above sea level, in meters."
                 }
             },
             "precision": {
-                "title": "Moon Astro",
-                "description": "High precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.",
+                "title": "Computation precision",
+                "description": "The DE440 ephemeris is ready.",
                 "data": {
                     "high_precision": "High precision mode"
+                },
+                "data_description": {
+                    "high_precision": "Refines the apogee and perigee instants with a finer sampling step and a wider bracket. This noticeably increases CPU usage and is not recommended on low-power devices such as a Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Downloading Skyfield DE440 ephemeris (> 100 MB). Please do not close this window during the download..."
+            "download_ephemeris": "Downloading the JPL DE440 ephemeris (about 115 MB). This can take several minutes depending on your connection."
+        },
+        "error": {
+            "download_failed": "The DE440 ephemeris could not be downloaded. Check that Home Assistant can reach ssd.jpl.nasa.gov, then try again."
         },
         "abort": {
             "already_configured": "Moon Astro is already configured",
-            "missing_data": "Configuration data missing",
             "reconfigure_successful": "Configuration updated"
         }
     },
@@ -32,18 +56,27 @@
         "step": {
             "init": {
                 "title": "Moon Astro options",
-                "description": "Adjust the sensors update interval and time zone handling.\n\nHigh precision mode reduces timestamp variability, but increases CPU usage because it uses a finer sampling step and a wider refinement bracket. It is not recommended on low-power devices such as Raspberry Pi.\n\nThe events refresh fallback interval forces a periodic refresh of event-based sensors (next/previous phases, apogee/perigee, zodiac at lunations) in case the scheduled refresh around the next event is missed (restart, time change, delay). Lower values refresh more often; higher values reduce CPU usage.",
+                "description": "Changes are applied when the integration reloads after saving.",
                 "data": {
                     "scan_interval": "Sensors update interval (seconds)",
-                    "use_ha_timezone": "Use Home Assistant time zone",
+                    "use_ha_timezone": "Use the Home Assistant time zone",
                     "time_zone": "Time zone",
                     "high_precision": "High precision mode",
                     "events_refresh_fallback": "Events refresh fallback interval (seconds)"
                 },
                 "data_description": {
-                    "time_zone": "IANA time zone used to localize event timestamps when the Home Assistant time zone is not used."
+                    "scan_interval": "Seconds between two computations of the current Moon position (60 to 21600). Shorter intervals increase CPU usage.",
+                    "use_ha_timezone": "Use the Home Assistant time zone for the calendar months that name full moons. Disable it to pick another zone below.",
+                    "time_zone": "IANA time zone used when the Home Assistant time zone is not used. Timestamps themselves are always published as UTC instants.",
+                    "high_precision": "Refines the apogee and perigee instants with a finer sampling step and a wider bracket. This noticeably increases CPU usage and is not recommended on low-power devices such as a Raspberry Pi.",
+                    "events_refresh_fallback": "Seconds between two forced recomputations of the event-based sensors (3600 to 604800), in case the refresh scheduled after the next event is missed. 24 hours is plenty."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "The DE440 ephemeris is not available: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Full moon",
                     "waning_gibbous": "Waning gibbous",
                     "last_quarter": "Last quarter",
-                    "waning_crescent": "Waning crescent",
-                    "unknown": "Unknown"
+                    "waning_crescent": "Waning crescent"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Hunter's Moon",
                     "beaver_moon": "Beaver Moon",
                     "cold_moon": "Cold Moon",
-                    "blue_moon": "Blue Moon",
-                    "unknown": "Unknown"
+                    "blue_moon": "Blue Moon"
                 }
             },
             "next_full_moon_alt_names": {
@@ -152,8 +183,7 @@
                     "harvest_moon_alt_names": "Full Corn Moon, Green Corn Moon, Corn Moon, Wine Moon, Song Moon, Barley Moon",
                     "hunters_moon_alt_names": "Drying Rice Moon, Falling Leaves Moon, Freezing Moon, Blood Moon, Sanguine Moon",
                     "beaver_moon_alt_names": "Frost Moon, Freezing Moon, Trading Moon, Snow Moon, Mourning Moon, Darkest Depths Moon",
-                    "cold_moon_alt_names": "Long Nights Moon, Moon Before Yule, Oak Moon, Full Cold Moon",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Long Nights Moon, Moon Before Yule, Oak Moon, Full Cold Moon"
                 }
             },
             "next_last_quarter": {
@@ -195,8 +225,7 @@
                     "hunters_moon": "Hunter's Moon",
                     "beaver_moon": "Beaver Moon",
                     "cold_moon": "Cold Moon",
-                    "blue_moon": "Blue Moon",
-                    "unknown": "Unknown"
+                    "blue_moon": "Blue Moon"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -213,8 +242,7 @@
                     "harvest_moon_alt_names": "Full Corn Moon, Green Corn Moon, Corn Moon, Wine Moon, Song Moon, Barley Moon",
                     "hunters_moon_alt_names": "Drying Rice Moon, Falling Leaves Moon, Freezing Moon, Blood Moon, Sanguine Moon",
                     "beaver_moon_alt_names": "Frost Moon, Freezing Moon, Trading Moon, Snow Moon, Mourning Moon, Darkest Depths Moon",
-                    "cold_moon_alt_names": "Long Nights Moon, Moon Before Yule, Oak Moon, Full Cold Moon",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Long Nights Moon, Moon Before Yule, Oak Moon, Full Cold Moon"
                 }
             },
             "previous_last_quarter": {

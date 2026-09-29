@@ -3,36 +3,60 @@
     "config": {
         "step": {
             "user": {
-                "title": "Lua Astro",
-                "description": "Defina suas coordenadas de GPS e altitude.",
+                "title": "Localização do observador",
+                "description": "Lua Astro calcula a posição da Lua vista a partir deste local. Os valores são preenchidos previamente com a configuração do Home Assistant.",
                 "data": {
                     "latitude": "Latitude",
                     "longitude": "Longitude",
                     "elevation": "Elevação (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitude geográfica em graus decimais, positiva ao norte do equador.",
+                    "longitude": "Longitude geográfica em graus decimais, positiva a leste de Greenwich.",
+                    "elevation": "Altura acima do nível do mar, em metros."
+                }
+            },
+            "reconfigure": {
+                "title": "Localização do observador",
+                "description": "Atualize a localização usada para a posição da Lua. As entidades existentes são mantidas.",
+                "data": {
+                    "latitude": "Latitude",
+                    "longitude": "Longitude",
+                    "elevation": "Elevação (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitude geográfica em graus decimais, positiva ao norte do equador.",
+                    "longitude": "Longitude geográfica em graus decimais, positiva a leste de Greenwich.",
+                    "elevation": "Altura acima do nível do mar, em metros."
                 }
             },
             "precision": {
-                "title": "Lua Astro",
-                "description": "O modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso de CPU porque utiliza um passo de amostragem mais fino e um intervalo de refinamento mais amplo. Não é recomendável ativar esta opção em dispositivos de baixo desempenho, como o Raspberry Pi.",
+                "title": "Precisão do cálculo",
+                "description": "A efeméride DE440 está pronta.",
                 "data": {
                     "high_precision": "Modo de alta precisão"
+                },
+                "data_description": {
+                    "high_precision": "Refina os instantes de apogeu e perigeu com um passo de amostragem mais fino e um intervalo de busca mais amplo. Isso aumenta notavelmente o uso de CPU e não é recomendado em dispositivos de baixa potência, como um Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Baixando a efeméride Skyfield DE440 (> 100 MB). Por favor, não feche esta janela durante o download..."
+            "download_ephemeris": "Baixando a efeméride JPL DE440 (cerca de 115 MB). Isso pode levar vários minutos, dependendo da sua conexão."
+        },
+        "error": {
+            "download_failed": "Não foi possível baixar a efeméride DE440. Verifique se o Home Assistant consegue acessar ssd.jpl.nasa.gov e tente novamente."
         },
         "abort": {
             "already_configured": "Lua Astro já está configurado",
-            "missing_data": "Dados de configuração ausentes",
             "reconfigure_successful": "Configuração atualizada"
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "Opções do Lua Astro",
-                "description": "Ajuste o intervalo de atualização dos sensores e o tratamento do fuso horário.\n\nO modo de alta precisão reduz a variabilidade dos carimbos de data/hora, mas aumenta o uso da CPU porque utiliza um passo de amostragem mais fino e uma faixa de refinamento mais ampla. Não é recomendado em dispositivos de baixa potência como o Raspberry Pi.\n\nO intervalo de fallback de atualização de eventos força uma atualização periódica dos sensores baseados em eventos (fases seguintes/anteriores, apogeu/perigeu, zodíaco nas lunações) caso a atualização agendada em torno do próximo evento seja perdida (reinício, mudança de hora, atraso). Valores menores atualizam com mais frequência; valores maiores reduzem o uso da CPU.",
+                "title": "Opções de Lua Astro",
+                "description": "As alterações são aplicadas quando a integração é recarregada após salvar.",
                 "data": {
                     "scan_interval": "Intervalo de atualização dos sensores (segundos)",
                     "use_ha_timezone": "Usar o fuso horário do Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Intervalo de fallback de atualização de eventos (segundos)"
                 },
                 "data_description": {
-                    "time_zone": "Fuso horário IANA usado para localizar carimbos de data/hora de eventos quando o fuso horário do Home Assistant não é usado."
+                    "scan_interval": "Segundos entre dois cálculos da posição atual da Lua (60 a 21600). Intervalos menores aumentam o uso de CPU.",
+                    "use_ha_timezone": "Use o fuso horário do Home Assistant para os meses do calendário que dão nome às luas cheias. Desative para escolher outro fuso abaixo.",
+                    "time_zone": "Fuso horário IANA usado quando o fuso horário do Home Assistant não é usado. Os próprios carimbos de data/hora são sempre publicados como instantes UTC.",
+                    "high_precision": "Refina os instantes de apogeu e perigeu com um passo de amostragem mais fino e um intervalo de busca mais amplo. Isso aumenta notavelmente o uso de CPU e não é recomendado em dispositivos de baixa potência, como um Raspberry Pi.",
+                    "events_refresh_fallback": "Segundos entre dois recálculos forçados dos sensores baseados em eventos (3600 a 604800), caso a atualização agendada após o próximo evento seja perdida. 24 horas é mais do que suficiente."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "A efeméride DE440 não está disponível: {error}"
         }
     },
     "entity": {
@@ -67,8 +100,7 @@
                     "full_moon": "Lua cheia",
                     "waning_gibbous": "Gibosa minguante",
                     "last_quarter": "Quarto minguante",
-                    "waning_crescent": "Minguante",
-                    "unknown": "Desconhecida"
+                    "waning_crescent": "Minguante"
                 }
             },
             "azimuth": {
@@ -134,17 +166,16 @@
                     "hunters_moon": "Lua do Caçador",
                     "beaver_moon": "Lua do Castor",
                     "cold_moon": "Lua Fria",
-                    "blue_moon": "Lua Azul",
-                    "unknown": "Desconhecida"
+                    "blue_moon": "Lua Azul"
                 }
             },
             "next_full_moon_alt_names": {
                 "name": "Nomes alternativos da próxima lua cheia",
                 "state": {
-                    "wolf_moon_alt_names": "Lua Após o Yule, Lua Fique em Casa, Lua Silenciosa, Lua Severa, Lua Central",
+                    "wolf_moon_alt_names": "Lua Após o Yule, Lua de Ficar em Casa, Lua Silenciosa, Lua Severa, Lua Central",
                     "snow_moon_alt_names": "Lua da Fome, Lua do Urso, Lua da Tempestade, Lua do Gelo",
                     "worm_moon_alt_names": "Lua da Quaresma, Lua do Corvo, Lua da Crosta, Lua Casta, Lua do Açúcar, Lua da Seiva",
-                    "pink_moon_alt_names": "Lua do Gelo Quebrando, Lua dos Brotos, Lua do Despertar, Lua dos Ovos, Lua Pascal",
+                    "pink_moon_alt_names": "Lua da Quebra do Gelo, Lua dos Brotos, Lua do Despertar, Lua dos Ovos, Lua Pascal",
                     "flower_moon_alt_names": "Lua do Plantio, Lua do Leite, Lua da Lebre, Lua da Grama, Lua das Mães, Lua Brilhante",
                     "strawberry_moon_alt_names": "Lua da Rosa, Lua Quente, Lua do Hidromel, Lua das Flores, Lua do Plantio",
                     "buck_moon_alt_names": "Lua do Trovão, Lua do Feno, Lua das Ervas",
@@ -152,14 +183,12 @@
                     "harvest_moon_alt_names": "Lua Cheia do Milho, Lua do Milho Verde, Lua do Milho, Lua do Vinho, Lua da Canção, Lua da Cevada",
                     "hunters_moon_alt_names": "Lua do Arroz Secando, Lua das Folhas Caindo, Lua do Congelamento, Lua de Sangue, Lua Sanguínea",
                     "beaver_moon_alt_names": "Lua da Geada, Lua do Congelamento, Lua da Troca, Lua da Neve, Lua do Luto, Lua das Profundezas Mais Escuras",
-                    "cold_moon_alt_names": "Lua das Noites Longas, Lua Antes do Yule, Lua do Carvalho, Lua Fria (Cheia)",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lua das Noites Longas, Lua Antes do Yule, Lua do Carvalho, Lua Cheia Fria"
                 }
             },
             "next_last_quarter": {
                 "name": "Próximo quarto minguante"
             },
-
             "previous_rise": {
                 "name": "Nascer anterior"
             },
@@ -196,17 +225,16 @@
                     "hunters_moon": "Lua do Caçador",
                     "beaver_moon": "Lua do Castor",
                     "cold_moon": "Lua Fria",
-                    "blue_moon": "Lua Azul",
-                    "unknown": "Desconhecida"
+                    "blue_moon": "Lua Azul"
                 }
             },
             "previous_full_moon_alt_names": {
                 "name": "Nomes alternativos da lua cheia anterior",
                 "state": {
-                    "wolf_moon_alt_names": "Lua Após o Yule, Lua Fique em Casa, Lua Silenciosa, Lua Severa, Lua Central",
+                    "wolf_moon_alt_names": "Lua Após o Yule, Lua de Ficar em Casa, Lua Silenciosa, Lua Severa, Lua Central",
                     "snow_moon_alt_names": "Lua da Fome, Lua do Urso, Lua da Tempestade, Lua do Gelo",
                     "worm_moon_alt_names": "Lua da Quaresma, Lua do Corvo, Lua da Crosta, Lua Casta, Lua do Açúcar, Lua da Seiva",
-                    "pink_moon_alt_names": "Lua do Gelo Quebrando, Lua dos Brotos, Lua do Despertar, Lua dos Ovos, Lua Pascal",
+                    "pink_moon_alt_names": "Lua da Quebra do Gelo, Lua dos Brotos, Lua do Despertar, Lua dos Ovos, Lua Pascal",
                     "flower_moon_alt_names": "Lua do Plantio, Lua do Leite, Lua da Lebre, Lua da Grama, Lua das Mães, Lua Brilhante",
                     "strawberry_moon_alt_names": "Lua da Rosa, Lua Quente, Lua do Hidromel, Lua das Flores, Lua do Plantio",
                     "buck_moon_alt_names": "Lua do Trovão, Lua do Feno, Lua das Ervas",
@@ -214,14 +242,12 @@
                     "harvest_moon_alt_names": "Lua Cheia do Milho, Lua do Milho Verde, Lua do Milho, Lua do Vinho, Lua da Canção, Lua da Cevada",
                     "hunters_moon_alt_names": "Lua do Arroz Secando, Lua das Folhas Caindo, Lua do Congelamento, Lua de Sangue, Lua Sanguínea",
                     "beaver_moon_alt_names": "Lua da Geada, Lua do Congelamento, Lua da Troca, Lua da Neve, Lua do Luto, Lua das Profundezas Mais Escuras",
-                    "cold_moon_alt_names": "Lua das Noites Longas, Lua Antes do Yule, Lua do Carvalho, Lua Fria (Cheia)",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Lua das Noites Longas, Lua Antes do Yule, Lua do Carvalho, Lua Cheia Fria"
                 }
             },
             "previous_last_quarter": {
                 "name": "Quarto minguante anterior"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Longitude eclíptica na próxima lua cheia"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Latitude eclíptica na lua nova anterior"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Signo do zodíaco (atual)",
                 "state": {
@@ -332,7 +357,6 @@
                     "pisces": "Peixes"
                 }
             },
-
             "zodiac_degree_current_moon": {
                 "name": "Grau do zodíaco (atual)"
             },

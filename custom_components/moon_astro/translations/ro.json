@@ -3,28 +3,52 @@
     "config": {
         "step": {
             "user": {
-                "title": "Lună Astro",
-                "description": "Setează coordonatele GPS și altitudinea.",
+                "title": "Locația observatorului",
+                "description": "Lună Astro calculează poziția Lunii văzută din această locație. Valorile sunt completate în prealabil din configurația Home Assistant.",
                 "data": {
                     "latitude": "Latitudine",
                     "longitude": "Longitudine",
                     "elevation": "Elevație (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitudine geografică în grade zecimale, pozitivă la nord de ecuator.",
+                    "longitude": "Longitudine geografică în grade zecimale, pozitivă la est de Greenwich.",
+                    "elevation": "Înălțime deasupra nivelului mării, în metri."
+                }
+            },
+            "reconfigure": {
+                "title": "Locația observatorului",
+                "description": "Actualizați locația folosită pentru poziția Lunii. Entitățile existente sunt păstrate.",
+                "data": {
+                    "latitude": "Latitudine",
+                    "longitude": "Longitudine",
+                    "elevation": "Elevație (m)"
+                },
+                "data_description": {
+                    "latitude": "Latitudine geografică în grade zecimale, pozitivă la nord de ecuator.",
+                    "longitude": "Longitudine geografică în grade zecimale, pozitivă la est de Greenwich.",
+                    "elevation": "Înălțime deasupra nivelului mării, în metri."
                 }
             },
             "precision": {
-                "title": "Lună Astro",
-                "description": "Modul de înaltă precizie reduce variabilitatea marcajelor temporale, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat să activați această opțiune pe dispozitive cu putere redusă, precum Raspberry Pi.",
+                "title": "Precizia calculului",
+                "description": "Efemerida DE440 este pregătită.",
                 "data": {
                     "high_precision": "Mod de înaltă precizie"
+                },
+                "data_description": {
+                    "high_precision": "Rafinează momentele apogeului și perigeului cu un pas de eșantionare mai fin și un interval de căutare mai larg. Acest lucru crește vizibil utilizarea CPU și nu este recomandat pe dispozitive cu putere redusă, precum Raspberry Pi."
                 }
             }
         },
         "progress": {
-            "download_ephemeris": "Se descarcă efemerida Skyfield DE440 (> 100 MB). Vă rugăm să nu închideți această fereastră în timpul descărcării..."
+            "download_ephemeris": "Se descarcă efemerida JPL DE440 (aproximativ 115 MB). Aceasta poate dura câteva minute, în funcție de conexiune."
+        },
+        "error": {
+            "download_failed": "Efemerida DE440 nu a putut fi descărcată. Verificați dacă Home Assistant poate accesa ssd.jpl.nasa.gov, apoi încercați din nou."
         },
         "abort": {
             "already_configured": "Lună Astro este deja configurat",
-            "missing_data": "Lipsesc datele de configurare",
             "reconfigure_successful": "Configurația a fost actualizată"
         }
     },
@@ -32,7 +56,7 @@
         "step": {
             "init": {
                 "title": "Opțiuni Lună Astro",
-                "description": "Ajustați intervalul de actualizare al senzorilor și gestionarea fusului orar.\n\nModul de înaltă precizie reduce variabilitatea marcajelor de timp, dar crește utilizarea CPU deoarece folosește un pas de eșantionare mai fin și un interval de rafinare mai larg. Nu este recomandat pe dispozitive cu putere redusă precum Raspberry Pi.\n\nIntervalul de reîmprospătare de rezervă pentru evenimente forțează o reîmprospătare periodică a senzorilor bazați pe evenimente (fazele următoare/anterioare, apogeu/perigeu, zodiac la lunații) în cazul în care reîmprospătarea programată în jurul următorului eveniment este ratată (repornire, schimbare de timp, întârziere). Valorile mai mici reîmprospătează mai des; valorile mai mari reduc utilizarea CPU.",
+                "description": "Modificările se aplică atunci când integrarea se reîncarcă după salvare.",
                 "data": {
                     "scan_interval": "Interval de actualizare a senzorilor (secunde)",
                     "use_ha_timezone": "Utilizați fusul orar Home Assistant",
@@ -41,9 +65,18 @@
                     "events_refresh_fallback": "Interval de reîmprospătare de rezervă pentru evenimente (secunde)"
                 },
                 "data_description": {
-                    "time_zone": "Fus orar IANA utilizat pentru localizarea marcajelor temporale ale evenimentelor atunci când fusul orar Home Assistant nu este utilizat."
+                    "scan_interval": "Secunde între două calcule ale poziției curente a Lunii (60 până la 21600). Intervalele mai scurte cresc utilizarea CPU.",
+                    "use_ha_timezone": "Folosiți fusul orar Home Assistant pentru lunile calendaristice care dau nume lunilor pline. Dezactivați pentru a alege alt fus orar mai jos.",
+                    "time_zone": "Fus orar IANA utilizat atunci când fusul orar Home Assistant nu este utilizat. Marcajele temporale în sine sunt întotdeauna publicate ca momente UTC.",
+                    "high_precision": "Rafinează momentele apogeului și perigeului cu un pas de eșantionare mai fin și un interval de căutare mai larg. Acest lucru crește vizibil utilizarea CPU și nu este recomandat pe dispozitive cu putere redusă, precum Raspberry Pi.",
+                    "events_refresh_fallback": "Secunde între două recalculări forțate ale senzorilor bazați pe evenimente (3600 până la 604800), în cazul în care reîmprospătarea programată după următorul eveniment este ratată. 24 de ore sunt mai mult decât suficiente."
                 }
             }
+        }
+    },
+    "exceptions": {
+        "ephemeris_unavailable": {
+            "message": "Efemerida DE440 nu este disponibilă: {error}"
         }
     },
     "entity": {
@@ -63,12 +96,11 @@
                     "new_moon": "Lună nouă",
                     "waxing_crescent": "Semilună în creștere",
                     "first_quarter": "Primul pătrar",
-                    "waxing_gibbous": "Gibos în creștere",
+                    "waxing_gibbous": "Giboasă în creștere",
                     "full_moon": "Lună plină",
-                    "waning_gibbous": "Gibos în descreștere",
+                    "waning_gibbous": "Giboasă în descreștere",
                     "last_quarter": "Ultimul pătrar",
-                    "waning_crescent": "Semilună în descreștere",
-                    "unknown": "Necunoscută"
+                    "waning_crescent": "Semilună în descreștere"
                 }
             },
             "azimuth": {
@@ -134,8 +166,7 @@
                     "hunters_moon": "Luna Vânătorului",
                     "beaver_moon": "Luna Castorului",
                     "cold_moon": "Luna Rece",
-                    "blue_moon": "Luna Albastră",
-                    "unknown": "Necunoscută"
+                    "blue_moon": "Luna Albastră"
                 }
             },
             "next_full_moon_alt_names": {
@@ -147,19 +178,17 @@
                     "pink_moon_alt_names": "Luna Gheții Care Se Rupe, Luna Mugurilor, Luna Trezirii, Luna Ouălor, Luna Pascală",
                     "flower_moon_alt_names": "Luna Plantării, Luna Laptelui, Luna Iepurelui, Luna Ierbii, Luna Mamelor, Luna Strălucitoare",
                     "strawberry_moon_alt_names": "Luna Trandafirilor, Luna Caldă, Luna Miedului, Luna Florilor, Luna Plantării",
-                    "buck_moon_alt_names": "Luna Tunetului, Luna Fânului, Luna Ierburiilor",
+                    "buck_moon_alt_names": "Luna Tunetului, Luna Fânului, Luna Ierburilor",
                     "sturgeon_moon_alt_names": "Luna Grânelor, Luna Porumbului, Luna Râsului, Luna Fulgerelor",
-                    "harvest_moon_alt_names": "Luna Porumbului (Plină), Luna Porumbului Verde, Luna Porumbului, Luna Vinului, Luna Cântecului, Luna Orzului",
-                    "hunters_moon_alt_names": "Luna Orezului Uscat, Luna Frunzelor Căzătoare, Luna Înghețului, Luna Sângelui, Luna Sanguină",
+                    "harvest_moon_alt_names": "Luna Plină a Porumbului, Luna Porumbului Verde, Luna Porumbului, Luna Vinului, Luna Cântecului, Luna Orzului",
+                    "hunters_moon_alt_names": "Luna Orezului Uscat, Luna Frunzelor Căzătoare, Luna Înghețului, Luna Sângelui, Luna Purpurie",
                     "beaver_moon_alt_names": "Luna Brumei, Luna Înghețului, Luna Comerțului, Luna Zăpezii, Luna Doliului, Luna Adâncurilor Întunecate",
-                    "cold_moon_alt_names": "Luna Nopților Lungi, Luna Înainte de Yule, Luna Stejarului, Luna Rece (Plină)",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Luna Nopților Lungi, Luna Înainte de Yule, Luna Stejarului, Luna Plină Rece"
                 }
             },
             "next_last_quarter": {
                 "name": "Următorul ultim pătrar"
             },
-
             "previous_rise": {
                 "name": "Răsărirea anterioară"
             },
@@ -196,8 +225,7 @@
                     "hunters_moon": "Luna Vânătorului",
                     "beaver_moon": "Luna Castorului",
                     "cold_moon": "Luna Rece",
-                    "blue_moon": "Luna Albastră",
-                    "unknown": "Necunoscută"
+                    "blue_moon": "Luna Albastră"
                 }
             },
             "previous_full_moon_alt_names": {
@@ -209,19 +237,17 @@
                     "pink_moon_alt_names": "Luna Gheții Care Se Rupe, Luna Mugurilor, Luna Trezirii, Luna Ouălor, Luna Pascală",
                     "flower_moon_alt_names": "Luna Plantării, Luna Laptelui, Luna Iepurelui, Luna Ierbii, Luna Mamelor, Luna Strălucitoare",
                     "strawberry_moon_alt_names": "Luna Trandafirilor, Luna Caldă, Luna Miedului, Luna Florilor, Luna Plantării",
-                    "buck_moon_alt_names": "Luna Tunetului, Luna Fânului, Luna Ierburiilor",
+                    "buck_moon_alt_names": "Luna Tunetului, Luna Fânului, Luna Ierburilor",
                     "sturgeon_moon_alt_names": "Luna Grânelor, Luna Porumbului, Luna Râsului, Luna Fulgerelor",
-                    "harvest_moon_alt_names": "Luna Porumbului (Plină), Luna Porumbului Verde, Luna Porumbului, Luna Vinului, Luna Cântecului, Luna Orzului",
-                    "hunters_moon_alt_names": "Luna Orezului Uscat, Luna Frunzelor Căzătoare, Luna Înghețului, Luna Sângelui, Luna Sanguină",
+                    "harvest_moon_alt_names": "Luna Plină a Porumbului, Luna Porumbului Verde, Luna Porumbului, Luna Vinului, Luna Cântecului, Luna Orzului",
+                    "hunters_moon_alt_names": "Luna Orezului Uscat, Luna Frunzelor Căzătoare, Luna Înghețului, Luna Sângelui, Luna Purpurie",
                     "beaver_moon_alt_names": "Luna Brumei, Luna Înghețului, Luna Comerțului, Luna Zăpezii, Luna Doliului, Luna Adâncurilor Întunecate",
-                    "cold_moon_alt_names": "Luna Nopților Lungi, Luna Înainte de Yule, Luna Stejarului, Luna Rece (Plină)",
-                    "unknown": ""
+                    "cold_moon_alt_names": "Luna Nopților Lungi, Luna Înainte de Yule, Luna Stejarului, Luna Plină Rece"
                 }
             },
             "previous_last_quarter": {
                 "name": "Ultimul pătrar anterior"
             },
-
             "ecliptic_longitude_next_full_moon": {
                 "name": "Longitudine ecliptică la următoarea lună plină"
             },
@@ -246,7 +272,6 @@
             "ecliptic_latitude_previous_new_moon": {
                 "name": "Latitudine ecliptică la luna nouă anterioară"
             },
-
             "zodiac_sign_current_moon": {
                 "name": "Semn zodiacal (curent)",
                 "state": {
@@ -332,7 +357,6 @@
                     "pisces": "Pești"
                 }
             },
-
             "zodiac_degree_current_moon": {
                 "name": "Grad zodiacal (curent)"
             },

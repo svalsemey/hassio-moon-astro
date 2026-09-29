@@ -20,7 +20,6 @@ from homeassistant.components.sensor import (
 from homeassistant.const import DEGREE, PERCENTAGE, UnitOfLength
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.util import dt as dt_util
 
 from .const import (
     ATTR_NEXT_UPDATE,
@@ -310,13 +309,10 @@ class MoonAstroSensor(MoonAstroEntity, RestoreSensor):
         is never replaced by an unknown one.
 
         Returns:
-            The native value, parsed to an aware UTC datetime for timestamp sensors.
+            The native value taken as-is from the coordinator payload.
         """
         data = self.coordinator.data
         value = None if data is None else data.get(self.entity_description.key)
-        if isinstance(value, str) and self.device_class == SensorDeviceClass.TIMESTAMP:
-            parsed = dt_util.parse_datetime(value)
-            value = None if parsed is None else dt_util.as_utc(parsed)
         if value is None and self.entity_description.is_event_based:
             return self._last_written_value
         return value

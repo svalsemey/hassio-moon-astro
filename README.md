@@ -15,7 +15,7 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 ## Features
 
 - Current:
-  - Phase, Azimuth, Elevation, Illumination (%), Distance (km), Parallax (°)
+  - Phase, Azimuth, Elevation, Illumination (%), Geocentric distance (km), Parallax (°)
   - Ecliptic longitude/latitude (topocentric and geocentric)
   - Zodiac sign and zodiac degree (current moon position)
 
@@ -89,7 +89,7 @@ Some intermediate computations use non-rounded (“raw”) values internally to 
 
 ## High precision mode
 
-Moon Astro can run in a high precision mode designed to reduce timestamp variability for event sensors (lunation phases, apogee/perigee, moonrise/moonset) by using a finer sampling step and a wider refinement bracket.
+Moon Astro can run in a high precision mode designed to reduce timestamp variability for event sensors (apogee and perigee) by using a finer sampling step and a wider refinement bracket.
 
 In this mode, additional refinement is applied to apsides computations (apogee/perigee) to improve the stability of the computed timestamps:
 - the search uses a finer coarse sampling step to identify candidate extrema more reliably
@@ -147,7 +147,7 @@ Options are available via **Configure** on the integration:
 
   Default: true
 
-  When enabled, the integration uses Home Assistant’s configured time zone for timestamps and event calculations.
+  Timestamps are always published as UTC instants and rendered by Home Assistant in your locale. The time zone only defines the calendar month used to name full moons and to detect blue moons.
 
 - **Time zone**
 
@@ -177,11 +177,11 @@ If you notice that a translation is incomplete or inaccurate, contributions are 
 - Python dependencies are installed automatically by Home Assistant:
   - `skyfield==1.55`
 
-Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on first run. These files are cached for later use.
+Note: Moon Astro downloads the JPL DE440 ephemeris (about 115 MB) from ssd.jpl.nasa.gov into <config>/.skyfield during the initial setup. The file is validated at each start-up; a damaged copy is downloaded again automatically.
 
 ## Privacy and Network
 
-- No external network calls during runtime except Skyfield’s initial ephemeris download (cached locally).
+- No external network calls except the one-time download of the DE440 ephemeris from ssd.jpl.nasa.gov (JPL).
 - Computations are local on your Home Assistant instance.
 
 ## Troubleshooting
@@ -190,6 +190,7 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
   - Check Logs → “Moon Astro” for errors.
   - Ensure your HA location and elevation are set.
   - Verify ephemeris download completed (see `<config>/.skyfield` content).
+  - If the download fails at start-up, the setup is retried automatically; check that Home Assistant can reach ssd.jpl.nasa.gov.
 
 - Time zone issues:
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
@@ -209,6 +210,7 @@ Note: Skyfield downloads ephemeris/timescale data to `<config>/.skyfield` on fir
 
 - Ecliptic-of-date values use IAU 1980 nutation with true obliquity.
 - If you modify local translation files, reload the integration to apply changes.
+- The phase sensor reports new moon, first quarter, full moon or last quarter within about six hours (3° of phase angle) of the exact instant. » et « Rise, set and the above-horizon state use the Moon center at −34′ of altitude (standard refraction).
 
 ## Contributing
 
