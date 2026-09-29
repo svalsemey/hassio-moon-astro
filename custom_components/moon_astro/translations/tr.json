@@ -29,16 +29,6 @@
                     "longitude": "Ondalık derece cinsinden coğrafi boylam; Greenwich'in doğusunda pozitiftir.",
                     "elevation": "Deniz seviyesinden yükseklik, metre cinsinden."
                 }
-            },
-            "precision": {
-                "title": "Hesaplama hassasiyeti",
-                "description": "DE440 efemerisi hazır.",
-                "data": {
-                    "high_precision": "Yüksek hassasiyet modu"
-                },
-                "data_description": {
-                    "high_precision": "Daha ince bir örnekleme adımı ve daha geniş bir arama aralığıyla apoje ve perije anlarını iyileştirir. CPU kullanımını belirgin şekilde artırır ve Raspberry Pi gibi düşük güçlü cihazlarda önerilmez."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Sensör güncelleme aralığı (saniye)",
                     "use_ha_timezone": "Home Assistant saat dilimini kullan",
                     "time_zone": "Saat dilimi",
-                    "high_precision": "Yüksek hassasiyet modu",
                     "events_refresh_fallback": "Olay yenileme yedek aralığı (saniye)"
                 },
                 "data_description": {
                     "scan_interval": "Ay'ın mevcut konumunun iki hesaplaması arasındaki saniye sayısı (60 ile 21600 arası). Daha kısa aralıklar CPU kullanımını artırır.",
                     "use_ha_timezone": "Dolunayları adlandıran takvim ayları için Home Assistant saat dilimini kullanın. Aşağıdan başka bir dilim seçmek için kapatın.",
                     "time_zone": "Home Assistant saat dilimi kullanılmadığında kullanılan IANA saat dilimi. Zaman damgalarının kendisi her zaman UTC anları olarak yayımlanır.",
-                    "high_precision": "Daha ince bir örnekleme adımı ve daha geniş bir arama aralığıyla apoje ve perije anlarını iyileştirir. CPU kullanımını belirgin şekilde artırır ve Raspberry Pi gibi düşük güçlü cihazlarda önerilmez.",
                     "events_refresh_fallback": "Olay tabanlı sensörlerin iki zorunlu yeniden hesaplaması arasındaki saniye sayısı (3600 ile 604800 arası); bir sonraki olaydan sonra planlanan yenilemenin kaçırılması ihtimaline karşı. 24 saat fazlasıyla yeterlidir."
                 }
             }

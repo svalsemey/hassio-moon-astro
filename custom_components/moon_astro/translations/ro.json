@@ -29,16 +29,6 @@
                     "longitude": "Longitudine geografică în grade zecimale, pozitivă la est de Greenwich.",
                     "elevation": "Înălțime deasupra nivelului mării, în metri."
                 }
-            },
-            "precision": {
-                "title": "Precizia calculului",
-                "description": "Efemerida DE440 este pregătită.",
-                "data": {
-                    "high_precision": "Mod de înaltă precizie"
-                },
-                "data_description": {
-                    "high_precision": "Rafinează momentele apogeului și perigeului cu un pas de eșantionare mai fin și un interval de căutare mai larg. Acest lucru crește vizibil utilizarea CPU și nu este recomandat pe dispozitive cu putere redusă, precum Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Interval de actualizare a senzorilor (secunde)",
                     "use_ha_timezone": "Utilizați fusul orar Home Assistant",
                     "time_zone": "Fus orar",
-                    "high_precision": "Mod de înaltă precizie",
                     "events_refresh_fallback": "Interval de reîmprospătare de rezervă pentru evenimente (secunde)"
                 },
                 "data_description": {
                     "scan_interval": "Secunde între două calcule ale poziției curente a Lunii (60 până la 21600). Intervalele mai scurte cresc utilizarea CPU.",
                     "use_ha_timezone": "Folosiți fusul orar Home Assistant pentru lunile calendaristice care dau nume lunilor pline. Dezactivați pentru a alege alt fus orar mai jos.",
                     "time_zone": "Fus orar IANA utilizat atunci când fusul orar Home Assistant nu este utilizat. Marcajele temporale în sine sunt întotdeauna publicate ca momente UTC.",
-                    "high_precision": "Rafinează momentele apogeului și perigeului cu un pas de eșantionare mai fin și un interval de căutare mai larg. Acest lucru crește vizibil utilizarea CPU și nu este recomandat pe dispozitive cu putere redusă, precum Raspberry Pi.",
                     "events_refresh_fallback": "Secunde între două recalculări forțate ale senzorilor bazați pe evenimente (3600 până la 604800), în cazul în care reîmprospătarea programată după următorul eveniment este ratată. 24 de ore sunt mai mult decât suficiente."
                 }
             }

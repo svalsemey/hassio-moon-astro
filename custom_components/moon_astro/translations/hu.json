@@ -29,16 +29,6 @@
                     "longitude": "Földrajzi hosszúság tizedesfokban, Greenwichtől keletre pozitív.",
                     "elevation": "Tengerszint feletti magasság méterben."
                 }
-            },
-            "precision": {
-                "title": "Számítási pontosság",
-                "description": "A DE440 efemerida készen áll.",
-                "data": {
-                    "high_precision": "Nagy pontosságú mód"
-                },
-                "data_description": {
-                    "high_precision": "Finomabb mintavételezési lépéssel és szélesebb keresési tartománnyal finomítja az apogeum és a perigeum időpontjait. Ez észrevehetően növeli a CPU-használatot, ezért alacsony teljesítményű eszközökön, például Raspberry Pi-n nem ajánlott."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Érzékelők frissítési intervalluma (másodperc)",
                     "use_ha_timezone": "Home Assistant időzónájának használata",
                     "time_zone": "Időzóna",
-                    "high_precision": "Nagy pontosságú mód",
                     "events_refresh_fallback": "Eseményfrissítés tartalék időköze (másodperc)"
                 },
                 "data_description": {
                     "scan_interval": "A Hold aktuális helyzetének két számítása közötti idő másodpercben (60–21600). A rövidebb időközök növelik a CPU-használatot.",
                     "use_ha_timezone": "A Home Assistant időzónájának használata a teliholdakat elnevező naptári hónapokhoz. Kapcsolja ki, ha lent másik időzónát szeretne választani.",
                     "time_zone": "IANA időzóna, amelyet akkor használ, ha a Home Assistant időzónája nincs használatban. Maguk az időbélyegek mindig UTC időpontként kerülnek közzétételre.",
-                    "high_precision": "Finomabb mintavételezési lépéssel és szélesebb keresési tartománnyal finomítja az apogeum és a perigeum időpontjait. Ez észrevehetően növeli a CPU-használatot, ezért alacsony teljesítményű eszközökön, például Raspberry Pi-n nem ajánlott.",
                     "events_refresh_fallback": "Az eseményalapú érzékelők két kényszerített újraszámítása közötti idő másodpercben (3600–604800), arra az esetre, ha a következő esemény után ütemezett frissítés kimarad. 24 óra bőven elegendő."
                 }
             }

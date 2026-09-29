@@ -29,16 +29,6 @@
                     "longitude": "Geografisk længdegrad i decimalgrader, positiv øst for Greenwich.",
                     "elevation": "Højde over havets overflade i meter."
                 }
-            },
-            "precision": {
-                "title": "Beregningspræcision",
-                "description": "DE440-efemeriden er klar.",
-                "data": {
-                    "high_precision": "Højpræcisionstilstand"
-                },
-                "data_description": {
-                    "high_precision": "Forfiner tidspunkterne for apogæum og perigæum med et finere samplingtrin og et bredere søgeinterval. Det øger CPU-forbruget mærkbart og anbefales ikke på enheder med lav ydeevne som Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Opdateringsinterval for sensorer (sekunder)",
                     "use_ha_timezone": "Brug Home Assistants tidszone",
                     "time_zone": "Tidszone",
-                    "high_precision": "Højpræcisionstilstand",
                     "events_refresh_fallback": "Reserveopdateringsinterval for hændelser (sekunder)"
                 },
                 "data_description": {
                     "scan_interval": "Sekunder mellem to beregninger af Månens aktuelle position (60 til 21600). Kortere intervaller øger CPU-forbruget.",
                     "use_ha_timezone": "Brug Home Assistants tidszone til de kalendermåneder, der navngiver fuldmåner. Deaktiver for at vælge en anden zone nedenfor.",
                     "time_zone": "IANA-tidszone, der bruges, når Home Assistants tidszone ikke bruges. Selve tidsstemplerne udgives altid som UTC-tidspunkter.",
-                    "high_precision": "Forfiner tidspunkterne for apogæum og perigæum med et finere samplingtrin og et bredere søgeinterval. Det øger CPU-forbruget mærkbart og anbefales ikke på enheder med lav ydeevne som Raspberry Pi.",
                     "events_refresh_fallback": "Sekunder mellem to tvungne genberegninger af de hændelsesbaserede sensorer (3600 til 604800), hvis den opdatering, der er planlagt efter næste hændelse, går glip. 24 timer er rigeligt."
                 }
             }

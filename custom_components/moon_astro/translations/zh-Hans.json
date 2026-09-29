@@ -29,16 +29,6 @@
                     "longitude": "以十进制度表示的地理经度，格林尼治以东为正。",
                     "elevation": "海平面以上的高度，单位为米。"
                 }
-            },
-            "precision": {
-                "title": "计算精度",
-                "description": "DE440 星历已准备就绪。",
-                "data": {
-                    "high_precision": "高精度模式"
-                },
-                "data_description": {
-                    "high_precision": "使用更精细的采样步长和更宽的搜索区间来精确求解远地点和近地点的时刻。这会明显增加 CPU 使用率，不建议在 Raspberry Pi 等低功耗设备上使用。"
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "传感器更新间隔（秒）",
                     "use_ha_timezone": "使用 Home Assistant 时区",
                     "time_zone": "时区",
-                    "high_precision": "高精度模式",
                     "events_refresh_fallback": "事件刷新回退间隔（秒）"
                 },
                 "data_description": {
                     "scan_interval": "两次计算当前月亮位置之间的间隔秒数（60 至 21600）。间隔越短，CPU 使用率越高。",
                     "use_ha_timezone": "为满月命名所依据的日历月份使用 Home Assistant 时区。关闭后可在下方选择其他时区。",
                     "time_zone": "不使用 Home Assistant 时区时所用的 IANA 时区。时间戳本身始终以 UTC 时刻发布。",
-                    "high_precision": "使用更精细的采样步长和更宽的搜索区间来精确求解远地点和近地点的时刻。这会明显增加 CPU 使用率，不建议在 Raspberry Pi 等低功耗设备上使用。",
                     "events_refresh_fallback": "基于事件的传感器两次强制重新计算之间的间隔秒数（3600 至 604800），以防下一次事件之后计划的刷新被错过。24 小时已经足够。"
                 }
             }

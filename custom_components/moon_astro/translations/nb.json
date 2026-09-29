@@ -29,16 +29,6 @@
                     "longitude": "Geografisk lengdegrad i desimalgrader, positiv øst for Greenwich.",
                     "elevation": "Høyde over havet, i meter."
                 }
-            },
-            "precision": {
-                "title": "Beregningspresisjon",
-                "description": "DE440-efemeriden er klar.",
-                "data": {
-                    "high_precision": "Høypresisjonsmodus"
-                },
-                "data_description": {
-                    "high_precision": "Forfiner tidspunktene for apogeum og perigeum med et finere samplingsteg og et bredere søkeintervall. Dette øker CPU-bruken merkbart og anbefales ikke på enheter med lav ytelse som Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Oppdateringsintervall for sensorer (sekunder)",
                     "use_ha_timezone": "Bruk Home Assistant-tidssone",
                     "time_zone": "Tidssone",
-                    "high_precision": "Høypresisjonsmodus",
                     "events_refresh_fallback": "Fallback-intervall for hendelsesoppdatering (sekunder)"
                 },
                 "data_description": {
                     "scan_interval": "Sekunder mellom to beregninger av månens gjeldende posisjon (60 til 21600). Kortere intervaller øker CPU-bruken.",
                     "use_ha_timezone": "Bruk Home Assistant-tidssonen for kalendermånedene som gir fullmånene navn. Deaktiver for å velge en annen sone nedenfor.",
                     "time_zone": "IANA-tidssone som brukes når Home Assistant-tidssonen ikke brukes. Selve tidsstemplene publiseres alltid som UTC-tidspunkter.",
-                    "high_precision": "Forfiner tidspunktene for apogeum og perigeum med et finere samplingsteg og et bredere søkeintervall. Dette øker CPU-bruken merkbart og anbefales ikke på enheter med lav ytelse som Raspberry Pi.",
                     "events_refresh_fallback": "Sekunder mellom to tvungne omberegninger av de hendelsesbaserte sensorene (3600 til 604800), i tilfelle oppdateringen som er planlagt etter neste hendelse blir uteblitt. 24 timer er mer enn nok."
                 }
             }

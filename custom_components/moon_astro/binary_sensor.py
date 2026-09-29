@@ -46,7 +46,5 @@ class MoonAstroAboveHorizonBinarySensor(MoonAstroEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        """Return True above the horizon, False below, or None without data."""
-        if (data := self.coordinator.data) is None:
-            return None
-        return data.get(KEY_ABOVE_HORIZON)
+        """Return True above the horizon, False below."""
+        return self.coordinator.data.get(KEY_ABOVE_HORIZON)

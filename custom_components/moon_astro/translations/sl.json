@@ -29,16 +29,6 @@
                     "longitude": "Zemljepisna dolžina v decimalnih stopinjah, pozitivna vzhodno od Greenwicha.",
                     "elevation": "Višina nad morjem v metrih."
                 }
-            },
-            "precision": {
-                "title": "Natančnost izračuna",
-                "description": "Efemeride DE440 so pripravljene.",
-                "data": {
-                    "high_precision": "Način visoke natančnosti"
-                },
-                "data_description": {
-                    "high_precision": "Izboljša trenutke apogeja in perigeja z manjšim korakom vzorčenja in širšim iskalnim intervalom. To opazno poveča porabo CPU in ni priporočljivo na napravah z nizko močjo, kot je Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Interval posodabljanja senzorjev (sekunde)",
                     "use_ha_timezone": "Uporabi časovni pas Home Assistant",
                     "time_zone": "Časovni pas",
-                    "high_precision": "Način visoke natančnosti",
                     "events_refresh_fallback": "Rezervni interval osveževanja dogodkov (sekunde)"
                 },
                 "data_description": {
                     "scan_interval": "Število sekund med dvema izračunoma trenutnega položaja Lune (od 60 do 21600). Krajši intervali povečajo porabo CPU.",
                     "use_ha_timezone": "Uporabi časovni pas Home Assistant za koledarske mesece, po katerih se imenujejo polne lune. Izklopite za izbiro drugega pasu spodaj.",
                     "time_zone": "Časovni pas IANA, ki se uporablja, kadar se časovni pas Home Assistant ne uporablja. Sami časovni žigi so vedno objavljeni kot trenutki UTC.",
-                    "high_precision": "Izboljša trenutke apogeja in perigeja z manjšim korakom vzorčenja in širšim iskalnim intervalom. To opazno poveča porabo CPU in ni priporočljivo na napravah z nizko močjo, kot je Raspberry Pi.",
                     "events_refresh_fallback": "Število sekund med dvema prisilnima ponovnima izračunoma senzorjev, ki temeljijo na dogodkih (od 3600 do 604800), za primer, da se osvežitev, načrtovana po naslednjem dogodku, izpusti. 24 ur je povsem dovolj."
                 }
             }

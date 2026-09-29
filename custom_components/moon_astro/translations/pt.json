@@ -29,16 +29,6 @@
                     "longitude": "Longitude geográfica em graus decimais, positiva a leste de Greenwich.",
                     "elevation": "Altura acima do nível do mar, em metros."
                 }
-            },
-            "precision": {
-                "title": "Precisão do cálculo",
-                "description": "A efeméride DE440 está pronta.",
-                "data": {
-                    "high_precision": "Modo de alta precisão"
-                },
-                "data_description": {
-                    "high_precision": "Refina os instantes de apogeu e perigeu com um passo de amostragem mais fino e um intervalo de busca mais amplo. Isso aumenta notavelmente o uso de CPU e não é recomendado em dispositivos de baixa potência, como um Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Intervalo de atualização dos sensores (segundos)",
                     "use_ha_timezone": "Usar o fuso horário do Home Assistant",
                     "time_zone": "Fuso horário",
-                    "high_precision": "Modo de alta precisão",
                     "events_refresh_fallback": "Intervalo de fallback de atualização de eventos (segundos)"
                 },
                 "data_description": {
                     "scan_interval": "Segundos entre dois cálculos da posição atual da Lua (60 a 21600). Intervalos menores aumentam o uso de CPU.",
                     "use_ha_timezone": "Use o fuso horário do Home Assistant para os meses do calendário que dão nome às luas cheias. Desative para escolher outro fuso abaixo.",
                     "time_zone": "Fuso horário IANA usado quando o fuso horário do Home Assistant não é usado. Os próprios carimbos de data/hora são sempre publicados como instantes UTC.",
-                    "high_precision": "Refina os instantes de apogeu e perigeu com um passo de amostragem mais fino e um intervalo de busca mais amplo. Isso aumenta notavelmente o uso de CPU e não é recomendado em dispositivos de baixa potência, como um Raspberry Pi.",
                     "events_refresh_fallback": "Segundos entre dois recálculos forçados dos sensores baseados em eventos (3600 a 604800), caso a atualização agendada após o próximo evento seja perdida. 24 horas é mais do que suficiente."
                 }
             }

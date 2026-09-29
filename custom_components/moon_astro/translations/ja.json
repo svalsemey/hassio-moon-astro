@@ -29,16 +29,6 @@
                     "longitude": "10進数の度で表す地理的経度。グリニッジより東が正です。",
                     "elevation": "海抜の高さ（メートル）。"
                 }
-            },
-            "precision": {
-                "title": "計算精度",
-                "description": "DE440 暦表の準備ができました。",
-                "data": {
-                    "high_precision": "高精度モード"
-                },
-                "data_description": {
-                    "high_precision": "より細かいサンプリングステップと広い探索範囲で、遠地点と近地点の時刻をリファインします。CPU 使用率が顕著に増加するため、Raspberry Pi のような低消費電力デバイスでは推奨されません。"
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "センサー更新間隔（秒）",
                     "use_ha_timezone": "Home Assistant のタイムゾーンを使用",
                     "time_zone": "タイムゾーン",
-                    "high_precision": "高精度モード",
                     "events_refresh_fallback": "イベント更新フォールバック間隔（秒）"
                 },
                 "data_description": {
                     "scan_interval": "現在の月の位置を計算する間隔（秒）（60〜21600）。間隔が短いほど CPU 使用率が高くなります。",
                     "use_ha_timezone": "満月の名称の基準となる暦の月に、Home Assistant のタイムゾーンを使用します。下で別のタイムゾーンを選択するには無効にしてください。",
                     "time_zone": "Home Assistant のタイムゾーンが使用されていない場合に使用される IANA タイムゾーン。タイムスタンプ自体は常に UTC の時刻として公開されます。",
-                    "high_precision": "より細かいサンプリングステップと広い探索範囲で、遠地点と近地点の時刻をリファインします。CPU 使用率が顕著に増加するため、Raspberry Pi のような低消費電力デバイスでは推奨されません。",
                     "events_refresh_fallback": "次のイベント後に予定されている更新が失われた場合に備えて、イベントベースのセンサーを強制的に再計算する間隔（秒）（3600〜604800）。24 時間で十分です。"
                 }
             }

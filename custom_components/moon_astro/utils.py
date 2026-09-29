@@ -16,7 +16,7 @@ from pathlib import Path
 import zoneinfo
 
 import aiohttp
-from skyfield.api import Loader
+from skyfield.api import load
 from skyfield.jpllib import SpiceKernel
 from skyfield.timelib import Timescale
 
@@ -100,8 +100,9 @@ def _open_kernel(cache_dir: Path) -> EphemerisKernel:
     path = cache_dir / DE440_FILE
     if (size := path.stat().st_size) < MIN_EPHEMERIS_SIZE_BYTES:
         raise EphemerisError(f"{path} is truncated ({size} bytes)")
+    # The timescale relies on the leap second table bundled with Skyfield: no I/O.
+    timescale = load.timescale()
     try:
-        timescale = Loader(str(cache_dir), verbose=False).timescale()
         kernel = SpiceKernel(str(path))
         # Exercise every segment used at runtime so that a damaged file is rejected.
         kernel["earth"].at(timescale.now()).observe(
@@ -254,15 +255,16 @@ async def async_discard_ephemeris(hass: HomeAssistant) -> None:
 
 
 @cache
-def available_time_zones() -> tuple[str, ...]:
+def available_time_zones() -> list[str]:
     """Return the sorted IANA time zone names available on this system.
 
-    The first call walks the tzdata directories and must run in the executor.
+    The first call walks the tzdata directories and must run in the executor. The
+    list is shared between calls and must not be mutated.
 
     Returns:
         Sorted time zone names.
     """
-    return tuple(sorted(zoneinfo.available_timezones()))
+    return sorted(zoneinfo.available_timezones())
 
 
 async def async_resolve_time_zone(entry: ConfigEntry) -> tzinfo:

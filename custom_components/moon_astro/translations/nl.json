@@ -29,16 +29,6 @@
                     "longitude": "Geografische lengtegraad in decimale graden, positief ten oosten van Greenwich.",
                     "elevation": "Hoogte boven zeeniveau, in meters."
                 }
-            },
-            "precision": {
-                "title": "Rekennauwkeurigheid",
-                "description": "De DE440-efemeride is gereed.",
-                "data": {
-                    "high_precision": "Modus hoge precisie"
-                },
-                "data_description": {
-                    "high_precision": "Verfijnt de momenten van apogeum en perigeum met een fijnere samplingstap en een bredere zoekmarge. Dit verhoogt het CPU-gebruik merkbaar en wordt niet aanbevolen op apparaten met weinig rekenkracht, zoals een Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Update-interval van sensoren (seconden)",
                     "use_ha_timezone": "Tijdzone van Home Assistant gebruiken",
                     "time_zone": "Tijdzone",
-                    "high_precision": "Modus hoge precisie",
                     "events_refresh_fallback": "Fallback-interval voor het verversen van gebeurtenissen (seconden)"
                 },
                 "data_description": {
                     "scan_interval": "Aantal seconden tussen twee berekeningen van de huidige positie van de maan (60 tot 21600). Kortere intervallen verhogen het CPU-gebruik.",
                     "use_ha_timezone": "Gebruik de tijdzone van Home Assistant voor de kalendermaanden waarnaar volle manen worden vernoemd. Schakel dit uit om hieronder een andere tijdzone te kiezen.",
                     "time_zone": "IANA-tijdzone die wordt gebruikt wanneer de tijdzone van Home Assistant niet wordt gebruikt. De tijdstempels zelf worden altijd als UTC-momenten gepubliceerd.",
-                    "high_precision": "Verfijnt de momenten van apogeum en perigeum met een fijnere samplingstap en een bredere zoekmarge. Dit verhoogt het CPU-gebruik merkbaar en wordt niet aanbevolen op apparaten met weinig rekenkracht, zoals een Raspberry Pi.",
                     "events_refresh_fallback": "Aantal seconden tussen twee geforceerde herberekeningen van de gebeurtenisgestuurde sensoren (3600 tot 604800), voor het geval de na de volgende gebeurtenis geplande verversing wordt gemist. 24 uur is ruim voldoende."
                 }
             }

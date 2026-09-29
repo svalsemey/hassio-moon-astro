@@ -29,16 +29,6 @@
                     "longitude": "Longitudine geografica in gradi decimali, positiva a est di Greenwich.",
                     "elevation": "Altezza sul livello del mare, in metri."
                 }
-            },
-            "precision": {
-                "title": "Precisione del calcolo",
-                "description": "L’effemeride DE440 è pronta.",
-                "data": {
-                    "high_precision": "Modalità ad alta precisione"
-                },
-                "data_description": {
-                    "high_precision": "Affina gli istanti di apogeo e perigeo con un passo di campionamento più fine e un intervallo di ricerca più ampio. Questo aumenta notevolmente l’uso della CPU e non è consigliato su dispositivi a bassa potenza come un Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Intervallo di aggiornamento dei sensori (secondi)",
                     "use_ha_timezone": "Usa il fuso orario di Home Assistant",
                     "time_zone": "Fuso orario",
-                    "high_precision": "Modalità ad alta precisione",
                     "events_refresh_fallback": "Intervallo di aggiornamento di fallback degli eventi (secondi)"
                 },
                 "data_description": {
                     "scan_interval": "Secondi tra due calcoli della posizione attuale della Luna (da 60 a 21600). Intervalli più brevi aumentano l’uso della CPU.",
                     "use_ha_timezone": "Usa il fuso orario di Home Assistant per i mesi del calendario che danno il nome alle lune piene. Disattivalo per scegliere un altro fuso orario qui sotto.",
                     "time_zone": "Fuso orario IANA usato quando non viene utilizzato il fuso orario di Home Assistant. I timestamp stessi sono sempre pubblicati come istanti UTC.",
-                    "high_precision": "Affina gli istanti di apogeo e perigeo con un passo di campionamento più fine e un intervallo di ricerca più ampio. Questo aumenta notevolmente l’uso della CPU e non è consigliato su dispositivi a bassa potenza come un Raspberry Pi.",
                     "events_refresh_fallback": "Secondi tra due ricalcoli forzati dei sensori basati su eventi (da 3600 a 604800), nel caso in cui l’aggiornamento pianificato dopo il prossimo evento venga perso. 24 ore sono più che sufficienti."
                 }
             }

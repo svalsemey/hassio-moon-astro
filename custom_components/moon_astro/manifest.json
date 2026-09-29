@@ -10,5 +10,5 @@
   "loggers": ["skyfield"],
   "requirements": ["skyfield==1.55"],
   "single_config_entry": true,
-  "version": "0.4.6"
+  "version": "0.5.0"
 }

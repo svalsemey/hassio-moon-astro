@@ -29,16 +29,6 @@
                     "longitude": "Zemepisná dĺžka v desatinných stupňoch, kladná východne od Greenwichu.",
                     "elevation": "Výška nad morom v metroch."
                 }
-            },
-            "precision": {
-                "title": "Presnosť výpočtu",
-                "description": "Efemeridy DE440 sú pripravené.",
-                "data": {
-                    "high_precision": "Režim vysokej presnosti"
-                },
-                "data_description": {
-                    "high_precision": "Spresňuje okamihy apogea a perigea jemnejším krokom vzorkovania a širším intervalom hľadania. Výrazne zvyšuje využitie CPU a neodporúča sa na zariadeniach s nízkym výkonom, ako je Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Interval aktualizácie senzorov (sekundy)",
                     "use_ha_timezone": "Použiť časové pásmo Home Assistant",
                     "time_zone": "Časové pásmo",
-                    "high_precision": "Režim vysokej presnosti",
                     "events_refresh_fallback": "Záložný interval obnovovania udalostí (sekundy)"
                 },
                 "data_description": {
                     "scan_interval": "Počet sekúnd medzi dvoma výpočtami aktuálnej polohy Mesiaca (60 až 21600). Kratšie intervaly zvyšujú využitie CPU.",
                     "use_ha_timezone": "Použiť časové pásmo Home Assistant pre kalendárne mesiace, podľa ktorých sa pomenúvajú splny. Vypnite pre výber iného pásma nižšie.",
                     "time_zone": "Časové pásmo IANA použité, keď sa nepoužíva časové pásmo Home Assistant. Samotné časové pečiatky sa vždy publikujú ako okamihy UTC.",
-                    "high_precision": "Spresňuje okamihy apogea a perigea jemnejším krokom vzorkovania a širším intervalom hľadania. Výrazne zvyšuje využitie CPU a neodporúča sa na zariadeniach s nízkym výkonom, ako je Raspberry Pi.",
                     "events_refresh_fallback": "Počet sekúnd medzi dvoma vynútenými prepočtami senzorov založených na udalostiach (3600 až 604800) pre prípad, že sa zmešká obnovenie naplánované po nasledujúcej udalosti. 24 hodín úplne stačí."
                 }
             }

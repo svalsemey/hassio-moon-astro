@@ -29,16 +29,6 @@
                     "longitude": "Geografische Länge in Dezimalgrad, positiv östlich von Greenwich.",
                     "elevation": "Höhe über dem Meeresspiegel in Metern."
                 }
-            },
-            "precision": {
-                "title": "Berechnungsgenauigkeit",
-                "description": "Die DE440-Ephemeride ist bereit.",
-                "data": {
-                    "high_precision": "Hochpräzisionsmodus"
-                },
-                "data_description": {
-                    "high_precision": "Verfeinert die Zeitpunkte von Apogäum und Perigäum mit einer feineren Abtastschrittweite und einem breiteren Suchintervall. Dies erhöht die CPU-Auslastung spürbar und wird auf leistungsschwachen Geräten wie dem Raspberry Pi nicht empfohlen."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Aktualisierungsintervall der Sensoren (Sekunden)",
                     "use_ha_timezone": "Zeitzone von Home Assistant verwenden",
                     "time_zone": "Zeitzone",
-                    "high_precision": "Hochpräzisionsmodus",
                     "events_refresh_fallback": "Fallback-Intervall für Ereignis-Aktualisierung (Sekunden)"
                 },
                 "data_description": {
                     "scan_interval": "Sekunden zwischen zwei Berechnungen der aktuellen Mondposition (60 bis 21600). Kürzere Intervalle erhöhen die CPU-Auslastung.",
                     "use_ha_timezone": "Verwendet die Zeitzone von Home Assistant für die Kalendermonate, nach denen Vollmonde benannt werden. Deaktivieren, um unten eine andere Zone zu wählen.",
                     "time_zone": "IANA-Zeitzone, die verwendet wird, wenn die Zeitzone von Home Assistant nicht verwendet wird. Die Zeitstempel selbst werden immer als UTC-Zeitpunkte veröffentlicht.",
-                    "high_precision": "Verfeinert die Zeitpunkte von Apogäum und Perigäum mit einer feineren Abtastschrittweite und einem breiteren Suchintervall. Dies erhöht die CPU-Auslastung spürbar und wird auf leistungsschwachen Geräten wie dem Raspberry Pi nicht empfohlen.",
                     "events_refresh_fallback": "Sekunden zwischen zwei erzwungenen Neuberechnungen der ereignisbasierten Sensoren (3600 bis 604800), falls die nach dem nächsten Ereignis geplante Aktualisierung verpasst wird. 24 Stunden reichen völlig aus."
                 }
             }

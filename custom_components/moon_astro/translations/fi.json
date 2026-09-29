@@ -29,16 +29,6 @@
                     "longitude": "Maantieteellinen pituusaste desimaaliasteina, positiivinen Greenwichin itäpuolella.",
                     "elevation": "Korkeus merenpinnasta metreinä."
                 }
-            },
-            "precision": {
-                "title": "Laskennan tarkkuus",
-                "description": "DE440-efemeridit ovat valmiina.",
-                "data": {
-                    "high_precision": "Korkean tarkkuuden tila"
-                },
-                "data_description": {
-                    "high_precision": "Tarkentaa apogeumin ja perigeumin ajankohdat hienommalla näytteenottovälillä ja laajemmalla haarukalla. Tämä lisää huomattavasti suorittimen käyttöä, eikä sitä suositella heikkotehoisille laitteille, kuten Raspberry Pi:lle."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Antureiden päivitysväli (sekuntia)",
                     "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä",
                     "time_zone": "Aikavyöhyke",
-                    "high_precision": "Korkean tarkkuuden tila",
                     "events_refresh_fallback": "Tapahtumien varapäivitysväli (sekuntia)"
                 },
                 "data_description": {
                     "scan_interval": "Sekunteja Kuun nykyisen sijainnin kahden laskennan välillä (60–21600). Lyhyemmät välit lisäävät suorittimen käyttöä.",
                     "use_ha_timezone": "Käytä Home Assistantin aikavyöhykettä kalenterikuukausille, joiden mukaan täysikuut nimetään. Poista käytöstä valitaksesi toisen aikavyöhykkeen alla.",
                     "time_zone": "IANA-aikavyöhyke, jota käytetään, kun Home Assistantin aikavyöhykettä ei käytetä. Aikaleimat itse julkaistaan aina UTC-hetkinä.",
-                    "high_precision": "Tarkentaa apogeumin ja perigeumin ajankohdat hienommalla näytteenottovälillä ja laajemmalla haarukalla. Tämä lisää huomattavasti suorittimen käyttöä, eikä sitä suositella heikkotehoisille laitteille, kuten Raspberry Pi:lle.",
                     "events_refresh_fallback": "Sekunteja tapahtumapohjaisten antureiden kahden pakotetun uudelleenlaskennan välillä (3600–604800) siltä varalta, että seuraavan tapahtuman jälkeen ajoitettu päivitys jää väliin. 24 tuntia riittää hyvin."
                 }
             }

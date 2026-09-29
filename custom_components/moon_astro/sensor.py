@@ -1,8 +1,7 @@
 """Sensor entities for Moon Astro.
 
 Each sensor exposes one key of a coordinator payload. Event-based sensors are bound
-to the events coordinator and keep their last known value across restarts until the
-first event computation completes.
+to the events coordinator, the others to the main coordinator.
 """
 
 from __future__ import annotations
@@ -12,13 +11,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.sensor import (
-    RestoreSensor,
     SensorDeviceClass,
+    SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.const import DEGREE, PERCENTAGE, UnitOfLength
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import (
@@ -83,11 +82,7 @@ from .const import (
     PRECISION_ZODIAC_DEGREE,
     ZODIAC_SIGNS,
 )
-from .coordinator import (
-    MoonAstroConfigEntry,
-    MoonAstroCoordinator,
-    MoonAstroEventsCoordinator,
-)
+from .coordinator import MoonAstroConfigEntry, MoonAstroEventsCoordinator
 from .entity import MoonAstroEntity
 
 PARALLEL_UPDATES = 0
@@ -120,6 +115,7 @@ def _angle(
     precision: int,
     *,
     event: bool = False,
+    enabled: bool = True,
     state_class: SensorStateClass | None = None,
 ) -> MoonAstroSensorDescription:
     """Return the description of an angular sensor expressed in degrees."""
@@ -129,6 +125,7 @@ def _angle(
         native_unit_of_measurement=DEGREE,
         state_class=state_class,
         suggested_display_precision=precision,
+        entity_registry_enabled_default=enabled,
         is_event_based=event,
     )
 
@@ -148,6 +145,8 @@ def _enum(
 
 _FULL_MOON_NAME_OPTIONS: tuple[str, ...] = (*FULL_MOON_NAMES, "blue_moon")
 
+# Detailed coordinates whose human-friendly counterpart exists (zodiac signs, geocentric
+# coordinates) are registered disabled; users enable them on demand.
 SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
     # Current position and derived values (main coordinator)
     _enum(KEY_PHASE, PHASE_CODES),
@@ -171,8 +170,8 @@ SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
         suggested_display_precision=PRECISION_DISTANCE,
     ),
     _angle(KEY_PARALLAX, PRECISION_PARALLAX, state_class=SensorStateClass.MEASUREMENT),
-    _angle(KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC, PRECISION_ECL_TOPO),
-    _angle(KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC, PRECISION_ECL_TOPO),
+    _angle(KEY_ECLIPTIC_LONGITUDE_TOPOCENTRIC, PRECISION_ECL_TOPO, enabled=False),
+    _angle(KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC, PRECISION_ECL_TOPO, enabled=False),
     _angle(KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC, PRECISION_ECL_GEO),
     _angle(KEY_ECLIPTIC_LATITUDE_GEOCENTRIC, PRECISION_ECL_GEO),
     _timestamp(KEY_NEXT_RISE),
@@ -206,42 +205,68 @@ SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
         translation_key=KEY_PREVIOUS_FULL_MOON_ALT_NAMES,
         is_event_based=True,
     ),
-    _angle(KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON, PRECISION_ECL_GEO, event=True),
-    _angle(KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON, PRECISION_ECL_GEO, event=True),
+    _angle(
+        KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+    ),
+    _angle(
+        KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+    ),
+    _angle(
+        KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+    ),
+    _angle(
+        KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+    ),
+    _angle(
+        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
+    ),
+    _angle(
+        KEY_ECLIPTIC_LATITUDE_PREVIOUS_NEW_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
+    ),
+    _angle(
+        KEY_ECLIPTIC_LONGITUDE_PREVIOUS_FULL_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
+    ),
+    _angle(
+        KEY_ECLIPTIC_LATITUDE_PREVIOUS_FULL_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
+    ),
     _enum(KEY_ZODIAC_SIGN_NEXT_NEW_MOON, ZODIAC_SIGNS, event=True),
     _enum(KEY_ZODIAC_SIGN_NEXT_FULL_MOON, ZODIAC_SIGNS, event=True),
     _enum(KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON, ZODIAC_SIGNS, event=True),
     _enum(KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON, ZODIAC_SIGNS, event=True),
-    _angle(KEY_ZODIAC_DEGREE_NEXT_NEW_MOON, PRECISION_ZODIAC_DEGREE, event=True),
-    _angle(KEY_ZODIAC_DEGREE_NEXT_FULL_MOON, PRECISION_ZODIAC_DEGREE, event=True),
-    _angle(KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON, PRECISION_ZODIAC_DEGREE, event=True),
-    _angle(KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON, PRECISION_ZODIAC_DEGREE, event=True),
+    _angle(
+        KEY_ZODIAC_DEGREE_NEXT_NEW_MOON, PRECISION_ZODIAC_DEGREE, event=True, enabled=False
+    ),
+    _angle(
+        KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
+        PRECISION_ZODIAC_DEGREE,
+        event=True,
+        enabled=False,
+    ),
+    _angle(
+        KEY_ZODIAC_DEGREE_PREVIOUS_NEW_MOON,
+        PRECISION_ZODIAC_DEGREE,
+        event=True,
+        enabled=False,
+    ),
+    _angle(
+        KEY_ZODIAC_DEGREE_PREVIOUS_FULL_MOON,
+        PRECISION_ZODIAC_DEGREE,
+        event=True,
+        enabled=False,
+    ),
 )
-
-
-def _values_equal(old: Any, new: Any, tolerance: float | None) -> bool:
-    """Return True when two native values are equal for state writing purposes.
-
-    Floats are compared with the absolute tolerance when one is given; NaN never
-    compares equal, so it is never silently preserved.
-
-    Args:
-        old: Last written native value.
-        new: Newly computed native value.
-        tolerance: Absolute tolerance for float comparisons, or None for equality.
-
-    Returns:
-        True if the values are equivalent.
-    """
-    if tolerance is not None and isinstance(old, float) and isinstance(new, float):
-        return abs(old - new) <= tolerance
-    return old == new
 
 
 async def async_setup_entry(
@@ -269,58 +294,15 @@ async def async_setup_entry(
     )
 
 
-class MoonAstroSensor(MoonAstroEntity, RestoreSensor):
-    """Sensor exposing one key of a coordinator payload.
-
-    State writes are skipped while a float value stays within half of the last digit
-    shown at the suggested display precision, which limits recorder churn caused by
-    numerical jitter. Availability changes are always written.
-    """
+class MoonAstroSensor(MoonAstroEntity, SensorEntity):
+    """Sensor exposing one key of a coordinator payload."""
 
     entity_description: MoonAstroSensorDescription
 
-    def __init__(
-        self,
-        coordinator: MoonAstroCoordinator | MoonAstroEventsCoordinator,
-        entry: MoonAstroConfigEntry,
-        description: MoonAstroSensorDescription,
-    ) -> None:
-        """Initialize the sensor.
-
-        Args:
-            coordinator: Coordinator providing the value.
-            entry: Config entry owning the sensor.
-            description: Sensor description.
-        """
-        super().__init__(coordinator, entry, description)
-        self._float_tolerance: float | None = (
-            None
-            if (precision := description.suggested_display_precision) is None
-            else 0.5 * 10.0**-precision
-        )
-        self._last_written_value: Any = None
-        self._last_written_available: bool | None = None
-
-    def _compute_native_value(self) -> Any:
-        """Return the value to expose without writing the state.
-
-        Event-based sensors keep their last written (or restored) value while the
-        events coordinator has not produced the key yet, so a valid restored state
-        is never replaced by an unknown one.
-
-        Returns:
-            The native value taken as-is from the coordinator payload.
-        """
-        data = self.coordinator.data
-        value = None if data is None else data.get(self.entity_description.key)
-        if value is None and self.entity_description.is_event_based:
-            return self._last_written_value
-        return value
-
     @property
     def native_value(self) -> Any:
-        """Return the state of the sensor."""
-        return self._compute_native_value()
+        """Return the payload value of the sensor."""
+        return self.coordinator.data.get(self.entity_description.key)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
@@ -328,33 +310,3 @@ class MoonAstroSensor(MoonAstroEntity, RestoreSensor):
         if isinstance(self.coordinator, MoonAstroEventsCoordinator):
             return {ATTR_NEXT_UPDATE: self.coordinator.next_refresh_utc}
         return None
-
-    async def async_added_to_hass(self) -> None:
-        """Restore the last known value of event-based sensors.
-
-        The platform writes the initial state right after this method returns, so
-        the restored value is exposed before the first coordinator refresh completes.
-        Values outside the ENUM options of a sensor are ignored.
-        """
-        await super().async_added_to_hass()
-        if not self.entity_description.is_event_based:
-            return
-        if (last := await self.async_get_last_sensor_data()) is None:
-            return
-        value = last.native_value
-        options = self.entity_description.options
-        if options is not None and value not in options:
-            return
-        self._last_written_value = value
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Write the state when the value or the availability changed."""
-        value = self._compute_native_value()
-        if self.available == self._last_written_available and _values_equal(
-            self._last_written_value, value, self._float_tolerance
-        ):
-            return
-        self._last_written_value = value
-        self._last_written_available = self.available
-        self.async_write_ha_state()

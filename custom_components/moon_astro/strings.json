@@ -29,16 +29,6 @@
                     "longitude": "Geographic longitude in decimal degrees, positive east of Greenwich.",
                     "elevation": "Height above sea level, in meters."
                 }
-            },
-            "precision": {
-                "title": "Computation precision",
-                "description": "The DE440 ephemeris is ready.",
-                "data": {
-                    "high_precision": "High precision mode"
-                },
-                "data_description": {
-                    "high_precision": "Refines the apogee and perigee instants with a finer sampling step and a wider bracket. This noticeably increases CPU usage and is not recommended on low-power devices such as a Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Sensors update interval (seconds)",
                     "use_ha_timezone": "Use the Home Assistant time zone",
                     "time_zone": "Time zone",
-                    "high_precision": "High precision mode",
                     "events_refresh_fallback": "Events refresh fallback interval (seconds)"
                 },
                 "data_description": {
                     "scan_interval": "Seconds between two computations of the current Moon position (60 to 21600). Shorter intervals increase CPU usage.",
                     "use_ha_timezone": "Use the Home Assistant time zone for the calendar months that name full moons. Disable it to pick another zone below.",
                     "time_zone": "IANA time zone used when the Home Assistant time zone is not used. Timestamps themselves are always published as UTC instants.",
-                    "high_precision": "Refines the apogee and perigee instants with a finer sampling step and a wider bracket. This noticeably increases CPU usage and is not recommended on low-power devices such as a Raspberry Pi.",
                     "events_refresh_fallback": "Seconds between two forced recomputations of the event-based sensors (3600 to 604800), in case the refresh scheduled after the next event is missed. 24 hours is plenty."
                 }
             }

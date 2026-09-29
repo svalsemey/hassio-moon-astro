@@ -29,16 +29,6 @@
                     "longitude": "Longitude géographique en degrés décimaux, positive à l’est de Greenwich.",
                     "elevation": "Altitude au-dessus du niveau de la mer, en mètres."
                 }
-            },
-            "precision": {
-                "title": "Précision du calcul",
-                "description": "L’éphéméride DE440 est prête.",
-                "data": {
-                    "high_precision": "Mode haute précision"
-                },
-                "data_description": {
-                    "high_precision": "Affinement des instants d’apogée et de périgée avec un pas d’échantillonnage plus fin et un bracket plus large. Cela augmente notablement l’utilisation du CPU et n’est pas recommandé sur des appareils à faible puissance tels que le Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Intervalle de mise à jour des capteurs (secondes)",
                     "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant",
                     "time_zone": "Fuseau horaire",
-                    "high_precision": "Mode haute précision",
                     "events_refresh_fallback": "Intervalle de secours de rafraîchissement des événements (secondes)"
                 },
                 "data_description": {
                     "scan_interval": "Intervalle entre deux calculs de la position actuelle de la Lune (60 à 21600). Des intervalles plus courts augmentent l’utilisation du CPU.",
                     "use_ha_timezone": "Utiliser le fuseau horaire de Home Assistant pour les mois du calendrier qui nomment les pleines lunes. Désactivez-le pour choisir un autre fuseau horaire ci-dessous.",
                     "time_zone": "Fuseau horaire IANA utilisé lorsque le fuseau horaire de Home Assistant n'est pas utilisé. Les horodatages eux-mêmes sont toujours publiés en tant qu'instants UTC.",
-                    "high_precision": "Affinement des instants d’apogée et de périgée avec une étape d’échantillonnage plus fine et une plage de raffinement plus large. Cela augmente sensiblement l’utilisation du CPU et n’est pas recommandé sur des appareils à faible puissance tels que le Raspberry Pi.",
                     "events_refresh_fallback": "Secondes entre deux recomputations forcées des capteurs basés sur des événements (3600 à 604800), au cas où le rafraîchissement prévu après le prochain événement serait manqué. 24 heures suffisent amplement."
                 }
             }

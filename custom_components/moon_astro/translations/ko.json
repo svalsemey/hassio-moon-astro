@@ -29,16 +29,6 @@
                     "longitude": "십진 도 단위의 지리적 경도이며, 그리니치 동쪽이 양수입니다.",
                     "elevation": "해발 고도이며 단위는 미터입니다."
                 }
-            },
-            "precision": {
-                "title": "계산 정밀도",
-                "description": "DE440 천체력이 준비되었습니다.",
-                "data": {
-                    "high_precision": "고정밀 모드"
-                },
-                "data_description": {
-                    "high_precision": "더 미세한 샘플링 단계와 더 넓은 탐색 범위로 원지점과 근지점의 시각을 정밀화합니다. CPU 사용량이 눈에 띄게 증가하므로 Raspberry Pi와 같은 저전력 장치에서는 권장하지 않습니다."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "센서 업데이트 간격(초)",
                     "use_ha_timezone": "Home Assistant 시간대 사용",
                     "time_zone": "시간대",
-                    "high_precision": "고정밀 모드",
                     "events_refresh_fallback": "이벤트 새로 고침 폴백 간격(초)"
                 },
                 "data_description": {
                     "scan_interval": "현재 달 위치를 계산하는 두 시점 사이의 간격(초)입니다(60~21600). 간격이 짧을수록 CPU 사용량이 증가합니다.",
                     "use_ha_timezone": "보름달의 이름을 정하는 달력상의 월에 Home Assistant 시간대를 사용합니다. 아래에서 다른 시간대를 선택하려면 이 옵션을 끄세요.",
                     "time_zone": "Home Assistant 시간대를 사용하지 않을 때 사용되는 IANA 시간대입니다. 타임스탬프 자체는 항상 UTC 시각으로 게시됩니다.",
-                    "high_precision": "더 미세한 샘플링 단계와 더 넓은 탐색 범위로 원지점과 근지점의 시각을 정밀화합니다. CPU 사용량이 눈에 띄게 증가하므로 Raspberry Pi와 같은 저전력 장치에서는 권장하지 않습니다.",
                     "events_refresh_fallback": "다음 이벤트 이후 예약된 새로 고침이 누락될 경우에 대비하여, 이벤트 기반 센서를 강제로 다시 계산하는 두 시점 사이의 간격(초)입니다(3600~604800). 24시간이면 충분합니다."
                 }
             }

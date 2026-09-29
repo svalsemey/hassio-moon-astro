@@ -1,4 +1,4 @@
-[![HACS Default](https://img.shields.io/badge/HACS-Default-blue?style=flat&logo=homeassistantcommunitystore&logoSize=auto)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svalsemey&repository=hassio-moon-astro&category=plugin)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-blue?style=flat&logo=homeassistantcommunitystore&logoSize=auto)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svalsemey&repository=hassio-moon-astro&category=integration)
 [![HACS Passing](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml/badge.svg)](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml)
 [![Total Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/latest/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases/latest)
@@ -10,7 +10,7 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Accurate ecliptic-of-date conversion (IAU 1980 nutation, true obliquity)
 - Topocentric elevation/azimuth from your configured location
 - Fully localized entities and state translations
-- Config flow with options for scan interval, time zone handling, precision settings, and event refresh resilience
+- Config flow with options for scan interval, time zone handling and event refresh resilience
 
 ## Features
 
@@ -45,62 +45,36 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 
 ## Sensor update model
 
-Moon Astro uses two complementary calculation paths:
+Moon Astro uses two coordinators:
 
-- **Periodic sensors** (current position and related values) are updated on the configured scan interval.
-- **Event-based sensors** (lunation phases, apogee/perigee, and related zodiac and lon/lat-at-event sensors) are refreshed around astronomical event instants and updated shortly after the next relevant event boundary is reached.
+- **Periodic sensors** (position, illumination, distance, parallax, ecliptic coordinates, current zodiac position, moonrise/moonset) are recomputed on the configured scan interval.
+- **Event-based sensors** (lunation phases, apogee/perigee, full moon names, and the ecliptic/zodiac position at lunations) are recomputed shortly after the earliest upcoming event, and at least once per **events refresh fallback interval**.
 
-This approach keeps “current” values responsive while avoiding unnecessary recomputation of event timestamps between two events.
-
-### Startup behavior for event-based sensors
-
-To keep Home Assistant responsive during startup and reloads, event-based sensors are refreshed using a deferred startup refresh. The main (periodic) coordinator is refreshed first, then the event-based refresh is scheduled after a short startup delay.
-
-This avoids long-running computations from blocking the setup path, while still ensuring event-based sensors become available shortly after startup.
+A full refresh takes a fraction of a second in a background thread, so both coordinators are refreshed during setup and every entity starts with data.
 
 ### Scheduled refresh around the next event
 
-Event-based sensors are refreshed automatically shortly after the earliest upcoming astronomical event among:
-- next lunation phase boundary (new moon, quarters, full moon),
-- next apogee/perigee.
-
-A small safety offset is applied when scheduling the refresh to avoid edge instability exactly at the boundary.
+After each refresh, the events coordinator schedules the next one two minutes after the earliest of the next new moon, first quarter, full moon, last quarter, apogee and perigee. The margin keeps the computation safely past the boundary.
 
 ### `next_update` attribute for event-based sensors
 
-All **event-based sensors** expose an extra state attribute named `next_update`.
-
-- `next_update` is a UTC timestamp indicating the **scheduled time of the next event-based refresh**.
-- When an event-boundary refresh is scheduled (for example after the next phase boundary or apsis), `next_update` reflects that planned refresh time.
-- If no event-boundary refresh can be determined, `next_update` falls back to the next refresh time derived from the configured **Events refresh fallback interval**.
-
-This attribute can be used in automations to anticipate the next time event-based values will be recalculated.
+All **event-based sensors** expose an extra state attribute named `next_update`: the UTC instant of the next event-based recomputation, i.e. the earlier of the scheduled boundary refresh and the fallback refresh.
 
 ### Events refresh fallback interval
 
-Event-based sensors normally refresh automatically shortly after the next computed event time. The **Events refresh fallback interval (seconds)** acts as a safety net by forcing a periodic refresh of event-based sensors if the scheduled refresh is missed (for example after a restart, a time change, or a system delay).
-
-- Lower values refresh event-based sensors more often.
-- Higher values reduce CPU usage.
+The **Events refresh fallback interval (seconds)** forces a periodic recomputation of the event-based sensors even when no boundary refresh fires (for example after a time change). The default of 24 hours is plenty.
 
 ## Precision notes (raw values)
 
 Some intermediate computations use non-rounded (“raw”) values internally to avoid boundary artifacts, especially when values are close to zodiac sign cusps (0°, 30°, 60°…). The values exposed as sensor states remain rounded for readability, but zodiac sign/degree calculations can rely on raw longitudes for higher precision.
 
-## High precision mode
+## Accuracy
 
-Moon Astro can run in a high precision mode designed to reduce timestamp variability for event sensors (apogee and perigee) by using a finer sampling step and a wider refinement bracket.
-
-In this mode, additional refinement is applied to apsides computations (apogee/perigee) to improve the stability of the computed timestamps:
-- the search uses a finer coarse sampling step to identify candidate extrema more reliably
-- the extremum refinement uses a wider bracket to converge more consistently
-- after convergence, the resulting instant is validated against neighboring minute instants to select the most extreme minute-aligned solution
-
-**CPU note:** high precision mode requires more computations and can significantly increase CPU usage. It is generally not recommended on low-power hardware (for example Raspberry Pi models with limited resources). If you enable it, prefer using a longer scan interval and monitor system load.
-
-### Responsiveness and long computations
-
-Event-based calculations, especially in high precision mode, can be significantly heavier than periodic calculations. Moon Astro isolates these computations so the Home Assistant event loop remains responsive even when event-based refreshes take a long time. If multiple refresh requests happen close together, they are coalesced to avoid running overlapping long computations.
+- Phase instants (new moon, quarters, full moon) and moonrise/moonset come from Skyfield's discrete event search, accurate to the millisecond before the instants are rounded to the minute.
+- Apogee and perigee are the extremes of the geometric geocentric distance, located with Skyfield's vectorized extremum search to within ten seconds; the published minute is the one whose boundary is closest to the extreme, so it does not depend on the sampling grid.
+- Ecliptic-of-date coordinates use the IAU 1980 nutation series with the true obliquity.
+- Rise, set and the above-horizon state use the Moon center at −34′ of altitude (standard refraction).
+- The phase sensor reports new moon, first quarter, full moon or last quarter within about six hours (3° of phase angle) of the exact instant.
 
 ## Update frequency and minimum granularity
 
@@ -108,7 +82,7 @@ To keep computations stable and avoid unnecessary CPU load, Moon Astro updates s
 
 When configuring the integration, choose an interval that matches your needs:
 - For dashboards and general automations: a few minutes is usually enough.
-- For time-sensitive automations: use a shorter interval while staying at **one minute or above**, and consider the CPU impact (especially in high precision mode).
+- For time-sensitive automations: use a shorter interval while staying at **one minute or above**, and consider the CPU impact.
 
 ## Installation
 
@@ -153,12 +127,6 @@ Options are available via **Configure** on the integration:
 
   Used only if "Use Home Assistant time zone" is disabled
 
-- **High precision mode**
-
-  Default: false
-
-  Reduces timestamp variability but increases CPU usage due to finer sampling and wider refinement.
-
 - **Events refresh fallback interval (seconds)**
 
   Default: 86400 (24 hours)
@@ -170,6 +138,8 @@ Options are available via **Configure** on the integration:
 Translations are included for multiple languages. Entity names and some state values (for example zodiac signs and full moon names) are localized via Home Assistant’s translation system.
 
 If you notice that a translation is incomplete or inaccurate, contributions are very welcome.
+
+If you modify local translation files, reload the integration to apply changes.
 
 ## Requirements
 
@@ -196,21 +166,12 @@ Note: Moon Astro downloads the JPL DE440 ephemeris (about 115 MB) from ssd.jpl.n
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
 
 - CPU usage is high:
-  - Disable “High precision mode”.
-  - Increase the sensors update interval.
-  - Don't set an event refresh fallback interval too low for event-based sensors (24 hours is more than enough!)
-  - Avoid running with a one-minute interval on low-power hardware.
+  - Increase the sensors update interval; keep the events refresh fallback interval at its 24-hour default.
 
 - Data looks stale:
   - Reduce the scan interval (respect CPU usage and the one-minute minimum granularity).
   - If only event-based sensors look stale, reduce the events refresh fallback interval.
   - Manually reload the integration from the UI.
-
-## Known Notes
-
-- Ecliptic-of-date values use IAU 1980 nutation with true obliquity.
-- If you modify local translation files, reload the integration to apply changes.
-- The phase sensor reports new moon, first quarter, full moon or last quarter within about six hours (3° of phase angle) of the exact instant. » et « Rise, set and the above-horizon state use the Moon center at −34′ of altitude (standard refraction).
 
 ## Contributing
 

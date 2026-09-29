@@ -29,16 +29,6 @@
                     "longitude": "Długość geograficzna w stopniach dziesiętnych, dodatnia na wschód od Greenwich.",
                     "elevation": "Wysokość nad poziomem morza w metrach."
                 }
-            },
-            "precision": {
-                "title": "Dokładność obliczeń",
-                "description": "Efemeryda DE440 jest gotowa.",
-                "data": {
-                    "high_precision": "Tryb wysokiej precyzji"
-                },
-                "data_description": {
-                    "high_precision": "Doprecyzowuje momenty apogeum i perygeum przy użyciu mniejszego kroku próbkowania i szerszego przedziału poszukiwań. Zauważalnie zwiększa to użycie CPU i nie jest zalecane na urządzeniach o niskiej mocy, takich jak Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Interwał aktualizacji czujników (sekundy)",
                     "use_ha_timezone": "Użyj strefy czasowej Home Assistant",
                     "time_zone": "Strefa czasowa",
-                    "high_precision": "Tryb wysokiej precyzji",
                     "events_refresh_fallback": "Zapasowy interwał odświeżania zdarzeń (sekundy)"
                 },
                 "data_description": {
                     "scan_interval": "Liczba sekund między dwoma obliczeniami bieżącego położenia Księżyca (60 do 21600). Krótsze interwały zwiększają użycie CPU.",
                     "use_ha_timezone": "Użyj strefy czasowej Home Assistant dla miesięcy kalendarzowych, od których pochodzą nazwy pełni. Wyłącz, aby wybrać inną strefę poniżej.",
                     "time_zone": "Strefa czasowa IANA używana, gdy strefa czasowa Home Assistant nie jest używana. Same znaczniki czasu są zawsze publikowane jako momenty UTC.",
-                    "high_precision": "Doprecyzowuje momenty apogeum i perygeum przy użyciu mniejszego kroku próbkowania i szerszego przedziału poszukiwań. Zauważalnie zwiększa to użycie CPU i nie jest zalecane na urządzeniach o niskiej mocy, takich jak Raspberry Pi.",
                     "events_refresh_fallback": "Liczba sekund między dwoma wymuszonymi ponownymi obliczeniami czujników opartych na zdarzeniach (3600 do 604800) na wypadek pominięcia odświeżenia zaplanowanego po następnym zdarzeniu. 24 godziny w zupełności wystarczą."
                 }
             }

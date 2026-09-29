@@ -13,24 +13,14 @@ MODEL = "Skyfield DE440"
 NAME = "Moon Astro"
 DEFAULT_SCAN_INTERVAL = 300  # seconds
 DEFAULT_USE_HA_TZ = True
-DEFAULT_HIGH_PRECISION = False
 DEFAULT_EVENTS_REFRESH_FALLBACK = 86400  # seconds (24h)
-DEFAULT_EVENTS_STARTUP_DELAY = 180  # seconds
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_LAT = "latitude"
 CONF_LON = "longitude"
 CONF_ALT = "elevation"
 CONF_USE_HA_TZ = "use_ha_timezone"
 CONF_TIME_ZONE = "time_zone"
-CONF_HIGH_PRECISION = "high_precision"
 CONF_EVENTS_REFRESH_FALLBACK = "events_refresh_fallback"
-
-# Precision computation parameters
-HIGH_PRECISION_STEP_HOURS = 1.0
-HIGH_PRECISION_BRACKET_EXPAND = 2
-HIGH_PRECISION_BRACKETS_TO_REFINE = 6
-STANDARD_PRECISION_STEP_HOURS = 2.0
-STANDARD_PRECISION_BRACKET_EXPAND = 1
 
 # Files and external resources
 CACHE_DIR_NAME = ".skyfield"
@@ -97,9 +87,8 @@ KEY_NEXT_FULL_MOON_ALT_NAMES = "next_full_moon_alt_names"
 KEY_PREVIOUS_FULL_MOON_NAME = "previous_full_moon_name"
 KEY_PREVIOUS_FULL_MOON_ALT_NAMES = "previous_full_moon_alt_names"
 
-# Additional flags
+# Binary sensor flag
 KEY_ABOVE_HORIZON = "above_horizon"
-KEY_WAXING = "waxing"
 
 # Extra state attributes
 ATTR_NEXT_UPDATE = "next_update"
@@ -139,6 +128,14 @@ RISE_SET_SEARCH_DAYS = 7.0
 # Two lunations back so that the previous full moon can be recognized as a blue moon
 PHASE_SEARCH_DAYS_BACK = 70.0
 PHASE_SEARCH_DAYS_AHEAD = 40.0
+
+# Apsis search: the Moon's distance extremes alternate every 13.8 days on average, so a
+# three-day sampling step cannot skip one. The refinement stops at a ten-second bracket,
+# far below the minute resolution of the published instants and coarse enough to keep
+# the sampled distances apart from floating-point noise on the flat top of the curve.
+APSIS_SEARCH_DAYS = 30.0
+APSIS_STEP_DAYS = 3.0
+APSIS_EPSILON_DAYS = 10.0 / 86400.0
 
 # Fixed state code sets; they are also the ENUM options of the matching sensors
 PHASE_CODES: tuple[str, ...] = (

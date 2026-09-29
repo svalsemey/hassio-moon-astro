@@ -29,16 +29,6 @@
                     "longitude": "Geografisk longitud i decimalgrader, positiv öster om Greenwich.",
                     "elevation": "Höjd över havet, i meter."
                 }
-            },
-            "precision": {
-                "title": "Beräkningsprecision",
-                "description": "DE440-efemeriden är klar.",
-                "data": {
-                    "high_precision": "Högprecisionsläge"
-                },
-                "data_description": {
-                    "high_precision": "Förfinar tidpunkterna för apogeum och perigeum med ett finare samplingssteg och ett bredare sökintervall. Detta ökar CPU-användningen märkbart och rekommenderas inte på enheter med låg prestanda som Raspberry Pi."
-                }
             }
         },
         "progress": {
@@ -61,14 +51,12 @@
                     "scan_interval": "Uppdateringsintervall för sensorer (sekunder)",
                     "use_ha_timezone": "Använd Home Assistants tidszon",
                     "time_zone": "Tidszon",
-                    "high_precision": "Högprecisionsläge",
                     "events_refresh_fallback": "Fallback-intervall för händelseuppdatering (sekunder)"
                 },
                 "data_description": {
                     "scan_interval": "Sekunder mellan två beräkningar av månens aktuella position (60 till 21600). Kortare intervall ökar CPU-användningen.",
                     "use_ha_timezone": "Använd Home Assistants tidszon för de kalendermånader som ger fullmånarna deras namn. Inaktivera för att välja en annan zon nedan.",
                     "time_zone": "IANA-tidszon som används när Home Assistants tidszon inte används. Själva tidsstämplarna publiceras alltid som UTC-tidpunkter.",
-                    "high_precision": "Förfinar tidpunkterna för apogeum och perigeum med ett finare samplingssteg och ett bredare sökintervall. Detta ökar CPU-användningen märkbart och rekommenderas inte på enheter med låg prestanda som Raspberry Pi.",
                     "events_refresh_fallback": "Sekunder mellan två påtvingade omberäkningar av de händelsebaserade sensorerna (3600 till 604800), ifall uppdateringen som schemalagts efter nästa händelse missas. 24 timmar räcker gott."
                 }
             }

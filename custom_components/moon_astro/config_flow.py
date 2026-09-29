@@ -25,14 +25,12 @@ from homeassistant.helpers.selector import (
 from .const import (
     CONF_ALT,
     CONF_EVENTS_REFRESH_FALLBACK,
-    CONF_HIGH_PRECISION,
     CONF_LAT,
     CONF_LON,
     CONF_SCAN_INTERVAL,
     CONF_TIME_ZONE,
     CONF_USE_HA_TZ,
     DEFAULT_EVENTS_REFRESH_FALLBACK,
-    DEFAULT_HIGH_PRECISION,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_USE_HA_TZ,
     DOMAIN,
@@ -53,9 +51,6 @@ LOCATION_SCHEMA = vol.Schema(
             vol.Coerce(float), vol.Range(min=-500, max=10000)
         ),
     }
-)
-PRECISION_SCHEMA = vol.Schema(
-    {vol.Required(CONF_HIGH_PRECISION, default=DEFAULT_HIGH_PRECISION): bool}
 )
 
 
@@ -133,7 +128,7 @@ class MoonAstroConfigFlow(ConfigFlow, domain=DOMAIN):
         except EphemerisError:
             next_step_id = "download_failed"
         else:
-            next_step_id = "precision"
+            next_step_id = "finish"
         finally:
             self._download_task = None
         return self.async_show_progress_done(next_step_id=next_step_id)
@@ -146,17 +141,11 @@ class MoonAstroConfigFlow(ConfigFlow, domain=DOMAIN):
             "user", self._location, errors={"base": "download_failed"}
         )
 
-    async def async_step_precision(
+    async def async_step_finish(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Collect the precision option and create the entry."""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="precision", data_schema=PRECISION_SCHEMA
-            )
-        return self.async_create_entry(
-            title=NAME, data=self._location, options=user_input
-        )
+        """Create the entry once the ephemeris is available."""
+        return self.async_create_entry(title=NAME, data=self._location)
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
@@ -180,40 +169,35 @@ class MoonAstroOptionsFlow(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Show and store the options."""
+        """Show and store the options.
+
+        Stored options pre-fill the form; the defaults apply to cleared fields.
+        """
         if user_input is not None:
             return self.async_create_entry(data=user_input)
 
-        options = self.config_entry.options
         time_zones = await self.hass.async_add_executor_job(available_time_zones)
         schema = vol.Schema(
             {
+                vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
+                    vol.Coerce(int), vol.Range(min=60, max=21600)
+                ),
+                vol.Required(CONF_USE_HA_TZ, default=DEFAULT_USE_HA_TZ): bool,
                 vol.Required(
-                    CONF_SCAN_INTERVAL,
-                    default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-                ): vol.All(vol.Coerce(int), vol.Range(min=60, max=21600)),
-                vol.Required(
-                    CONF_USE_HA_TZ,
-                    default=options.get(CONF_USE_HA_TZ, DEFAULT_USE_HA_TZ),
-                ): bool,
-                vol.Required(
-                    CONF_TIME_ZONE,
-                    default=options.get(CONF_TIME_ZONE, self.hass.config.time_zone),
+                    CONF_TIME_ZONE, default=self.hass.config.time_zone
                 ): SelectSelector(
                     SelectSelectorConfig(
                         options=time_zones, mode=SelectSelectorMode.DROPDOWN
                     )
                 ),
                 vol.Required(
-                    CONF_HIGH_PRECISION,
-                    default=options.get(CONF_HIGH_PRECISION, DEFAULT_HIGH_PRECISION),
-                ): bool,
-                vol.Required(
-                    CONF_EVENTS_REFRESH_FALLBACK,
-                    default=options.get(
-                        CONF_EVENTS_REFRESH_FALLBACK, DEFAULT_EVENTS_REFRESH_FALLBACK
-                    ),
+                    CONF_EVENTS_REFRESH_FALLBACK, default=DEFAULT_EVENTS_REFRESH_FALLBACK
                 ): vol.All(vol.Coerce(int), vol.Range(min=3600, max=604800)),
             }
         )
-        return self.async_show_form(step_id="init", data_schema=schema)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                schema, self.config_entry.options
+            ),
+        )
