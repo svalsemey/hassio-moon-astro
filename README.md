@@ -2,6 +2,7 @@
 [![HACS Passing](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml/badge.svg)](https://github.com/svalsemey/hassio-moon-astro/actions/workflows/validate.yml)
 [![Total Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/svalsemey/hassio-moon-astro/latest/total.svg)](https://github.com/svalsemey/hassio-moon-astro/releases/latest)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-orange?logo=buy-me-a-coffee)](https://www.buymeacoffee.com/sebastien_valsemey)
 
 # Moon Astro
 
