@@ -446,18 +446,23 @@ def compute_current_payload(
             ecl_lon_geo, KEY_ZODIAC_SIGN_CURRENT_MOON, KEY_ZODIAC_DEGREE_CURRENT_MOON
         ),
     }
-    times, rising = almanac.find_discrete(
-        t - RISE_SET_SEARCH_DAYS,
-        t + RISE_SET_SEARCH_DAYS,
-        almanac.risings_and_settings(
-            eph, eph["moon"], observer, horizon_degrees=HORIZON_ALTITUDE_DEG
-        ),
-    )
-    events = list(zip(times, rising, strict=True))
-    for keys, rises in ((_RISE_KEYS, True), (_SET_KEYS, False)):
-        surrounding = _surrounding(t, (ti for ti, up in events if bool(up) == rises))
+    for keys, find in (
+        (_RISE_KEYS, almanac.find_risings),
+        (_SET_KEYS, almanac.find_settings),
+    ):
+        # Hour angle searches find even the briefest stay above or below the horizon.
+        times, crosses_horizon = find(
+            eph["earth"] + observer,
+            eph["moon"],
+            t - RISE_SET_SEARCH_DAYS,
+            t + RISE_SET_SEARCH_DAYS,
+            horizon_degrees=HORIZON_ALTITUDE_DEG,
+        )
+        surrounding = _surrounding(t, times[crosses_horizon])
         payload.update(zip(keys, map(_time_to_utc, surrounding), strict=True))
     return payload
+
+
 
 
 def compute_events_payload(eph: SpiceKernel, t: Time, tz: tzinfo) -> dict[str, Any]:
