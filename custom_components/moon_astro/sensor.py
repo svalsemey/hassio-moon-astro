@@ -174,13 +174,13 @@ SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
     _angle(KEY_ECLIPTIC_LATITUDE_TOPOCENTRIC, PRECISION_ECL_TOPO, enabled=False),
     _angle(KEY_ECLIPTIC_LONGITUDE_GEOCENTRIC, PRECISION_ECL_GEO),
     _angle(KEY_ECLIPTIC_LATITUDE_GEOCENTRIC, PRECISION_ECL_GEO),
-    _timestamp(KEY_NEXT_RISE),
-    _timestamp(KEY_NEXT_SET),
-    _timestamp(KEY_PREVIOUS_RISE),
-    _timestamp(KEY_PREVIOUS_SET),
     _enum(KEY_ZODIAC_SIGN_CURRENT_MOON, ZODIAC_SIGNS),
     _angle(KEY_ZODIAC_DEGREE_CURRENT_MOON, PRECISION_ZODIAC_DEGREE),
-    # Lunation, apsis and derived values (events coordinator)
+    # Rise, set, lunation, apsis and derived values (events coordinator)
+    _timestamp(KEY_NEXT_RISE, event=True),
+    _timestamp(KEY_NEXT_SET, event=True),
+    _timestamp(KEY_PREVIOUS_RISE, event=True),
+    _timestamp(KEY_PREVIOUS_SET, event=True),
     _timestamp(KEY_NEXT_NEW_MOON, event=True),
     _timestamp(KEY_NEXT_FIRST_QUARTER, event=True),
     _timestamp(KEY_NEXT_FULL_MOON, event=True),

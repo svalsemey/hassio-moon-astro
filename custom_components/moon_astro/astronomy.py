@@ -13,6 +13,8 @@ from datetime import UTC, datetime, timedelta, tzinfo
 import math
 from typing import Any
 
+import numpy as np
+from numpy.typing import NDArray
 from skyfield import almanac
 from skyfield.framelib import ecliptic_frame
 from skyfield.jpllib import SpiceKernel
@@ -25,6 +27,8 @@ from .const import (
     APSIS_EPSILON_DAYS,
     APSIS_SEARCH_DAYS,
     APSIS_STEP_DAYS,
+    CULMINATION_EPSILON_DAYS,
+    CULMINATION_STEP_DAYS,
     DARK_MOON,
     FIRST_QUARTER,
     FULL_MOON,
@@ -84,6 +88,7 @@ from .const import (
     PHASE_SEARCH_DAYS_AHEAD,
     PHASE_SEARCH_DAYS_BACK,
     PRINCIPAL_PHASE_WINDOW_DEG,
+    RISE_SET_EPSILON_DAYS,
     RISE_SET_SEARCH_DAYS,
     ZODIAC_SIGNS,
 )
@@ -264,6 +269,103 @@ class _GeocentricDistance:
         return self._earth_to_moon.at(t).distance().km
 
 
+class _TopocentricAltitude:
+    """Apparent altitude of the Moon center in degrees as a function of time.
+
+    Instances are the callables expected by the Skyfield extremum searches, which
+    read the step_days attribute to size their coarse sampling grid.
+    """
+
+    step_days = CULMINATION_STEP_DAYS
+
+    def __init__(self, eph: SpiceKernel, observer: GeographicPosition) -> None:
+        """Bind the observer site and the Moon segment of the ephemeris."""
+        self._site = eph["earth"] + observer
+        self._moon = eph["moon"]
+
+    def __call__(self, t: Time) -> Any:
+        """Return the altitude at t; an array when t holds several times."""
+        # Light deflection shifts the Moon by microarcseconds; skipping it saves time.
+        apparent = self._site.at(t).observe(self._moon).apparent(deflectors=())
+        return apparent.altaz()[0].degrees
+
+
+def _horizon_crossings(
+    eph: SpiceKernel, observer: GeographicPosition, start: Time, end: Time
+) -> tuple[Time, NDArray[np.bool_]]:
+    """Return the moonrises and moonsets between two times.
+
+    The altitude is monotonic between consecutive culminations, so each stretch
+    between them, or between a culmination and a bound of the range, crosses the
+    horizon at most once. Bisecting every stretch whose ends lie on both sides of the
+    horizon, then interpolating between the last bounds, finds each crossing at any
+    latitude and however briefly the Moon stays above or below the horizon.
+
+    Args:
+        eph: Loaded ephemeris.
+        observer: Observer position on the WGS84 ellipsoid.
+        start: Start of the searched range.
+        end: End of the searched range.
+
+    Returns:
+        A tuple (chronological crossing times, True for each rise and False for each
+        set).
+    """
+    altitude = _TopocentricAltitude(eph, observer)
+    bounds = np.sort(
+        np.concatenate(
+            (
+                (start.tt, end.tt),
+                *(
+                    search(start, end, altitude, epsilon=CULMINATION_EPSILON_DAYS)[0].tt
+                    for search in (find_minima, find_maxima)
+                ),
+            )
+        )
+    )
+    above = altitude(start.ts.tt_jd(bounds)) > HORIZON_ALTITUDE_DEG
+    index = np.flatnonzero(above[:-1] != above[1:])
+    rising = ~above[index]
+    low, high = bounds[index], bounds[index + 1]
+    while np.any(high - low > RISE_SET_EPSILON_DAYS):
+        middle = (low + high) / 2.0
+        reached = (altitude(start.ts.tt_jd(middle)) > HORIZON_ALTITUDE_DEG) == rising
+        low, high = np.where(reached, low, middle), np.where(reached, middle, high)
+    ends = altitude(start.ts.tt_jd(np.concatenate((low, high)))).reshape(2, -1)
+    fraction = (ends[0] - HORIZON_ALTITUDE_DEG) / (ends[0] - ends[1])
+    return start.ts.tt_jd(low + fraction * (high - low)), rising
+
+
+def _rises_and_sets(
+    eph: SpiceKernel, t: Time, observer: GeographicPosition
+) -> dict[str, datetime | None]:
+    """Return the previous and next moonrises and moonsets.
+
+    The search widens through the half-spans of RISE_SET_SEARCH_DAYS and stops at the
+    first one holding the four events, so that it stays short wherever the Moon rises
+    and sets every day.
+
+    Args:
+        eph: Loaded ephemeris.
+        t: Reference time.
+        observer: Observer position on the WGS84 ellipsoid.
+
+    Returns:
+        The rise and set payload fragment; an instant is None when no such event lies
+        within the widest half-span.
+    """
+    for span in RISE_SET_SEARCH_DAYS:
+        crossings, rising = _horizon_crossings(eph, observer, t - span, t + span)
+        events = {
+            key: _time_to_utc(ti)
+            for keys, mask in ((_RISE_KEYS, rising), (_SET_KEYS, ~rising))
+            for key, ti in zip(keys, _surrounding(t, crossings[mask]), strict=True)
+        }
+        if None not in events.values():
+            break
+    return events
+
+
 def _moon_parallax_angle_deg(distance_km: float) -> float:
     """Return the equatorial horizontal parallax for a geocentric distance.
 
@@ -413,7 +515,7 @@ def _snap_to_minute(
 def compute_current_payload(
     eph: SpiceKernel, t: Time, observer: GeographicPosition
 ) -> dict[str, Any]:
-    """Compute the current Moon position and the surrounding moonrises and moonsets.
+    """Compute the current Moon position.
 
     Args:
         eph: Loaded ephemeris.
@@ -428,7 +530,7 @@ def compute_current_payload(
     ecl_lon_topo, ecl_lat_topo = _ecliptic_lon_lat_deg(topocentric)
     ecl_lon_geo, ecl_lat_geo = _ecliptic_lon_lat_deg(geocentric)
     distance_km = float(_GeocentricDistance(eph)(t))
-    payload: dict[str, Any] = {
+    return {
         KEY_PHASE: _moon_phase_code(float(almanac.moon_phase(eph, t).degrees)),
         KEY_AZIMUTH: round(az_deg, 4),
         KEY_ELEVATION: round(alt_deg, 4),
@@ -446,36 +548,23 @@ def compute_current_payload(
             ecl_lon_geo, KEY_ZODIAC_SIGN_CURRENT_MOON, KEY_ZODIAC_DEGREE_CURRENT_MOON
         ),
     }
-    for keys, find in (
-        (_RISE_KEYS, almanac.find_risings),
-        (_SET_KEYS, almanac.find_settings),
-    ):
-        # Hour angle searches find even the briefest stay above or below the horizon.
-        times, crosses_horizon = find(
-            eph["earth"] + observer,
-            eph["moon"],
-            t - RISE_SET_SEARCH_DAYS,
-            t + RISE_SET_SEARCH_DAYS,
-            horizon_degrees=HORIZON_ALTITUDE_DEG,
-        )
-        surrounding = _surrounding(t, times[crosses_horizon])
-        payload.update(zip(keys, map(_time_to_utc, surrounding), strict=True))
-    return payload
 
 
-
-
-def compute_events_payload(eph: SpiceKernel, t: Time, tz: tzinfo) -> dict[str, Any]:
+def compute_events_payload(
+    eph: SpiceKernel, t: Time, observer: GeographicPosition, tz: tzinfo
+) -> dict[str, Any]:
     """Compute the values that only change at astronomical events.
 
     Args:
         eph: Loaded ephemeris.
         t: Reference time.
+        observer: Observer position on the WGS84 ellipsoid.
         tz: Time zone defining the calendar months that name full moons.
 
     Returns:
-        The previous and next principal phases, full moon names and apsides, and the
-        ecliptic and zodiac position of the Moon at the surrounding new and full moons.
+        The previous and next moonrises, moonsets, principal phases, full moon names
+        and apsides, and the ecliptic and zodiac position of the Moon at the
+        surrounding new and full moons.
     """
     times, phases = almanac.find_discrete(
         t - PHASE_SEARCH_DAYS_BACK,
@@ -518,6 +607,8 @@ def compute_events_payload(eph: SpiceKernel, t: Time, tz: tzinfo) -> dict[str, A
                 strict=True,
             )
         )
+
+    payload.update(_rises_and_sets(eph, t, observer))
 
     for instant_key, (lon_key, lat_key, sign_key, degree_key) in _LUNATION_KEYS.items():
         lon, lat = (

@@ -48,14 +48,14 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 
 Moon Astro uses two coordinators:
 
-- **Periodic sensors** (position, illumination, distance, parallax, ecliptic coordinates, current zodiac position, moonrise/moonset) are recomputed on the configured scan interval.
-- **Event-based sensors** (lunation phases, apogee/perigee, full moon names, and the ecliptic/zodiac position at lunations) are recomputed shortly after the earliest upcoming event, and at least once per **events refresh fallback interval**.
+- **Periodic sensors** (position, illumination, distance, parallax, ecliptic coordinates, current zodiac position) are recomputed on the configured scan interval.
+- **Event-based sensors** (moonrise/moonset, lunation phases, apogee/perigee, full moon names, and the ecliptic/zodiac position at lunations) are recomputed shortly after the earliest upcoming event, and at least once per **events refresh fallback interval**.
 
 A full refresh takes a fraction of a second in a background thread, so both coordinators are refreshed during setup and every entity starts with data.
 
 ### Scheduled refresh around the next event
 
-After each refresh, the events coordinator schedules the next one two minutes after the earliest of the next new moon, first quarter, full moon, last quarter, apogee and perigee. The margin keeps the computation safely past the boundary.
+After each refresh, the events coordinator schedules the next one two minutes after the earliest of the next moonrise, moonset, new moon, first quarter, full moon, last quarter, apogee and perigee. The margin keeps the computation safely past the boundary.
 
 ### `next_update` attribute for event-based sensors
 
@@ -71,7 +71,8 @@ Some intermediate computations use non-rounded (“raw”) values internally to 
 
 ## Accuracy
 
-- Phase instants (new moon, quarters, full moon) and moonrise/moonset come from Skyfield's discrete event search, accurate to the millisecond before the instants are rounded to the minute.
+- Phase instants (new moon, quarters, full moon) come from Skyfield's discrete event search, accurate to the millisecond before the instants are rounded to the minute.
+- Moonrise and moonset are found at any latitude, poles included, however briefly the Moon stays above or below the horizon: the culminations (altitude extremes) are located first, then the single crossing of the horizon between two consecutive culminations is bisected to the second, then interpolated linearly to the millisecond before being rounded to the minute.
 - Apogee and perigee are the extremes of the geometric geocentric distance, located with Skyfield's vectorized extremum search to within ten seconds; the published minute is the one whose boundary is closest to the extreme, so it does not depend on the sampling grid.
 - Ecliptic coordinates are measured in the true ecliptic and equinox of date: Skyfield rotates the ICRS positions with its IAU 2006/2000A precession-nutation model and the true obliquity. Zodiac signs and degrees derive from the unrounded geocentric longitude.
 - Rise, set and the above-horizon state use the Moon center at −34′ of altitude (standard refraction).

@@ -121,10 +121,23 @@ PRECISION_ZODIAC_DEGREE = 2
 # Phase angle distance to a principal phase within which its name is reported;
 # the Moon covers about 3 degrees of phase angle in six hours.
 PRINCIPAL_PHASE_WINDOW_DEG = 3.0
+
 # Altitude of the Moon center defining rise, set and the above-horizon state;
 # the standard 34 arcminutes account for atmospheric refraction.
 HORIZON_ALTITUDE_DEG = -34.0 / 60.0
-RISE_SET_SEARCH_DAYS = 7.0
+
+# Rise and set search: the half-span widens until it holds the previous and next
+# events; two days always suffice up to 60 degrees of latitude, while near the poles
+# the Moon stays up or down for up to 27.8 days. A three-hour sampling step separates
+# the culminations bracketing the crossings at any latitude; locating them within two
+# minutes pins their altitude to a couple of arcseconds, enough to tell on which side
+# of the horizon they lie. Each crossing is bisected to within a second, then
+# interpolated linearly to the millisecond.
+RISE_SET_SEARCH_DAYS: tuple[float, ...] = (2.0, 6.0, 15.0, 30.0)
+CULMINATION_STEP_DAYS = 3.0 / 24.0
+CULMINATION_EPSILON_DAYS = 120.0 / 86400.0
+RISE_SET_EPSILON_DAYS = 1.0 / 86400.0
+
 # Two lunations back so that the previous full moon can be recognized as a blue moon
 PHASE_SEARCH_DAYS_BACK = 70.0
 PHASE_SEARCH_DAYS_AHEAD = 40.0

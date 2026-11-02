@@ -37,6 +37,8 @@ from .const import (
     KEY_NEXT_LAST_QUARTER,
     KEY_NEXT_NEW_MOON,
     KEY_NEXT_PERIGEE,
+    KEY_NEXT_RISE,
+    KEY_NEXT_SET,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,6 +57,8 @@ _BOUNDARY_REFRESH_DELAY = timedelta(minutes=2)
 
 # Upcoming event keys driving the boundary refresh of the events coordinator.
 _NEXT_EVENT_KEYS: tuple[str, ...] = (
+    KEY_NEXT_RISE,
+    KEY_NEXT_SET,
     KEY_NEXT_NEW_MOON,
     KEY_NEXT_FIRST_QUARTER,
     KEY_NEXT_FULL_MOON,
@@ -81,7 +85,8 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         Args:
             hass: Home Assistant instance.
-            entry: Config entry owning the coordinator.
+            entry: Config entry owning the coordinator and providing the observer
+                coordinates.
             name: Coordinator name used in logs.
             eph: Loaded ephemeris shared by the coordinators.
             ts: Loaded timescale shared by the coordinators.
@@ -96,6 +101,11 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self._eph = eph
         self._ts = ts
+        self._observer = wgs84.latlon(
+            latitude_degrees=float(entry.data.get(CONF_LAT, hass.config.latitude)),
+            longitude_degrees=float(entry.data.get(CONF_LON, hass.config.longitude)),
+            elevation_m=float(entry.data.get(CONF_ALT, hass.config.elevation)),
+        )
 
     def _compute_payload(self, t: Time) -> dict[str, Any]:
         """Compute the payload for the reference time t; runs in the executor."""
@@ -118,7 +128,7 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
 
 class MoonAstroCoordinator(_MoonAstroBaseCoordinator):
-    """Coordinator computing the current Moon position and the surrounding rises and sets."""
+    """Coordinator computing the current Moon position."""
 
     def __init__(
         self,
@@ -129,7 +139,7 @@ class MoonAstroCoordinator(_MoonAstroBaseCoordinator):
         ts: Timescale,
         interval: timedelta,
     ) -> None:
-        """Initialize the coordinator with the observer location of the entry.
+        """Initialize the coordinator.
 
         Args:
             hass: Home Assistant instance.
@@ -140,11 +150,6 @@ class MoonAstroCoordinator(_MoonAstroBaseCoordinator):
         """
         super().__init__(
             hass, entry, name="Moon Astro", eph=eph, ts=ts, interval=interval
-        )
-        self._observer = wgs84.latlon(
-            latitude_degrees=float(entry.data.get(CONF_LAT, hass.config.latitude)),
-            longitude_degrees=float(entry.data.get(CONF_LON, hass.config.longitude)),
-            elevation_m=float(entry.data.get(CONF_ALT, hass.config.elevation)),
         )
 
     def _compute_payload(self, t: Time) -> dict[str, Any]:
@@ -188,7 +193,7 @@ class MoonAstroEventsCoordinator(_MoonAstroBaseCoordinator):
 
     def _compute_payload(self, t: Time) -> dict[str, Any]:
         """Compute the event-based payload; runs in the executor."""
-        return compute_events_payload(self._eph, t, self._tz)
+        return compute_events_payload(self._eph, t, self._observer, self._tz)
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Compute the payload and schedule the refresh following the next event."""
