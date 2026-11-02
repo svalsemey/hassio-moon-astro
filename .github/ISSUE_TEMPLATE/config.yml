@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/svalsemey/hassio-moon-astro#readme
+    about: Configuration, options, accuracy notes, diagnostics and troubleshooting.

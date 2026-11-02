@@ -1,0 +1,110 @@
+name: Bug report
+description: Report a problem with the Moon Astro integration.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a problem. A diagnostics file lets us reproduce most issues without back-and-forth, so please attach one.
+        It only holds your location rounded to about 10 km: see [Privacy of the diagnostics](https://github.com/svalsemey/hassio-moon-astro#privacy-of-the-diagnostics).
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and found no report of this problem.
+          required: true
+        - label: I am running the latest release of the integration.
+          required: true
+        - label: I reviewed the attached files and removed any personal data I do not want to share.
+          required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.11.0"
+    validations:
+      required: true
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+      description: Shown in HACS or in `custom_components/moon_astro/manifest.json`.
+      placeholder: "0.6.0"
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      description: Machine running Home Assistant; it helps interpreting the computation times.
+      placeholder: "Raspberry Pi 4 (4 GB), Intel N100 mini PC, Proxmox VM (2 vCPU)…"
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      multiple: true
+      options:
+        - Setup / ephemeris download
+        - Reconfiguration or options
+        - Current position (azimuth, elevation, illumination, distance, parallax)
+        - Ecliptic coordinates or zodiac
+        - Moonrise / moonset
+        - Moon phases or full moon names
+        - Apogee / perigee
+        - Above horizon binary sensor
+        - Refresh scheduling (next_update)
+        - Performance (CPU usage, computation times)
+        - Translations
+        - Diagnostics
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference values
+      description: |
+        For a value you believe is wrong: the entity, the value shown, the expected value, its source (IMCCE, USNO, timeanddate.com…) and the date and time of the comparison with its time zone.
+      placeholder: |
+        Entity: sensor.moon_astro_next_rise
+        Shown: 2026-11-03 22:06 (Europe/Paris)
+        Expected: 2026-11-03 22:12 according to IMCCE
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Only needed when the problem follows an action (setup, options change, restart…).
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. Observe ...
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics file
+      description: |
+        Settings → Devices & services → Moon Astro → ⋮ → **Download diagnostics**. Drag and drop the JSON file here. The location is rounded automatically.
+        If the integration cannot load (for example when the ephemeris download fails), write "not available" and attach debug logs instead.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: |
+        Enable debug logging (⋮ menu of the entry → *Enable debug logging*), reproduce the problem, disable it to download the log, then paste the relevant lines.
+      render: text
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Screenshots, automations or dashboards involved, anything else useful.

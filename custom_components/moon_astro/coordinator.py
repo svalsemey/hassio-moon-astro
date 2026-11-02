@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, tzinfo
 import logging
+import math
+import time
 from typing import Any
 
 from skyfield.api import wgs84
@@ -68,6 +70,45 @@ _NEXT_EVENT_KEYS: tuple[str, ...] = (
 )
 
 
+@dataclass(slots=True)
+class ComputationStats:
+    """Statistics of the successful payload computations of a coordinator.
+
+    Durations are wall-clock seconds measured in the executor thread, so they exclude
+    the wait for a free executor worker. They cover the lifetime of the coordinator,
+    i.e. since the config entry was last loaded.
+
+    Attributes:
+        count: Number of successful computations.
+        last: Duration of the latest computation.
+        minimum: Shortest duration.
+        maximum: Longest duration.
+        total: Sum of the durations.
+        reference_time: Instant the latest payload was computed for.
+    """
+
+    count: int = 0
+    last: float = 0.0
+    minimum: float = math.inf
+    maximum: float = 0.0
+    total: float = 0.0
+    reference_time: datetime | None = None
+
+    def record(self, reference_time: datetime, duration: float) -> None:
+        """Account for a successful computation.
+
+        Args:
+            reference_time: Instant the payload was computed for.
+            duration: Computation time in seconds.
+        """
+        self.count += 1
+        self.last = duration
+        self.minimum = min(self.minimum, duration)
+        self.maximum = max(self.maximum, duration)
+        self.total += duration
+        self.reference_time = reference_time
+
+
 class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator running a Skyfield computation in the executor at each refresh."""
 
@@ -106,13 +147,31 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             longitude_degrees=float(entry.data.get(CONF_LON, hass.config.longitude)),
             elevation_m=float(entry.data.get(CONF_ALT, hass.config.elevation)),
         )
+        self.computation_stats = ComputationStats()
 
     def _compute_payload(self, t: Time) -> dict[str, Any]:
         """Compute the payload for the reference time t; runs in the executor."""
         raise NotImplementedError
 
+    def _compute_timed(self, reference: datetime) -> tuple[dict[str, Any], float]:
+        """Compute the payload for an instant and measure the computation time.
+
+        Runs in the executor.
+
+        Args:
+            reference: Aware UTC instant the payload is computed for.
+
+        Returns:
+            The payload and the computation time in seconds.
+        """
+        start = time.perf_counter()
+        return (
+            self._compute_payload(self._ts.from_datetime(reference)),
+            time.perf_counter() - start,
+        )
+
     async def _async_update_data(self) -> dict[str, Any]:
-        """Compute the payload for the current minute.
+        """Compute the payload for the current minute and record its duration.
 
         Returns:
             The payload exposed by the entities.
@@ -120,11 +179,15 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Raises:
             UpdateFailed: If the computation fails.
         """
-        t = self._ts.from_datetime(round_to_minute_utc(dt_util.utcnow()))
+        reference = round_to_minute_utc(dt_util.utcnow())
         try:
-            return await self.hass.async_add_executor_job(self._compute_payload, t)
+            payload, duration = await self.hass.async_add_executor_job(
+                self._compute_timed, reference
+            )
         except _RECOVERABLE_UPDATE_ERRORS as err:
             raise UpdateFailed(f"{self.name} computation failed: {err}") from err
+        self.computation_stats.record(reference, duration)
+        return payload
 
 
 class MoonAstroCoordinator(_MoonAstroBaseCoordinator):

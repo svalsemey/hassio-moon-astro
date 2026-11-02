@@ -44,6 +44,9 @@ High-precision Moon ephemeris integration for Home Assistant, powered by Skyfiel
 - Binary sensor:
   - Moon above horizon (on/off)
 
+- Diagnostics:
+  - Downloadable report with the refresh state, the computation times and the latest values, the location being rounded to about 10 km (see [Diagnostics](#diagnostics))
+
 ## Sensor update model
 
 Moon Astro uses two coordinators:
@@ -155,6 +158,7 @@ Note: Moon Astro downloads the JPL DE440 ephemeris (about 115 MB) from ssd.jpl.n
 
 - No external network calls except the one-time download of the DE440 ephemeris from ssd.jpl.nasa.gov (JPL).
 - Computations are local on your Home Assistant instance.
+- The diagnostics file is only generated when you download it and only leaves your machine if you share it; it holds a location rounded to about 10 km (see [Privacy of the diagnostics](#privacy-of-the-diagnostics)).
 
 ## Troubleshooting
 
@@ -168,6 +172,7 @@ Note: Moon Astro downloads the JPL DE440 ephemeris (about 115 MB) from ssd.jpl.n
   - Toggle the “Use Home Assistant time zone” option or verify your HA system time zone.
 
 - CPU usage is high:
+  - Check the computation times in the [diagnostics](#computation-times).
   - Increase the sensors update interval; keep the events refresh fallback interval at its 24-hour default.
 
 - Data looks stale:
@@ -175,10 +180,110 @@ Note: Moon Astro downloads the JPL DE440 ephemeris (about 115 MB) from ssd.jpl.n
   - If only event-based sensors look stale, reduce the events refresh fallback interval.
   - Manually reload the integration from the UI.
 
+## Diagnostics
+
+Moon Astro supports the Home Assistant diagnostics: a JSON file gathering what is needed to analyze a problem, namely the configuration, the refresh state, the computation times and the latest computed values.
+
+### Downloading the diagnostics
+
+1. Go to **Settings → Devices & services → Moon Astro**.
+2. Open the **⋮** menu of the integration entry and select **Download diagnostics**.
+3. Home Assistant saves a `.json` file; attach it unchanged to your issue (drag and drop).
+
+The diagnostics are available once the integration is loaded.
+
+### Content of the file
+
+Home Assistant adds its own sections at the top of the file:
+
+| Section | Content |
+| --- | --- |
+| `home_assistant` | Home Assistant version, installation type, operating system, architecture, Python version, time zone |
+| `custom_components` | Installed custom integrations and their versions |
+| `integration_manifest` | Moon Astro manifest, including its version and requirements |
+| `setup_times` | Time spent setting up the integration, which includes the validation of the ephemeris and the first two computations |
+
+The Moon Astro content sits under `data`:
+
+| Key | Content |
+| --- | --- |
+| `entry.data` | Observer latitude, longitude and elevation, rounded (see [Privacy of the diagnostics](#privacy-of-the-diagnostics)) |
+| `entry.options` | Options as stored; an empty object means that the defaults apply |
+| `coordinators.current` | Computation of the periodic sensors (position, illumination, distance, parallax, ecliptic coordinates, current zodiac position) |
+| `coordinators.events` | Computation of the event-based sensors (moonrise/moonset, lunation phases, apogee/perigee, full moon names, lunation coordinates) |
+
+Each coordinator section holds:
+
+| Key | Content |
+| --- | --- |
+| `last_update_success` | `false` when the latest refresh failed; the entities of this coordinator are then unavailable |
+| `last_exception` | Error raised by the latest failed refresh, or `null` |
+| `update_interval_seconds` | Effective periodic interval: the sensors update interval for `current`, the events refresh fallback interval for `events` |
+| `computation` | Statistics of the computation times (see below) |
+| `data` | Latest values published to the entities, as raw state codes and UTC instants |
+| `next_refresh` | `events` only: UTC instant of the next recomputation, as exposed by the `next_update` attribute |
+
+### Computation times
+
+The `computation` object of each coordinator holds:
+
+| Key | Content |
+| --- | --- |
+| `reference_time` | UTC minute the latest values were computed for; together with the rounded location, it allows the computation to be reproduced |
+| `count` | Number of successful computations |
+| `last_ms` | Duration of the latest computation, in milliseconds |
+| `mean_ms` | Mean duration, in milliseconds |
+| `min_ms` | Shortest duration, in milliseconds |
+| `max_ms` | Longest duration, in milliseconds |
+
+The durations are measured around the Skyfield computation itself, in the background thread running it: they exclude the wait for a free worker thread but include any slowdown caused by other activity on the machine. The statistics start over each time the integration is loaded (Home Assistant start, reload, options or location change).
+
+As an indication, on an ARM64 development machine a computation takes about 3 ms for `current`, and for `events` about 50 ms at mid-latitudes and up to about 200 ms in polar regions, where the Moon can stay above or below the horizon for days and the moonrise/moonset search window widens. A small single-board computer can be several times slower.
+
+Reading the statistics:
+
+- The CPU time spent per day is about `mean_ms` multiplied by the number of computations per day: with the default 300-second interval, `current` computes 288 times a day, i.e. about one second of CPU per day at 3 ms.
+- `events` recomputes shortly after each moonrise, moonset, phase and apsis, and at least once per events refresh fallback interval: a few times a day. A `count` growing much faster points to a scheduling problem worth reporting.
+- A `max_ms` far above `mean_ms` usually comes from the first computation, which reads the ephemeris from the disk, or from a temporary load of the machine (start-up, backup, other integrations).
+
+### Privacy of the diagnostics
+
+The integration never sends the diagnostics anywhere: the file is generated when you download it and only leaves your machine if you share it.
+
+Astronomical values depend on the observer location, so a problem cannot be reproduced without it. The location is therefore rounded rather than removed, coarsely enough not to identify a home:
+
+| Value | Rounding | Remaining precision |
+| --- | --- | --- |
+| Latitude | 0.1° | ±5.5 km |
+| Longitude | 0.1° | ±5.5 km at the equator, ±3.9 km at 45° of latitude |
+| Elevation | 100 m | ±50 m |
+| Topocentric Moon azimuth, elevation and ecliptic longitude/latitude (`coordinators.current.data`) | 0.1° | ±5.5 km at best once converted into a location |
+
+The rounded latitude and longitude designate an area of about 100 km², the size of a town or of a district of a city.
+
+The topocentric angles are rounded too because they depend on the observer location: given the time of the computation, which the geocentric values reveal anyway, the Moon azimuth and elevation published to the ten-thousandth of a degree would locate the observer to within about ten meters, on the principle of celestial navigation. Rounded to 0.1°, they reveal no more than the rounded coordinates.
+
+The other values are either the same everywhere on Earth (phase, illumination, distance, parallax, geocentric coordinates, lunation and apsis instants) or published to the minute (moonrise and moonset), which matches about a quarter of a degree of longitude.
+
+The file holds no exact coordinates, no account and no network information. The sections added by Home Assistant describe the installation (versions, operating system, time zone, user running Home Assistant, other custom integrations): review the file before posting it publicly.
+
+## Reporting an issue
+
+Issues are opened through forms that ask for the information needed to analyze them:
+
+- [Bug report](https://github.com/svalsemey/hassio-moon-astro/issues/new?template=bug_report.yml): attach the [diagnostics file](#downloading-the-diagnostics) and, when relevant, debug logs and reference values (IMCCE, USNO, timeanddate.com…) with the date and time of the comparison.
+- [Feature request](https://github.com/svalsemey/hassio-moon-astro/issues/new?template=feature_request.yml): describe the use case and, for a new astronomical value, its definition and a reference source.
+
+To collect debug logs:
+
+1. Go to **Settings → Devices & services → Moon Astro**, open the **⋮** menu of the integration entry and select **Enable debug logging**.
+2. Reproduce the problem (a reload of the integration triggers both computations).
+3. Open the **⋮** menu again and select **Disable debug logging**: Home Assistant downloads the log file.
+
 ## Contributing
 
 Issues and PRs are welcome!
-- Issues: https://github.com/svalsemey/hassio-moon-astro/issues
+- Issues: https://github.com/svalsemey/hassio-moon-astro/issues/new/choose (see [Reporting an issue](#reporting-an-issue))
 - Pull requests: please lint and follow HA integration best practices.
 
 ## License
