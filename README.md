@@ -148,7 +148,7 @@ If you modify local translation files, reload the integration to apply changes.
 
 ## Requirements
 
-- Home Assistant 2025.1+
+- Home Assistant 2026.9+ (Python 3.14)
 - Python dependencies are installed automatically by Home Assistant:
   - `skyfield==1.55`
 
@@ -269,7 +269,7 @@ The file holds no exact coordinates, no account and no network information. The 
 
 ## Reporting an issue
 
-Issues are opened through forms that ask for the information needed to analyze them:
+Questions, help requests and ideas to discuss belong in [Discussions](https://github.com/svalsemey/hassio-moon-astro/discussions). Issues are opened through forms that ask for the information needed to analyze them:
 
 - [Bug report](https://github.com/svalsemey/hassio-moon-astro/issues/new?template=bug_report.yml): attach the [diagnostics file](#downloading-the-diagnostics) and, when relevant, debug logs and reference values (IMCCE, USNO, timeanddate.com…) with the date and time of the comparison.
 - [Feature request](https://github.com/svalsemey/hassio-moon-astro/issues/new?template=feature_request.yml): describe the use case and, for a new astronomical value, its definition and a reference source.

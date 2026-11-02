@@ -4,8 +4,6 @@ The shared DE440 kernel is obtained (and downloaded when needed) before the two
 coordinators are created and refreshed once, so that every entity starts with data.
 """
 
-from __future__ import annotations
-
 from datetime import timedelta
 
 from homeassistant.const import Platform

@@ -6,8 +6,6 @@ coordinators: angles in degrees, instants as aware UTC datetimes rounded to the
 minute, state codes listed in const.
 """
 
-from __future__ import annotations
-
 from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta, tzinfo
 import math
@@ -178,9 +176,7 @@ def _time_to_utc(t: Time | None) -> datetime | None:
     return None if t is None else round_to_minute_utc(t.utc_datetime())
 
 
-def _surrounding(
-    t_ref: Time, times: Iterable[Time]
-) -> tuple[Time | None, Time | None]:
+def _surrounding(t_ref: Time, times: Iterable[Time]) -> tuple[Time | None, Time | None]:
     """Return the last event at or before t_ref and the first event after it.
 
     Args:
@@ -441,7 +437,9 @@ def _zodiac(lon_deg: float | None, sign_key: str, degree_key: str) -> dict[str, 
     }
 
 
-def _full_moon_name_codes(full_moons: Iterable[Time], tz: tzinfo) -> dict[datetime, str]:
+def _full_moon_name_codes(
+    full_moons: Iterable[Time], tz: tzinfo
+) -> dict[datetime, str]:
     """Return the name code of each full moon of a chronological sequence.
 
     A full moon is named after its Gregorian month in the given time zone, or is a
@@ -578,9 +576,7 @@ def compute_events_payload(
         lunations.update(zip(keys, surrounding, strict=True))
     payload: dict[str, Any] = {key: _time_to_utc(ti) for key, ti in lunations.items()}
 
-    names = _full_moon_name_codes(
-        (ti for ti, p in phase_events if p == FULL_MOON), tz
-    )
+    names = _full_moon_name_codes((ti for ti, p in phase_events if p == FULL_MOON), tz)
     for instant_key, name_key, alt_names_key in _FULL_MOON_NAME_KEYS:
         name = names.get(payload[instant_key])
         payload[name_key] = name

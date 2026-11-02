@@ -4,11 +4,9 @@ Each sensor exposes one key of a coordinator payload. Event-based sensors are bo
 to the events coordinator, the others to the main coordinator.
 """
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, override
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -206,16 +204,28 @@ SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
         is_event_based=True,
     ),
     _angle(
-        KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+        KEY_ECLIPTIC_LONGITUDE_NEXT_NEW_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
     ),
     _angle(
-        KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+        KEY_ECLIPTIC_LATITUDE_NEXT_NEW_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
     ),
     _angle(
-        KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+        KEY_ECLIPTIC_LONGITUDE_NEXT_FULL_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
     ),
     _angle(
-        KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON, PRECISION_ECL_GEO, event=True, enabled=False
+        KEY_ECLIPTIC_LATITUDE_NEXT_FULL_MOON,
+        PRECISION_ECL_GEO,
+        event=True,
+        enabled=False,
     ),
     _angle(
         KEY_ECLIPTIC_LONGITUDE_PREVIOUS_NEW_MOON,
@@ -246,7 +256,10 @@ SENSOR_DESCRIPTIONS: tuple[MoonAstroSensorDescription, ...] = (
     _enum(KEY_ZODIAC_SIGN_PREVIOUS_NEW_MOON, ZODIAC_SIGNS, event=True),
     _enum(KEY_ZODIAC_SIGN_PREVIOUS_FULL_MOON, ZODIAC_SIGNS, event=True),
     _angle(
-        KEY_ZODIAC_DEGREE_NEXT_NEW_MOON, PRECISION_ZODIAC_DEGREE, event=True, enabled=False
+        KEY_ZODIAC_DEGREE_NEXT_NEW_MOON,
+        PRECISION_ZODIAC_DEGREE,
+        event=True,
+        enabled=False,
     ),
     _angle(
         KEY_ZODIAC_DEGREE_NEXT_FULL_MOON,
@@ -300,11 +313,13 @@ class MoonAstroSensor(MoonAstroEntity, SensorEntity):
     entity_description: MoonAstroSensorDescription
 
     @property
+    @override
     def native_value(self) -> Any:
         """Return the payload value of the sensor."""
         return self.coordinator.data.get(self.entity_description.key)
 
     @property
+    @override
     def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return the next scheduled refresh time of event-based sensors."""
         if isinstance(self.coordinator, MoonAstroEventsCoordinator):

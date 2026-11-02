@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Questions and discussions
+    url: https://github.com/svalsemey/hassio-moon-astro/discussions
+    about: Ask for help or share ideas before opening an issue.
   - name: Documentation
     url: https://github.com/svalsemey/hassio-moon-astro#readme
     about: Configuration, options, accuracy notes, diagnostics and troubleshooting.

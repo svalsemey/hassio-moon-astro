@@ -1,6 +1,6 @@
 {
     "name": "Moon Astro",
-    "homeassistant": "2025.1",
+    "homeassistant": "2026.9",
     "zip_release": true,
     "render_readme": true,
     "filename": "moon_astro.zip"

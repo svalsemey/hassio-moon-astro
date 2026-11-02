@@ -5,14 +5,12 @@ position on the configured scan interval, the other recomputes the values that o
 change at astronomical events and schedules its own refresh after the next event.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from datetime import datetime, timedelta, tzinfo
 import logging
 import math
 import time
-from typing import Any
+from typing import Any, override
 
 from skyfield.api import wgs84
 from skyfield.jpllib import SpiceKernel
@@ -170,6 +168,7 @@ class _MoonAstroBaseCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             time.perf_counter() - start,
         )
 
+    @override
     async def _async_update_data(self) -> dict[str, Any]:
         """Compute the payload for the current minute and record its duration.
 
@@ -215,6 +214,7 @@ class MoonAstroCoordinator(_MoonAstroBaseCoordinator):
             hass, entry, name="Moon Astro", eph=eph, ts=ts, interval=interval
         )
 
+    @override
     def _compute_payload(self, t: Time) -> dict[str, Any]:
         """Compute the current position payload; runs in the executor."""
         return compute_current_payload(self._eph, t, self._observer)
@@ -254,10 +254,12 @@ class MoonAstroEventsCoordinator(_MoonAstroBaseCoordinator):
         self._unsub_boundary: CALLBACK_TYPE | None = None
         self.next_refresh_utc: datetime | None = None
 
+    @override
     def _compute_payload(self, t: Time) -> dict[str, Any]:
         """Compute the event-based payload; runs in the executor."""
         return compute_events_payload(self._eph, t, self._observer, self._tz)
 
+    @override
     async def _async_update_data(self) -> dict[str, Any]:
         """Compute the payload and schedule the refresh following the next event."""
         data = await super()._async_update_data()
@@ -300,6 +302,7 @@ class MoonAstroEventsCoordinator(_MoonAstroBaseCoordinator):
             self._unsub_boundary()
             self._unsub_boundary = None
 
+    @override
     async def async_shutdown(self) -> None:
         """Cancel the boundary refresh and stop the coordinator."""
         self._cancel_boundary_refresh()

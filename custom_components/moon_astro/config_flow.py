@@ -1,12 +1,10 @@
 """Config and options flows for Moon Astro."""
 
-from __future__ import annotations
-
 import asyncio
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, override
 
-import voluptuous as vol
+import probatio
 
 from homeassistant.config_entries import (
     ConfigEntry,
@@ -43,12 +41,12 @@ from .utils import (
     available_time_zones,
 )
 
-LOCATION_SCHEMA = vol.Schema(
+LOCATION_SCHEMA = probatio.Schema(
     {
-        vol.Required(CONF_LAT): cv.latitude,
-        vol.Required(CONF_LON): cv.longitude,
-        vol.Required(CONF_ALT): vol.All(
-            vol.Coerce(float), vol.Range(min=-500, max=10000)
+        probatio.Required(CONF_LAT): cv.latitude,
+        probatio.Required(CONF_LON): cv.longitude,
+        probatio.Required(CONF_ALT): probatio.All(
+            probatio.Coerce(float), probatio.Range(min=-500, max=10000)
         ),
     }
 )
@@ -86,6 +84,7 @@ class MoonAstroConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    @override
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -158,6 +157,7 @@ class MoonAstroConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
+    @override
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow handler."""
         return MoonAstroOptionsFlow()
@@ -177,22 +177,27 @@ class MoonAstroOptionsFlow(OptionsFlow):
             return self.async_create_entry(data=user_input)
 
         time_zones = await self.hass.async_add_executor_job(available_time_zones)
-        schema = vol.Schema(
+        schema = probatio.Schema(
             {
-                vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
-                    vol.Coerce(int), vol.Range(min=60, max=21600)
+                probatio.Required(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                ): probatio.All(
+                    probatio.Coerce(int), probatio.Range(min=60, max=21600)
                 ),
-                vol.Required(CONF_USE_HA_TZ, default=DEFAULT_USE_HA_TZ): bool,
-                vol.Required(
+                probatio.Required(CONF_USE_HA_TZ, default=DEFAULT_USE_HA_TZ): bool,
+                probatio.Required(
                     CONF_TIME_ZONE, default=self.hass.config.time_zone
                 ): SelectSelector(
                     SelectSelectorConfig(
                         options=time_zones, mode=SelectSelectorMode.DROPDOWN
                     )
                 ),
-                vol.Required(
-                    CONF_EVENTS_REFRESH_FALLBACK, default=DEFAULT_EVENTS_REFRESH_FALLBACK
-                ): vol.All(vol.Coerce(int), vol.Range(min=3600, max=604800)),
+                probatio.Required(
+                    CONF_EVENTS_REFRESH_FALLBACK,
+                    default=DEFAULT_EVENTS_REFRESH_FALLBACK,
+                ): probatio.All(
+                    probatio.Coerce(int), probatio.Range(min=3600, max=604800)
+                ),
             }
         )
         return self.async_show_form(

@@ -1,6 +1,6 @@
 """Binary sensor entities for Moon Astro."""
 
-from __future__ import annotations
+from typing import override
 
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -45,6 +45,7 @@ class MoonAstroAboveHorizonBinarySensor(MoonAstroEntity, BinarySensorEntity):
     """Binary sensor indicating whether the Moon is above the horizon."""
 
     @property
+    @override
     def is_on(self) -> bool | None:
         """Return True above the horizon, False below."""
         return self.coordinator.data.get(KEY_ABOVE_HORIZON)

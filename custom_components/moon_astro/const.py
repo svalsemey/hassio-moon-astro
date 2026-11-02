@@ -4,8 +4,6 @@ This module centralizes stable keys used by the coordinator and entities.
 Keys must remain stable over time to avoid entity_id churn in Home Assistant.
 """
 
-from __future__ import annotations
-
 # Domain and basic config
 DOMAIN = "moon_astro"
 MANUFACTURER = "Moon Astro"

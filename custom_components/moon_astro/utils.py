@@ -5,8 +5,6 @@ directory, validated, loaded a single time per Home Assistant instance and then
 shared by every coordinator. Filesystem and Skyfield calls run in the executor.
 """
 
-from __future__ import annotations
-
 import asyncio
 from contextlib import suppress
 from datetime import tzinfo
