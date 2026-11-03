@@ -1,0 +1,2790 @@
+# serializer version: 1
+# name: test_sensors[sensor.moon_astro_azimuth-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_azimuth',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Azimuth',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Azimuth',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'azimuth',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_azimuth',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_azimuth-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Azimuth',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_azimuth',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '58.802',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_distance-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_distance',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Distance',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 0,
+      }),
+    }),
+    'original_device_class': <SensorDeviceClass.DISTANCE: 'distance'>,
+    'original_icon': None,
+    'original_name': 'Distance',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'distance',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_distance',
+    'unit_of_measurement': <UnitOfLength.KILOMETERS: 'km'>,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_distance-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'distance',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Distance',
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: <UnitOfLength.KILOMETERS: 'km'>,
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_distance',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '376356.771',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_next_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_next_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude at next full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude at next full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_next_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_next_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_next_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude at next full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_next_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '4.958007',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_next_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_next_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude at next new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude at next new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_next_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_next_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_next_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude at next new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_next_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '-4.929972',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_previous_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_previous_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude at previous full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude at previous full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_previous_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_previous_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_previous_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude at previous full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_previous_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '4.577525',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_previous_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_previous_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude at previous new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude at previous new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_previous_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_previous_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_at_previous_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude at previous new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_at_previous_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '-3.832401',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_geocentric-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_geocentric',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude (geocentric)',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude (geocentric)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_geocentric',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_geocentric',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_geocentric-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude (geocentric)',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_geocentric',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '0.209104',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_topocentric-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_topocentric',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic latitude (topocentric)',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic latitude (topocentric)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_latitude_topocentric',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_latitude_topocentric',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_latitude_topocentric-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic latitude (topocentric)',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_latitude_topocentric',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '-0.339687',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_next_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_next_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude at next full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude at next full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_next_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_next_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_next_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude at next full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_next_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '62.336162',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_next_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_next_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude at next new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude at next new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_next_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_next_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_next_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude at next new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_next_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '226.889798',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_previous_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_previous_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude at previous full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude at previous full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_previous_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_previous_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_previous_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude at previous full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_previous_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '32.761885',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_previous_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_previous_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude at previous new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude at previous new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_previous_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_previous_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_at_previous_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude at previous new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_at_previous_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '197.360673',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_geocentric-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_geocentric',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude (geocentric)',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude (geocentric)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_geocentric',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_geocentric',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_geocentric-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude (geocentric)',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_geocentric',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '144.56965',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_topocentric-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_topocentric',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Ecliptic longitude (topocentric)',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 3,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Ecliptic longitude (topocentric)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'ecliptic_longitude_topocentric',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_ecliptic_longitude_topocentric',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_ecliptic_longitude_topocentric-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Ecliptic longitude (topocentric)',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_ecliptic_longitude_topocentric',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '145.354072',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_elevation-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_elevation',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Elevation',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Elevation',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'elevation',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_elevation',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_elevation-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Elevation',
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_elevation',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '-8.878',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_illumination-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_illumination',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Illumination',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 1,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Illumination',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'illumination',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_illumination',
+    'unit_of_measurement': '%',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_illumination-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Illumination',
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '%',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_illumination',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '37.995',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_apogee-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_apogee',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next apogee',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next apogee',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_apogee',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_apogee',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_apogee-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next apogee',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_apogee',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-13T17:50:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_first_quarter-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_first_quarter',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next first quarter',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next first quarter',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_first_quarter',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_first_quarter',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_first_quarter-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next first quarter',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_first_quarter',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-17T11:48:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next full moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_full_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-24T14:54:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon_alternative_names-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_full_moon_alternative_names',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next full moon alternative names',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Next full moon alternative names',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_full_moon_alt_names',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_full_moon_alt_names',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon_alternative_names-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next full moon alternative names',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_full_moon_alternative_names',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'beaver_moon_alt_names',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon_name-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'wolf_moon',
+        'snow_moon',
+        'worm_moon',
+        'pink_moon',
+        'flower_moon',
+        'strawberry_moon',
+        'buck_moon',
+        'sturgeon_moon',
+        'harvest_moon',
+        'hunters_moon',
+        'beaver_moon',
+        'cold_moon',
+        'blue_moon',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_full_moon_name',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next full moon name',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Next full moon name',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_full_moon_name',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_full_moon_name',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_full_moon_name-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next full moon name',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'wolf_moon',
+        'snow_moon',
+        'worm_moon',
+        'pink_moon',
+        'flower_moon',
+        'strawberry_moon',
+        'buck_moon',
+        'sturgeon_moon',
+        'harvest_moon',
+        'hunters_moon',
+        'beaver_moon',
+        'cold_moon',
+        'blue_moon',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_full_moon_name',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'beaver_moon',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_last_quarter-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_last_quarter',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next last quarter',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next last quarter',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_last_quarter',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_last_quarter',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_last_quarter-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next last quarter',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_last_quarter',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-12-01T06:09:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next new moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_new_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-09T07:02:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_perigee-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_perigee',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next perigee',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next perigee',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_perigee',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_perigee',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_perigee-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next perigee',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_perigee',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-25T21:01:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_rise-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_rise',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next rise',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next rise',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_rise',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_rise',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_rise-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next rise',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_rise',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-02T23:51:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_set-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_next_set',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Next set',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Next set',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'next_set',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_next_set',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_next_set-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Next set',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_next_set',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-03T14:02:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_parallax-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_parallax',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Parallax',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Parallax',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'parallax',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_parallax',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_parallax-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Parallax',
+      <SensorEntityCapabilityAttribute.STATE_CLASS: 'state_class'>: <SensorStateClass.MEASUREMENT: 'measurement'>,
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_parallax',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '0.971',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_phase-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'new_moon',
+        'waxing_crescent',
+        'first_quarter',
+        'waxing_gibbous',
+        'full_moon',
+        'waning_gibbous',
+        'last_quarter',
+        'waning_crescent',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_phase',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Phase',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Phase',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'phase',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_phase',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_phase-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Phase',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'new_moon',
+        'waxing_crescent',
+        'first_quarter',
+        'waxing_gibbous',
+        'full_moon',
+        'waning_gibbous',
+        'last_quarter',
+        'waning_crescent',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_phase',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'waning_crescent',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_apogee-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_apogee',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous apogee',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous apogee',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_apogee',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_apogee',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_apogee-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous apogee',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_apogee',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-10-16T22:56:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_first_quarter-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_first_quarter',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous first quarter',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous first quarter',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_first_quarter',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_first_quarter',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_first_quarter-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous first quarter',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_first_quarter',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-10-18T16:13:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous full moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_full_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-10-26T04:12:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon_alternative_names-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_full_moon_alternative_names',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous full moon alternative names',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Previous full moon alternative names',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_full_moon_alt_names',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_full_moon_alt_names',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon_alternative_names-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous full moon alternative names',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_full_moon_alternative_names',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'hunters_moon_alt_names',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon_name-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'wolf_moon',
+        'snow_moon',
+        'worm_moon',
+        'pink_moon',
+        'flower_moon',
+        'strawberry_moon',
+        'buck_moon',
+        'sturgeon_moon',
+        'harvest_moon',
+        'hunters_moon',
+        'beaver_moon',
+        'cold_moon',
+        'blue_moon',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_full_moon_name',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous full moon name',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Previous full moon name',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_full_moon_name',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_full_moon_name',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_full_moon_name-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous full moon name',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'wolf_moon',
+        'snow_moon',
+        'worm_moon',
+        'pink_moon',
+        'flower_moon',
+        'strawberry_moon',
+        'buck_moon',
+        'sturgeon_moon',
+        'harvest_moon',
+        'hunters_moon',
+        'beaver_moon',
+        'cold_moon',
+        'blue_moon',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_full_moon_name',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'hunters_moon',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_last_quarter-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_last_quarter',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous last quarter',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous last quarter',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_last_quarter',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_last_quarter',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_last_quarter-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous last quarter',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_last_quarter',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-01T20:28:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous new moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_new_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-10-10T15:50:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_perigee-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_perigee',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous perigee',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous perigee',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_perigee',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_perigee',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_perigee-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous perigee',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_perigee',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-10-28T18:06:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_rise-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_rise',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous rise',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous rise',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_rise',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_rise',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_rise-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous rise',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_rise',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-01T22:30:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_set-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_previous_set',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Previous set',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.TIMESTAMP: 'timestamp'>,
+    'original_icon': None,
+    'original_name': 'Previous set',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'previous_set',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_previous_set',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_previous_set-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'timestamp',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Previous set',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_previous_set',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2026-11-02T13:43:00+00:00',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_next_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_next_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac degree at next full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Zodiac degree at next full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_degree_next_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_degree_next_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_next_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac degree at next full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_next_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2.3362',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_next_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_next_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac degree at next new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Zodiac degree at next new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_degree_next_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_degree_next_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_next_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac degree at next new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_next_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '16.8898',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_previous_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_previous_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac degree at previous full moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Zodiac degree at previous full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_degree_previous_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_degree_previous_full_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_previous_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac degree at previous full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_previous_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '2.7619',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_previous_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_previous_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac degree at previous new moon',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Zodiac degree at previous new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_degree_previous_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_degree_previous_new_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_at_previous_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac degree at previous new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_at_previous_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '17.3607',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_current-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_current',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac degree (current)',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Zodiac degree (current)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_degree_current_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_degree_current_moon',
+    'unit_of_measurement': '°',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_degree_current-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac degree (current)',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: '°',
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_degree_current',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '24.5696',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_next_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_next_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac sign at next full moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Zodiac sign at next full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_sign_next_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_sign_next_full_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_next_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac sign at next full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_next_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'gemini',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_next_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_next_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac sign at next new moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Zodiac sign at next new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_sign_next_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_sign_next_new_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_next_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac sign at next new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_next_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'scorpio',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_previous_full_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_previous_full_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac sign at previous full moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Zodiac sign at previous full moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_sign_previous_full_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_sign_previous_full_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_previous_full_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac sign at previous full moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_previous_full_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'taurus',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_previous_new_moon-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_previous_new_moon',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac sign at previous new moon',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Zodiac sign at previous new moon',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_sign_previous_new_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_sign_previous_new_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_at_previous_new_moon-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac sign at previous new moon',
+      'next_update': HAFakeDatetime(2026, 11, 2, 23, 53, tzinfo=datetime.timezone.utc),
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_at_previous_new_moon',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'libra',
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_current-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': None,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_current',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Zodiac sign (current)',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Zodiac sign (current)',
+    'platform': 'moon_astro',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'zodiac_sign_current_moon',
+    'unique_id': 'moon_astro_01JZ6V8T4S3AN2W8MBY5HK6X7Q_zodiac_sign_current_moon',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[sensor.moon_astro_zodiac_sign_current-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Moon Astro Zodiac sign (current)',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'capricorn',
+        'aquarius',
+        'pisces',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.moon_astro_zodiac_sign_current',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'leo',
+  })
+# ---

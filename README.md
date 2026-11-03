@@ -284,7 +284,61 @@ To collect debug logs:
 
 Issues and PRs are welcome!
 - Issues: https://github.com/svalsemey/hassio-moon-astro/issues/new/choose (see [Reporting an issue](#reporting-an-issue))
-- Pull requests: please lint and follow HA integration best practices.
+- Pull requests: please lint, follow HA integration best practices and keep the [tests](#tests) passing.
+
+## Tests
+
+The test suite runs on every push and pull request (workflow **Tests**) and requires a coverage of at least 95% of the integration code.
+
+### Running the tests
+
+From the repository root, with [uv](https://docs.astral.sh/uv/) and `jq`:
+
+```shell
+uv venv --python 3.14
+uv pip install --requirement requirements_test.txt $(jq -r '.requirements[]' custom_components/moon_astro/manifest.json)
+uv run --no-project pytest --cov
+```
+
+The test dependencies are listed in `requirements_test.txt`, the integration requirements are read from its manifest so that both always match.
+
+### Test ephemeris
+
+The tests never download anything. They use `tests/fixtures/de440_2026_2027.bsp`, a 280 KB excerpt of DE440 holding the very coefficients of the full kernel for 2026 and 2027, so that results are identical to those of the 115 MB file. It was produced from the full kernel with:
+
+```shell
+python -m jplephem excerpt 2026/1/1 2028/1/1 de440.bsp tests/fixtures/de440_2026_2027.bsp
+```
+
+The clock is frozen at 2026-11-02 22:52 UTC, so the tests keep passing after 2027.
+
+### Snapshots
+
+Entity states and the diagnostics are compared with [Syrupy](https://github.com/syrupy-project/syrupy) snapshots stored in `tests/snapshots`. After an intended change of the values or of the entity definitions, regenerate them and review the differences before committing:
+
+```shell
+uv run --no-project pytest --snapshot-update
+```
+
+### What is tested
+
+| File | Scope |
+| --- | --- |
+| `test_config_flow.py` | Setup from the Home Assistant location, download failure and recovery, invalid locations, single instance, reconfiguration, options and their limits |
+| `test_init.py` | Loading, unloading, setup retry when the ephemeris or a first computation fails, reload on options change, ephemeris deletion on removal |
+| `test_coordinator.py` | Recomputation after the next event, fallback refresh, no refresh after unloading, computation time statistics |
+| `test_sensor.py`, `test_binary_sensor.py` | Every entity and its state (snapshots), sensors disabled by default, unavailability while a computation fails |
+| `test_diagnostics.py` | Diagnostics content (snapshot), rounding of the location and of the topocentric angles |
+| `test_utils.py` | Ephemeris cache, download, damaged files, network errors, deletion, time zone resolution |
+| `test_astronomy.py` | Accuracy and edge cases of the computations (see below) |
+
+The astronomical computations are checked against independent references and against their definitions:
+
+- Phase instants agree within one minute with those published by the [US Naval Observatory](https://aa.usno.navy.mil/data/MoonPhases), over five lunations.
+- Moonrises and moonsets in Paris agree within three minutes with those of the USNO, which refer to the upper limb of the Moon rather than its center.
+- At six locations from the equator to both poles, the Moon center crosses the −34′ horizon within the published minute of every rise and set, and a previous and next instant is found for every kind of event.
+- The phase angle is within 0.005° of 0°, 90°, 180° or 270° at the published phase instants, and the apogees and perigees are the distance extremes over three days.
+- Blue moons, the time zone defining the month of a full moon, phase names near the principal phases, zodiac cusps and the rounding to the minute.
 
 ## License
 

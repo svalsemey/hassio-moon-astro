@@ -1,0 +1,37 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.14"
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
+            requirements_test.txt
+            custom_components/moon_astro/manifest.json
+
+      - name: Install the test and integration requirements
+        run: >
+          uv pip install --requirement requirements_test.txt
+          $(jq -r '.requirements[]' custom_components/moon_astro/manifest.json)
+
+      - name: Run the tests with coverage
+        run: pytest --cov --cov-report=term-missing
